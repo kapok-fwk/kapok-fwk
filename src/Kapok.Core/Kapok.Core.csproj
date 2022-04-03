@@ -1,0 +1,73 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<Nullable>enable</Nullable>
+
+	<PackageId>Kapok.Core</PackageId>
+	<Version>0.1.0</Version>
+	<Authors>Kapok Framework Community</Authors>
+	<RepositoryUrl>https://github.com/kapok-fwk/kapok-fwk</RepositoryUrl>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.12" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="NLog" Version="4.6.4" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\BusinessLayer\MessageSeverity.Designer.cs">
+      <DependentUpon>MessageSeverity.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="Resources\Data\DataDomainScope.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DataDomainScope.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\Data\DeferredDao.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DeferredDao.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\Entity\EntityExtension.Designer.cs">
+      <DependentUpon>EntityExtension.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="Resources\ExtendDotNetBase\StringExtension.Designer.cs">
+      <DependentUpon>StringExtension.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\BusinessLayer\MessageSeverity.resx">
+      <LastGenOutput>MessageSeverity.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Data\DataDomainScope.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>DataDomainScope.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Data\DeferredDao.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>DeferredDao.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Entity\EntityExtension.resx">
+      <LastGenOutput>EntityExtension.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\ExtendDotNetBase\StringExtension.resx">
+      <LastGenOutput>StringExtension.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>
