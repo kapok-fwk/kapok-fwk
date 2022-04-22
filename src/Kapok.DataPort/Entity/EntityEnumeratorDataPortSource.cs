@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace Kapok.DataPort.Entity;
 
-namespace Kapok.DataPort;
-
-public class DataPortEntityEnumeratorSource<TEntity> : EntityDataPortSource<TEntity>
+public class EntityEnumeratorDataPortSource<TEntity> : EntityDataPortSourceBase<TEntity>
     where TEntity : class
 {
     private IEnumerator<TEntity>? _enumerator;
 
-    public IEnumerable<TEntity>? SourceEnumerable { get; set; }
+    public virtual IEnumerable<TEntity>? SourceEnumerable { get; set; }
 
     protected override TEntity? OnRead()
     {

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections;
 
-namespace Kapok.DataPort;
+namespace Kapok.DataPort.Entity;
 
-public abstract class EntityDataPortSource<TEntity> : IDataPortTableSource
+public abstract class EntityDataPortSourceBase<TEntity> : IDataPortTableSource
     where TEntity : class
 {
     private List<DataPortColumn>? _schema;

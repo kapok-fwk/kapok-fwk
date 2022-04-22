@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 
-namespace Kapok.DataPort;
+namespace Kapok.DataPort.Entity;
 
 internal class EntityDataPortHelper
 {

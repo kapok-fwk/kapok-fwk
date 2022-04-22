@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Kapok.DataPort;
+﻿namespace Kapok.DataPort;
 
 /// <summary>
 /// A table-like data destination

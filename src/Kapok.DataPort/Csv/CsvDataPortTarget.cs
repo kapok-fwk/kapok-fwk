@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Globalization;
 
 namespace Kapok.DataPort.Csv;
 
@@ -13,7 +10,17 @@ public class CsvDataPortTarget : IDataPortTableTarget
 
     public virtual bool WriteWithHeader { get; set; }
 
+    /// <summary>
+    /// Defines the column separator.
+    /// </summary>
     private CsvHelper.LineSeparator _columnSeparator = CsvHelper.LineSeparator.Comma;
+
+    /// <summary>
+    /// By default <c>null</c> is parsed into an empty string.
+    ///
+    /// With this property you can define a custom value for <c>null</c> values.
+    /// </summary>
+    public string? NullValueString { get; set; }
 
     public virtual CsvHelper.LineSeparator ColumnSeparator
     {
@@ -59,7 +66,7 @@ public class CsvDataPortTarget : IDataPortTableTarget
     public virtual string WriteCell(DataPortColumn column, object? value)
     {
         if (value == null)
-            return string.Empty;
+            return NullValueString ?? string.Empty;
 
         // base converting on column type definition
 

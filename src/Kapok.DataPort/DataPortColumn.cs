@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Kapok.DataPort;
+﻿namespace Kapok.DataPort;
 
 /// <summary>
 /// Representing a column in a data port schema.

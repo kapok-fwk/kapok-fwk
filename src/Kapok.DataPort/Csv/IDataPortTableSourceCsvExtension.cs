@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Kapok.DataPort.Csv;
+﻿namespace Kapok.DataPort.Csv;
 
 // ReSharper disable once InconsistentNaming
 public static class IDataPortTableSourceCsvExtension

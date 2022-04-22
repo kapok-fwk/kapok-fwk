@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿namespace Kapok.DataPort.Entity;
 
-namespace Kapok.DataPort;
-
-public abstract class EntityDataPortTarget<TEntity> : IDataPortTableTarget
+public abstract class EntityDataPortTargetBase<TEntity> : IDataPortTableTarget
     where TEntity : class, new()
 {
     private List<DataPortColumn>? _schema;

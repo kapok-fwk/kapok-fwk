@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace Kapok.DataPort.Entity;
 
-namespace Kapok.DataPort;
-
-public class DataPortEntityCollectionTarget<TEntity> : EntityDataPortTarget<TEntity>
+public class EntityCollectionDataPortTarget<TEntity> : EntityDataPortTargetBase<TEntity>
     where TEntity : class, new()
 {
     public ICollection<TEntity>? TargetCollection { get; set; }

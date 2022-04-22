@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Collections;
 
 namespace Kapok.DataPort.Csv;
 
@@ -13,6 +9,13 @@ public class CsvDataPortSource : IDataPortTableSource
     public virtual bool HasHeader { get; set; }
 
     public virtual CsvHelper.LineSeparator ColumnSeparator { get; set; }
+
+    /// <summary>
+    /// Defines which string value shall be converted into <c>null</c> when reading.
+    ///
+    /// When this value is null, no transformation takes place. Empty cells will then be read as an empty string.
+    /// </summary>
+    public string? NullValueString { get; set; }
 
     public StreamReader? StreamReader { get; set; }
 
@@ -44,7 +47,8 @@ public class CsvDataPortSource : IDataPortTableSource
             schema.Add(new DataPortColumn
             {
                 Name = column,
-                Type = typeof(string)
+                Type = typeof(string),
+                Required = false
             });
         }
 
@@ -53,7 +57,7 @@ public class CsvDataPortSource : IDataPortTableSource
         return schema;
     }
 
-    public virtual object[]? ReadNextRow()
+    public virtual object?[]? ReadNextRow()
     {
         if (StreamReader == null)
             throw new NotSupportedException($"You need to set {nameof(StreamReader)} before you call {nameof(ReadNextRow)}");
@@ -63,7 +67,24 @@ public class CsvDataPortSource : IDataPortTableSource
         if (newLine == null)
             return null;
 
-        return CsvHelper.DictionaryOfLineSeparatorAndItsFunc[ColumnSeparator].Invoke(newLine).Cast<object>().ToArray();
+        string[] cellStringValues = CsvHelper.DictionaryOfLineSeparatorAndItsFunc[ColumnSeparator].Invoke(newLine);
+        object?[] cellObjectValues = new object?[cellStringValues.Length];
+
+        for (int i = 0; i < cellStringValues.Length; i++)
+        {
+            var cellString = cellStringValues[i];
+
+            if (NullValueString == null)
+            {
+                cellObjectValues[i] = cellString;
+            }
+            else
+            {
+                cellObjectValues[i] = cellString == NullValueString ? null : cellString;
+            }
+        }
+
+        return cellObjectValues;
     }
 
     public IEnumerator<object[]> GetEnumerator()
