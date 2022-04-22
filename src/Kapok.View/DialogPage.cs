@@ -5,7 +5,7 @@
 /// </summary>
 public abstract class DialogPage : Page, IDialogPage
 {
-    protected DialogPage(IViewDomain? viewDomain)
+    protected DialogPage(IViewDomain? viewDomain = null)
         : base(viewDomain)
     {
         DefaultAction = new UIAction("DialogDefaultAction", Action, CanAction);

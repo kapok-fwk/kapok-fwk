@@ -17,9 +17,14 @@ public abstract class Page : ValidatableBindableObjectBase, IPage
     private string? _title;
     private bool _canClose;
 
-    protected Page(IViewDomain? viewDomain)
+    protected Page(IViewDomain? viewDomain = null)
     {
+        if (viewDomain == null && View.ViewDomain.Default == null)
+            throw new NotSupportedException(
+                $"You have to first set Kapok.View.ViewDomain.Default before you can initiate a page without {nameof(viewDomain)} being provided");
+#pragma warning disable CS8601
         ViewDomain = viewDomain ?? View.ViewDomain.Default;
+#pragma warning restore CS8601
         Title = GetType().ToString();
         _canClose = true;
 

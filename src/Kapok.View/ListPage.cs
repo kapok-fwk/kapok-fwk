@@ -557,7 +557,7 @@ public abstract class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
         set => CurrentListView = (DataSetListView)value;
     }
 
-    IEnumerable<IDataSetListView> IListPage.ListViews => ListViews.Cast<IDataSetListView>();
+    IEnumerable<IDataSetListView> IListPage.ListViews => ListViews;
 
     #endregion
 }

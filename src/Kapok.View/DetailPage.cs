@@ -11,7 +11,7 @@ namespace Kapok.View;
 public abstract class DetailPage<TEntry> : DataPage<TEntry>, IDetailPage<TEntry>
     where TEntry : class, new()
 {
-    protected DetailPage(IDataSetView<TEntry> tableData, IViewDomain viewDomain, IDataDomainScope? dataDomainScope = null)
+    protected DetailPage(IDataSetView<TEntry> tableData, IViewDomain? viewDomain = null, IDataDomainScope? dataDomainScope = null)
         : base(tableData, viewDomain, dataDomainScope)
     {
         IsClosed = false;

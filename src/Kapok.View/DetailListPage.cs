@@ -11,7 +11,7 @@ public abstract class DetailListPage<TBaseEntry, TLinkedEntry> : LinkedDetailPag
     where TBaseEntry : class, new()
     where TLinkedEntry : class, new()
 {
-    protected DetailListPage(IDataSetView<TBaseEntry> sourceDataSet, IViewDomain viewDomain, IDataDomainScope? dataDomainScope = null)
+    protected DetailListPage(IDataSetView<TBaseEntry> sourceDataSet, IViewDomain? viewDomain = null, IDataDomainScope? dataDomainScope = null)
         : base(sourceDataSet, viewDomain, dataDomainScope)
     {
     }
@@ -24,7 +24,7 @@ public abstract class DetailListPage<TBaseEntry, TLinkedEntry> : LinkedDetailPag
     // ReSharper disable InconsistentNaming
     // ReSharper disable UnusedAutoPropertyAccessor.Global
     // ReSharper disable MemberCanBeProtected.Global
-    public IDataSetSelectionAction<TLinkedEntry> OpenCardPageAction { get; protected set; }
+    public IDataSetSelectionAction<TLinkedEntry>? OpenCardPageAction { get; protected set; }
     // ReSharper restore MemberCanBeProtected.Global
     // ReSharper restore UnusedAutoPropertyAccessor.Global
     // ReSharper restore InconsistentNaming

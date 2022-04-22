@@ -14,7 +14,7 @@ public abstract class LinkedDetailPage<TBaseEntry, TLinkedEntry> : DetailPage<TL
     // ReSharper disable once MemberCanBePrivate.Global
     public static string SourceDataSetName = "Source";
 
-    protected LinkedDetailPage(IDataSetView<TBaseEntry> sourceDataSet,  IViewDomain? viewDomain, IDataDomainScope? dataDomainScope = null)
+    protected LinkedDetailPage(IDataSetView<TBaseEntry> sourceDataSet,  IViewDomain? viewDomain = null, IDataDomainScope? dataDomainScope = null)
         : base(viewDomain, dataDomainScope)
     {
         SourceDataSet = sourceDataSet;

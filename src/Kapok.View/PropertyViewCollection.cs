@@ -15,7 +15,7 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>,
     private readonly IViewDomain _viewDomain;
     private readonly IEntityModel _entityModel;
     private readonly IDataDomain _dataDomain;
-    private readonly IDataSetView? _dataSet;
+    private readonly IDataSetView<TEntity>? _dataSet;
         
     private readonly ObservableCollection<PropertyView> _observableCollection;
 
@@ -23,7 +23,7 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>,
     private readonly Dictionary<string, IDataSetSelectionAction<TEntity>> _drillDown = new();
 
     public PropertyViewCollection(IViewDomain viewDomain, IDataDomain dataDomain,
-        IEntityModel entityModel, IDataSetView? baseDataSet = null)
+        IEntityModel entityModel, IDataSetView<TEntity>? baseDataSet = null)
     {
         _viewDomain = viewDomain ?? throw new ArgumentNullException(nameof(viewDomain));
         _dataDomain = dataDomain ?? throw new ArgumentNullException(nameof(dataDomain));

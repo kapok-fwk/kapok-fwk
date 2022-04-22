@@ -10,7 +10,7 @@ namespace Kapok.View;
 public abstract class CardPage<TEntry> : DataPage<TEntry>, ICardPage, ICardPage<TEntry>
     where TEntry : class, new()
 {
-    protected CardPage(IDataSetView<TEntry> tableData, IViewDomain viewDomain, IDataDomainScope? dataDomainScope = null)
+    protected CardPage(IDataSetView<TEntry> tableData, IViewDomain? viewDomain = null, IDataDomainScope? dataDomainScope = null)
         : base(tableData, viewDomain, dataDomainScope)
     {
         PropertyViewDefinitions = new PropertyViewCollection<TEntry>(ViewDomain, DataDomainScope.DataDomain, DataSet.GetDao().Model, DataSet);

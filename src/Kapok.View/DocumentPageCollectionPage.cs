@@ -14,7 +14,7 @@ public partial class DocumentPageCollectionPage : InteractivePage
     private readonly Dictionary<IPage, List<UIMenuItemTab>> _contextualMenuItems = new();
     private Dictionary<IPage, object> _documentPageSource = new();
 
-    protected DocumentPageCollectionPage(IViewDomain viewDomain) : base(viewDomain)
+    protected DocumentPageCollectionPage(IViewDomain? viewDomain = null) : base(viewDomain)
     {
         ViewDomain.RegisterPageContainer(this, DocumentPages);
         DocumentPages.CollectionChanged += Pages_CollectionChanged;

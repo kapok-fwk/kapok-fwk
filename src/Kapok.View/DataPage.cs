@@ -26,10 +26,15 @@ public abstract class DataPage<TEntry> : InteractivePage, IDataPage<TEntry>
 
     private readonly Dictionary<string, IDataSetView> _dataSets = new();
 
-    protected DataPage(IViewDomain? viewDomain, IDataDomainScope? dataDomainScope = null)
+    protected DataPage(IViewDomain? viewDomain = null, IDataDomainScope? dataDomainScope = null)
         : base(viewDomain)
     {
+        if (dataDomainScope == null && DataDomain.Default == null)
+            throw new NotSupportedException(
+                $"You have to first set Kapok.Core.DataDomain.Default before you can initiate a page without {nameof(dataDomainScope)} being provided");
+#pragma warning disable CS8602
         DataDomainScope = dataDomainScope ?? DataDomain.Default.CreateScope();
+#pragma warning restore CS8602
 
         // init actions
         RefreshAction = new UIAction("RefreshPage", RefreshActionCall) { Image = "symbol-refresh" };
@@ -39,7 +44,7 @@ public abstract class DataPage<TEntry> : InteractivePage, IDataPage<TEntry>
         ToggleEditModeAction = new UIToggleAction("ToggleEditMode", ToggleEditMode, CanToggleEditMode) { Image = "tool-pencil", ImageIsBig = false, IsVisible = false };
     }
 
-    protected DataPage(IDataSetView<TEntry> dataSet, IViewDomain viewDomain, IDataDomainScope? dataDomainScope = null)
+    protected DataPage(IDataSetView<TEntry> dataSet, IViewDomain? viewDomain = null, IDataDomainScope? dataDomainScope = null)
         : this(viewDomain, dataDomainScope)
     {
         _tableDataPassedOnConstruction = true;

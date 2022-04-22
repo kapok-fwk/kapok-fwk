@@ -17,11 +17,11 @@ public interface IViewDomain
     /// </summary>
     Action<int>? ShutdownApplication { get; }
 
-    Type GetEntityDefaultPageType(Type entityType);
+    Type? GetEntityDefaultPageType(Type entityType);
 
     Type GetPageControlType(Type pageType);
 
-    IPage ConstructPage(Type pageType, Dictionary<Type, object?> constructorParamValues);
+    IPage ConstructPage(Type pageType, Dictionary<Type, object?>? constructorParamValues);
     TPage ConstructPage<TPage>(IDataDomainScope? dataDomainScope = null)
         where TPage : IPage;
     IDataPage ConstructEntityDefaultPage(Type entityType, IDataDomainScope? dataDomainScope = null);
@@ -66,8 +66,8 @@ public interface IViewDomain
     /// <param name="enforceFirstEditableRow"></param>
     void StartEditingDefaultDataGridCurrentEntity(IDataPage page, bool enforceFirstEditableRow);
 
-    string OpenOpenFileDialog(string title, string fileMask, IPage? ownerPage = null);
-    string OpenSaveFileDialog(string title, string fileMask, IPage? ownerPage = null);
+    string? OpenOpenFileDialog(string title, string fileMask, IPage? ownerPage = null);
+    string? OpenSaveFileDialog(string title, string fileMask, IPage? ownerPage = null);
 
     /// <summary>
     /// Opens an dialog for an report for the given model and layout

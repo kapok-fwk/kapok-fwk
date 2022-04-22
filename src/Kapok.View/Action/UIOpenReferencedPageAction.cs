@@ -16,13 +16,13 @@ public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction
     private readonly IViewDomain? _viewDomain;
     private readonly IDataPage? _page;
     protected readonly Dictionary<Type, object>? PageConstructorParamValues;
-    private readonly IDataSetView? _baseDataSetView;
+    private readonly IDataSetView<TEntry>? _baseDataSetView;
     private readonly Action<IFilterSet, TEntry, IReadOnlyDictionary<string, object>>? _filter;
 
     private readonly string? _listViewName;
 
     public UIOpenReferencedPageAction(string name, IDataPage page,
-        IDataSetView? baseDataSetView = null,
+        IDataSetView<TEntry>? baseDataSetView = null,
         Action<IFilterSet, TEntry, IReadOnlyDictionary<string, object>>? filter = null,
         Func<TEntry, bool>? canExecute = null, string? listViewName = null)
         : base(name, DummyExecute, canExecute)
@@ -39,7 +39,7 @@ public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction
     }
 
     public UIOpenReferencedPageAction(string name, Type pageType, IViewDomain viewDomain,
-        IDataSetView? baseDataSetView = null,
+        IDataSetView<TEntry>? baseDataSetView = null,
         Action<IFilterSet, TEntry, IReadOnlyDictionary<string, object>>? filter = null,
         Func<TEntry, bool>? canExecute = null, string? listViewName = null)
         : base(name, DummyExecute, canExecute)

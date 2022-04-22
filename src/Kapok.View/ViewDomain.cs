@@ -76,12 +76,12 @@ public abstract class ViewDomain : IViewDomain
 
     public abstract Type GetPageControlType(Type pageType);
 
-    public IPage ConstructPage(Type pageType, Dictionary<Type, object?> constructorParamValues)
+    public IPage ConstructPage(Type pageType, Dictionary<Type, object?>? constructorParamValues)
     {
         var constructors = pageType.GetConstructors(BindingFlags.Public | BindingFlags.Static |
                                                     BindingFlags.Instance);
         ConstructorInfo? foundConstructorInfo = null;
-        var constructorParameterValues = new List<object>();
+        var constructorParameterValues = new List<object?>();
 
         foreach (var constructorInfo in constructors)
         {
@@ -89,7 +89,7 @@ public abstract class ViewDomain : IViewDomain
             constructorParameterValues.Clear();
             foreach (var parameterInfo in constructorInfo.GetParameters())
             {
-                if (constructorParamValues.ContainsKey(parameterInfo.ParameterType))
+                if (constructorParamValues != null && constructorParamValues.ContainsKey(parameterInfo.ParameterType))
                 {
                     constructorParameterValues.Add(constructorParamValues[parameterInfo.ParameterType]);
                 }
@@ -161,7 +161,7 @@ public abstract class ViewDomain : IViewDomain
         var constructors = typeof(TPage).GetConstructors(BindingFlags.Public | BindingFlags.Static |
                                                          BindingFlags.Instance);
         ConstructorInfo? foundConstructorInfo = null;
-        var constructorParameterValues = new List<object>();
+        var constructorParameterValues = new List<object?>();
 
         foreach (var constructorInfo in constructors)
         {
@@ -206,7 +206,7 @@ public abstract class ViewDomain : IViewDomain
     public abstract IQueryableView<TEntity> CreateQueryableView<TEntity>(IQueryable<TEntity> queryable)
         where TEntity : class;
 
-    public abstract IPropertyLookupView CreatePropertyLookupView(ILookupDefinition lookupDefinition, IDataDomain dataDomain, IDataSetView dataSet);
+    public abstract IPropertyLookupView CreatePropertyLookupView(ILookupDefinition lookupDefinition, IDataDomain dataDomain, IDataSetView? dataSet);
 
     public IDataPage ConstructEntityDefaultPage(Type entityType, IDataDomainScope? dataDomainScope = null)
     {
@@ -238,8 +238,8 @@ public abstract class ViewDomain : IViewDomain
 
     public abstract void StartEditingDefaultDataGridCurrentEntity(IDataPage page, bool enforceFirstEditableRow);
 
-    public abstract string OpenOpenFileDialog(string title, string fileMask, IPage? ownerPage = null);
-    public abstract string OpenSaveFileDialog(string title, string fileMask, IPage? ownerPage = null);
+    public abstract string? OpenOpenFileDialog(string title, string fileMask, IPage? ownerPage = null);
+    public abstract string? OpenSaveFileDialog(string title, string fileMask, IPage? ownerPage = null);
 
     public abstract bool OpenReportDialog(object model, IDataDomain dataDomain, object? reportLayout = null, IPage? ownerPage = null);
 

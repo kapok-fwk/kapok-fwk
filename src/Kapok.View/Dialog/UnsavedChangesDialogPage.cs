@@ -4,7 +4,7 @@ namespace Kapok.View;
 
 public class UnsavedChangesDialogPage : QuestionDialogPage
 {
-    public static UnsavedChangesDialogResult ShowDialog(IViewDomain? viewDomain, bool allowCancel = true)
+    public static UnsavedChangesDialogResult ShowDialog(IViewDomain? viewDomain = null, bool allowCancel = true)
     {
         var questionWindow = new UnsavedChangesDialogPage(viewDomain, allowCancel);
         ((QuestionDialogPage)questionWindow).ShowDialog();
