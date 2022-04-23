@@ -1,10 +1,14 @@
 # Changelog
 
-## 0.1.1 (2022-04-23)
+## 0.1.1-0.1.2 (2022-04-23)
 
 ### General
 
 - add strong name to libraries
+
+### Kapok.Core
+
+- :tada: *feat* added a in-memory data domain for e.g. unit testing (see namespace Kapok.Data.InMemory)
 
 ### Kapok.DataPort
 
@@ -19,6 +23,7 @@
 ### Kapok.View
 - :rocket: *change* the `IViewDomain viewDomain` parameter is not anymore required in pages
 - :bug: *fix* several members had a wrong nullable assigment
+- :bug: *fix* bug with `ListPage<>.OpenCardPageAction` when using `UIOpenReferencedCardPageAction` and parameter `IDataSetView<T>` is used in the constructor of the new page
 
 ## 0.1.0 (2022-04-03)
 
