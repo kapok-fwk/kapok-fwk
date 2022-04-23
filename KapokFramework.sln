@@ -29,6 +29,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kapok.Report.SqlServer", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kapok.View", "src\Kapok.View\Kapok.View.csproj", "{9FB0DE42-672A-4D92-B5BA-023A0A4BE1DC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kapok.View.UnitTest", "src\Kapok.View.UnitTest\Kapok.View.UnitTest.csproj", "{8D48D6BD-FDAB-4FA5-AFEF-1C96236D3C56}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{9FB0DE42-672A-4D92-B5BA-023A0A4BE1DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FB0DE42-672A-4D92-B5BA-023A0A4BE1DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9FB0DE42-672A-4D92-B5BA-023A0A4BE1DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D48D6BD-FDAB-4FA5-AFEF-1C96236D3C56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D48D6BD-FDAB-4FA5-AFEF-1C96236D3C56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D48D6BD-FDAB-4FA5-AFEF-1C96236D3C56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D48D6BD-FDAB-4FA5-AFEF-1C96236D3C56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
