@@ -1,6 +1,14 @@
-﻿namespace Kapok.Core.Data;
+﻿using Kapok.Core;
 
-// TODO: this class doesn't have functions implemented to avoid duplicated keys (e.g. when in the model the EntityBase.SetPrimaryKey() method was used
+namespace Kapok.Data.InMemory;
+
+/// <summary>
+/// A in-memory repository holding the entities in memory until
+/// the repository is disposed.
+///
+/// Note: The in-memory repository does not have any primary key or unique key check.
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public class InMemoryRepository<T> : IRepository<T>
     where T : class
 {
