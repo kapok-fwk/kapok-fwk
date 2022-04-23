@@ -13,14 +13,14 @@ public class UIOpenReferencedCardPageAction<TEntry> : UIOpenReferencedPageAction
     }
 
     public UIOpenReferencedCardPageAction(string name, Type pageType, IViewDomain viewDomain,
-        IDataSetView? baseDataSetView = null,
+        IDataSetView<TEntry>? baseDataSetView = null,
         Func<TEntry, bool>? canExecute = null,
         IDataDomainScope? dataDomainScope = null)
-        : base(name, pageType, viewDomain, canExecute: canExecute)
+        : base(name, pageType, viewDomain, baseDataSetView, canExecute: canExecute)
     {
         // main constructor code
         if (!typeof(ICardPage).IsAssignableFrom(pageType))
-            throw new ArgumentException($"The pageType parameter must have a type which implements the interface {typeof(ICardPage<>).FullName}", nameof(pageType));
+            throw new ArgumentException($"The {nameof(pageType)} parameter must have a type which implements the interface {typeof(ICardPage<>).FullName}", nameof(pageType));
 
         if (dataDomainScope != null)
 #pragma warning disable CS8602
