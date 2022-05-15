@@ -5,7 +5,7 @@
 
     <IsPackable>false</IsPackable>
 	<SignAssembly>True</SignAssembly>
-	<AssemblyOriginatorKeyFile>..\..\..\kapok-fwk.snk</AssemblyOriginatorKeyFile>
+	<AssemblyOriginatorKeyFile>..\kapok-fwk.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
