@@ -223,6 +223,13 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
         private set => SetProperty(ref _isLoaded, value);
     }
 
+    /// <summary>
+    /// Gets or sets the current sorting for the DataSetView.
+    ///
+    /// <b>Note:</b> This property will be overriden when a ListView is changed.
+    /// To define a default sorting for a page you should by default prefer the <c>SortBy</c> property
+    /// behind the <c>ListView</c> property.
+    /// </summary>
     public PropertyInfo[]? SortBy
     {
         get => _sortBy;
@@ -236,6 +243,11 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
         }
     }
 
+    /// <summary>
+    /// Gets or sets the current sorting of the DataListView.
+    ///
+    /// This property is only used when <c>SortBy</c> is sed.
+    /// </summary>
     public SortDirection SortDirection
     {
         get => _sortDirection;

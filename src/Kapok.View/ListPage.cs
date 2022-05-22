@@ -137,10 +137,19 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
         RequestSaveData(false);
 
         ((ICollection<PropertyView>)DataSet.Columns).Clear();
-        DataSet.Columns.AddRange(CurrentListView.Columns);
 
-        DataSet.SortBy = CurrentListView.SortBy
-                         ?? DataSet.GetDao().Model.PrimaryKeyProperties;
+        // Note: In case the 'CurrentListView' is set to null we skip here the adding of columns and other changes..
+        if (CurrentListView != null)
+        {
+            if (CurrentListView.Columns != null)
+            {
+                DataSet.Columns.AddRange(CurrentListView.Columns);
+            }
+
+            DataSet.SortBy = CurrentListView.SortBy
+                             ?? DataSet.GetDao().Model.PrimaryKeyProperties;
+            DataSet.SortDirection = CurrentListView.SortDirection ?? SortDirection.Ascending;
+        }
 
         // NOTE: We do not check here if the list uses calculated fields (which must be recalculated e.g. via 'Refresh()' to make sure that the numbers are correct.
         //       Since we don't check this here - as a workaround - we enforce always an refresh when the list view changes.
