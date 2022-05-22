@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.3 (2022-05-22)
+
+### Kapok.Report
+
+- :bug: *fix* `DataTableReportFormatter.Default` was null without a default value
+
+### Kapok.View
+
+- :tada: *feat* `DataSetListView` supports now to set the sort direction of a data set with property `SortDirection`
+- :rocket: *change* `ListPage` is not anymore abstract
+
 ## 0.1.1-0.1.2 (2022-04-23)
 
 ### General
