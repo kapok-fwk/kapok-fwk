@@ -11,8 +11,10 @@ namespace Kapok.Report;
 [Obsolete]
 public class DataTableReportFormatter : IDataTableReportFormatter
 {
-    private static DataTableReportFormatter _defaultFormatter;
-    public static DataTableReportFormatter Default => _defaultFormatter;
+    private static DataTableReportFormatter? _defaultFormatter;
+
+    // ReSharper disable once ConstantNullCoalescingCondition
+    public static DataTableReportFormatter Default => _defaultFormatter ??= new DataTableReportFormatter();
 
     public virtual void FormatDataTable(DataTable dataTable, DataTableReport reportModel, CultureInfo cultureInfo)
     {
