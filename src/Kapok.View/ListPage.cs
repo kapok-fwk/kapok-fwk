@@ -20,14 +20,14 @@ namespace Kapok.View;
 /// A base class for a list page.
 /// </summary>
 /// <typeparam name="TEntry"></typeparam>
-public abstract class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
+public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
     where TEntry : class, new()
 {
     private ObservableCollection<DataSetListView> _listViews = new();
     private DataSetListView? _currentListView;
     private IDataSetSelectionAction<TEntry>? _openCardPageAction;
 
-    protected ListPage(IViewDomain? viewDomain, IDataDomainScope? dataDomainScope = null)
+    public ListPage(IViewDomain? viewDomain = null, IDataDomainScope? dataDomainScope = null)
         : base(viewDomain, dataDomainScope)
     {
         EditEntryAction = new UIDataSetSelectionAction<TEntry>("EditEntry", EditEntry, CanEditEntry) {Image = "tool-pencil", ImageIsBig = false };
@@ -169,10 +169,10 @@ public abstract class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
     public IDataSetSelectionAction<TEntry> EditEntryAction { get; }
 
     [MenuItem, Display(Name = "SortUpEntryCommand_Name", Description = "SortUpEntryCommand_Description", GroupName = "General", ResourceType = typeof(Res))]
-    public IAction SortUpEntryAction { get; }
+    public IAction? SortUpEntryAction { get; }
 
     [MenuItem, Display(Name = "SortDownEntryCommand_Name", Description = "SortDownEntryCommand_Description", GroupName = "General", ResourceType = typeof(Res))]
-    public IAction SortDownEntryAction { get; }
+    public IAction? SortDownEntryAction { get; }
 
     [MenuItem, Display(Name = "ExportAsExcelSheetCommand_Name", Description = "ExportAsExcelSheetCommand_Description", GroupName = "SendTo", Order = 1, ResourceType = typeof(Res))]
     public IAction ExportAsExcelSheetAction { get; }
