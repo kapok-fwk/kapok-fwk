@@ -51,7 +51,7 @@ namespace Kapok.Core.UnitTest
         [Fact]
         public void GetPropertyStringTest()
         {
-            Expression<Func<Entity, bool>> whereExpression = entity => Equals(entity.DataArea, "A");
+            Expression<Func<Entity, bool>> whereExpression = entity => entity.DataArea == "A";
 
             var modifier =
                 new FilterExpressionModifier(FilterExpressionModifierAction.GetFilterValue, typeof(Entity),DataAreaPropertyInfo);
@@ -134,7 +134,7 @@ namespace Kapok.Core.UnitTest
         {
             var list = BuildList();
 
-            Expression<Func<Entity, bool>> whereExpression = entity => Equals(entity.DataArea, "A");
+            Expression<Func<Entity, bool>> whereExpression = entity => entity.DataArea == "A";
 
             Assert.Single(list.Where(whereExpression.Compile()));
 
@@ -177,7 +177,7 @@ namespace Kapok.Core.UnitTest
         {
             var list = BuildList();
 
-            Expression<Func<Entity, bool>> whereExpression = entity => Equals(entity.DataArea, "A");
+            Expression<Func<Entity, bool>> whereExpression = entity => entity.DataArea == "A";
 
             Assert.Single(list.Where(whereExpression.Compile()));
 
