@@ -43,8 +43,8 @@ public class ModuleMigrationsHistoryDao : Dao<ModuleMigrationsHistory>, IModuleM
 
         return (
             from e in AsQueryable()
-            where e.ModuleName == moduleName &&
-                  e.MigrationId == migrationId
+            where Equals(e.ModuleName, moduleName) &&
+                  Equals(e.MigrationId, migrationId)
             select e
         ).FirstOrDefault();
     }

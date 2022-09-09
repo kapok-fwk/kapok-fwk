@@ -102,7 +102,7 @@ public class DeferredDaoSampleModelTests : IDisposable
         newEnrollment.CourseId = scope.GetDao<Course>().AsQueryable()
             .First(c => c.Title.StartsWith("Math course")).CourseId;
         newEnrollment.StudentId = scope.GetDao<Student>().AsQueryable()
-            .First(s => s.FirstMidName == "John" && s.LastName == "Adams").Id;
+            .First(s => Equals(s.FirstMidName, "John") && Equals(s.LastName, "Adams")).Id;
         newEnrollment.Grade = Grade.F;
         await enrollmentDao.CreateAsync(newEnrollment);
 

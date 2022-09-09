@@ -24,7 +24,7 @@ public class DataTableReportFormatter : IDataTableReportFormatter
 
     protected static char GetCsvSeparator(CultureInfo cultureInfo)
     {
-        if (cultureInfo.TwoLetterISOLanguageName.ToLower() == "de")
+        if (Equals(cultureInfo.TwoLetterISOLanguageName.ToLower(), "de"))
         {
             return ';';
         }
@@ -77,7 +77,7 @@ public class DataTableReportFormatter : IDataTableReportFormatter
             if (dataTable.Columns.Count > 0)
             {
                 var columnNames = from dataColumn in dataTable.Columns.Cast<DataColumn>()
-                    select report.Fields?.SingleOrDefault(c => c.Name == dataColumn.ColumnName)
+                    select report.Fields?.SingleOrDefault(c => Equals(c.Name, dataColumn.ColumnName))
                                ?.Caption.LanguageOrDefault(CultureInfo.CurrentCulture)
                            ?? dataColumn.ColumnName;
 
@@ -182,7 +182,7 @@ public class DataTableReportFormatter : IDataTableReportFormatter
 
                 var cell = excelWorksheet.Cells[rowStart, colStart + n++];
 
-                var captionClass = report.Fields?.SingleOrDefault(c => c.Name == col.ColumnName);
+                var captionClass = report.Fields?.SingleOrDefault(c => Equals(c.Name, col.ColumnName));
                 cell.Value = captionClass?.Caption.LanguageOrDefault(CultureInfo.CurrentCulture) ?? col.ColumnName;
 
                 cell.Style.Fill.PatternType = ExcelFillStyle.Solid;

@@ -40,7 +40,7 @@ public class CsvDataPortTest
                     Type = typeof(string),
                     Required = false
                 },
-                TargetColumn = tableDataPort.Target.Schema.First(c => c.Name == nameof(SimpleLedgerAccountEntity.LedgerAccountNum))
+                TargetColumn = tableDataPort.Target.Schema.First(c => Equals(c.Name, nameof(SimpleLedgerAccountEntity.LedgerAccountNum)))
             },
             new()
             {
@@ -50,7 +50,7 @@ public class CsvDataPortTest
                     Type = typeof(string),
                     Required = false
                 },
-                TargetColumn = tableDataPort.Target.Schema.First(c => c.Name == nameof(SimpleLedgerAccountEntity.Description))
+                TargetColumn = tableDataPort.Target.Schema.First(c => Equals(c.Name, nameof(SimpleLedgerAccountEntity.Description)))
             },
             new()
             {
@@ -60,7 +60,7 @@ public class CsvDataPortTest
                     Type = typeof(string),
                     Required = false
                 },
-                TargetColumn = tableDataPort.Target.Schema.First(c => c.Name == nameof(SimpleLedgerAccountEntity.CurrencyCode))
+                TargetColumn = tableDataPort.Target.Schema.First(c => Equals(c.Name, nameof(SimpleLedgerAccountEntity.CurrencyCode)))
             }
         };
 
@@ -164,19 +164,19 @@ public class CsvDataPortTest
                 new()
                 {
                     SourceColumn =
-                        sourceSchema.First(c => c.Name == nameof(SimpleLedgerAccountEntity.LedgerAccountNum)),
-                    TargetColumn = tableDataPort.Target.Schema.First(c => c.Name == "Account No.")
+                        sourceSchema.First(c => Equals(c.Name, nameof(SimpleLedgerAccountEntity.LedgerAccountNum))),
+                    TargetColumn = tableDataPort.Target.Schema.First(c => Equals(c.Name, "Account No."))
 
                 },
                 new()
                 {
-                    SourceColumn = sourceSchema.First(c => c.Name == nameof(SimpleLedgerAccountEntity.Description)),
-                    TargetColumn = tableDataPort.Target.Schema.First(c => c.Name == "Description")
+                    SourceColumn = sourceSchema.First(c => Equals(c.Name, nameof(SimpleLedgerAccountEntity.Description))),
+                    TargetColumn = tableDataPort.Target.Schema.First(c => Equals(c.Name, "Description"))
                 },
                 new()
                 {
-                    SourceColumn = sourceSchema.First(c => c.Name == nameof(SimpleLedgerAccountEntity.CurrencyCode)),
-                    TargetColumn = tableDataPort.Target.Schema.First(c => c.Name == "Currency")
+                    SourceColumn = sourceSchema.First(c => Equals(c.Name, nameof(SimpleLedgerAccountEntity.CurrencyCode))),
+                    TargetColumn = tableDataPort.Target.Schema.First(c => Equals(c.Name,"Currency"))
                 }
             };
 

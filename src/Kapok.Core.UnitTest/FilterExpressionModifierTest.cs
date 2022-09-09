@@ -178,7 +178,7 @@ namespace Kapok.Core.UnitTest
             var list = BuildList();
 
             Expression<Func<Entity, bool>> whereExpression = entity => entity.DataArea == "A";
-            
+
             Assert.Single(list.Where(whereExpression.Compile()));
 
             var modifier = new FilterExpressionModifier(

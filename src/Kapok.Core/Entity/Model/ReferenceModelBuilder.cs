@@ -97,7 +97,7 @@ public class ReferenceModelBuilder<T, TDestinationType>
             if (dataPartition.InterfaceType.IsAssignableFrom(typeof(T)) &&
                 // We only do the data partition skipping when the primary key column has the same name as the column defined in the interface
                 // and when they appear in the same order as they are registered to the DataDomain
-                _entityReference.ForeignKeyProperties[primaryKeyPropertyId].Name == dataPartition.PartitionProperty.Name)
+                Equals(_entityReference.ForeignKeyProperties[primaryKeyPropertyId].Name, dataPartition.PartitionProperty.Name))
             {
                 primaryKeyPropertyId++;
 
@@ -151,7 +151,7 @@ public class ReferenceModelBuilder<T, TDestinationType>
             Debug.Assert(asQueryableMethod != null);
             var whereLinqMethodInfo = (
                     from m in typeof(Queryable).GetMethods(BindingFlags.Public | BindingFlags.Static)
-                    where m.Name == nameof(Queryable.Where) &&
+                    where Equals(m.Name, nameof(Queryable.Where)) &&
                           m.IsGenericMethodDefinition &&
                           m.GetGenericArguments().Length == 1 &&
                           m.GetParameters().Length == 2 &&

@@ -37,7 +37,7 @@ public abstract class LinkedDetailPage<TBaseEntry, TLinkedEntry> : DetailPage<TL
     {
         // NOTE: we currently support with this class only single selections as link, not multi selections
 
-        if (e.PropertyName == nameof(IDataSetView.Current))
+        if (Equals(e.PropertyName, nameof(IDataSetView.Current)))
             LinkChanged(SourceDataSet.Current);
     }
 

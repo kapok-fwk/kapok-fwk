@@ -63,7 +63,7 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>,
     {
         // NOTE: move this maybe into the PropertyView constructor?
         item.LookupDefinition ??= _entityModel?.Properties
-            .FirstOrDefault(p => p.PropertyName == item.PropertyInfo.Name)?.LookupDefinition;
+            .FirstOrDefault(p => Equals(p.PropertyName, item.PropertyInfo.Name))?.LookupDefinition;
 
         if (item.LookupDefinition != null)
         {
@@ -78,7 +78,7 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>,
 
         // NOTE: move this maybe into the PropertyView constructor?
         item.DrillDownDefinition ??= _entityModel?.Properties
-            .FirstOrDefault(p => p.PropertyName == item.PropertyInfo.Name)?.DrillDownDefinition;
+            .FirstOrDefault(p => Equals(p.PropertyName, item.PropertyInfo.Name))?.DrillDownDefinition;
 
         if (item.DrillDownDefinition != null &&
                     

@@ -137,7 +137,7 @@ public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction
             }
             else
             {
-                var listView = listPage.ListViews.FirstOrDefault(lv => lv.Name == _listViewName);
+                var listView = listPage.ListViews.FirstOrDefault(lv => Equals(lv.Name, _listViewName));
                 listPage.CurrentListView = listView;
             }
         }

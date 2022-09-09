@@ -80,7 +80,7 @@ public class UIMenu
         UIMenuItem vmTab;
         if (string.IsNullOrEmpty(tabName))
         {
-            var defaultMenuItem = MenuItems.FirstOrDefault(l => l.Label.LanguageOrDefault(viewDomain.Culture) == Res.DefaultMenuTab_Label);
+            var defaultMenuItem = MenuItems.FirstOrDefault(l => Equals(l.Label.LanguageOrDefault(viewDomain.Culture), Res.DefaultMenuTab_Label));
             if (defaultMenuItem == null)
             {
                 defaultMenuItem = CreateDefaultTabMenuItem();
@@ -91,7 +91,7 @@ public class UIMenu
         }
         else
         {
-            vmTab = MenuItems.FirstOrDefault(i => i.Label.LanguageOrDefault(viewDomain.Culture) == tabName);
+            vmTab = MenuItems.FirstOrDefault(i => Equals(i.Label.LanguageOrDefault(viewDomain.Culture), tabName));
             if (vmTab == null)
             {
                 vmTab = new UIMenuItemTab(tabName);
@@ -102,15 +102,15 @@ public class UIMenu
         }
 
         string finalGroupName = groupName ?? Res.DefaultMenuGroup_Label;
-        UIMenuItem vmGroup = vmTab.SubMenuItems.FirstOrDefault(i => i.Label.LanguageOrDefault(viewDomain.Culture) == finalGroupName);
+        UIMenuItem vmGroup = vmTab.SubMenuItems.FirstOrDefault(i => Equals(i.Label.LanguageOrDefault(viewDomain.Culture), finalGroupName));
         if (vmGroup == null)
         {
             vmGroup = new UIMenuItem(finalGroupName);
             if (groupName == null)
             {
                 vmGroup.Label[viewDomain.Culture] = finalGroupName;
-                if (Array.FindIndex(GroupSortOrder, i => i == groupName) != -1)
-                    vmGroup.Order = Array.FindIndex(GroupSortOrder, i => i == groupName);
+                if (Array.FindIndex(GroupSortOrder, i => Equals(i, groupName)) != -1)
+                    vmGroup.Order = Array.FindIndex(GroupSortOrder, i => Equals(i, groupName));
                 else
                     vmGroup.Order = 2;
             }
@@ -151,8 +151,8 @@ public class UIMenu
         foreach (var prop in props)
         {
             var menuItemAttribute = prop.GetCustomAttribute<MenuItemAttribute>();
-            if (!(string.IsNullOrEmpty(menuItemAttribute.MenuName) && menuName == BaseMenuName ||
-                  menuItemAttribute.MenuName == menuName))
+            if (!(string.IsNullOrEmpty(menuItemAttribute.MenuName) && Equals(menuName, BaseMenuName) ||
+                  Equals(menuItemAttribute.MenuName, menuName)))
             {
                 continue;
             }
@@ -238,8 +238,8 @@ public class UIMenu
                 if (!string.IsNullOrEmpty(displayAttribute.GroupName))
                 {
                     groupName = resourceManager?.GetString(displayAttribute.GroupName) ?? displayAttribute.GroupName;
-                    if (Array.FindIndex(GroupSortOrder, i => i == groupName) != -1)
-                        groupSortOrder = Array.FindIndex(GroupSortOrder, i => i == groupName);
+                    if (Array.FindIndex(GroupSortOrder, i => Equals(i, groupName)) != -1)
+                        groupSortOrder = Array.FindIndex(GroupSortOrder, i => Equals(i, groupName));
                 }
 
                 if (displayAttribute.GetOrder() != null)

@@ -33,8 +33,8 @@ public class DbUserIdentity : UserIdentity
             Debug.Assert(userRoles.Role.RoleClaims != null);
 
             if (userRoles.Role.RoleClaims
-                .Where(c => c.ClaimType == ClaimType.Function.ToString())
-                .Any(claim => claim.ClaimValue == role))
+                .Where(c => Equals(c.ClaimType, ClaimType.Function.ToString()))
+                .Any(claim => Equals(claim.ClaimValue, role)))
             {
                 return true;
             }

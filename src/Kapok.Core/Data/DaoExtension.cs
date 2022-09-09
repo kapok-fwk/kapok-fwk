@@ -78,7 +78,7 @@ public static class DaoExtension
             if (dataPartition.InterfaceType.IsAssignableFrom(typeof(T)) &&
                 // We only do the data scope assignment when the primary key column has the same name as the column defined in the interface
                 // and when they appear in the same order as they are registered to the DataDomain
-                @this.Model.PrimaryKeyProperties[primaryKeyPropertyId].Name == dataPartition.PartitionProperty.Name)
+                Equals(@this.Model.PrimaryKeyProperties[primaryKeyPropertyId].Name, dataPartition.PartitionProperty.Name))
             {
                 var modifier = new FilterExpressionModifier(FilterExpressionModifierAction.SetFilterValue,
                     typeof(T), dataPartition.PartitionProperty);
@@ -163,7 +163,7 @@ public static class DaoExtension
             if (dataPartition.InterfaceType.IsAssignableFrom(typeof(T)) &&
                 // We only do the data scope assignment when the primary key column has the same name as the column defined in the interface
                 // and when they appear in the same order as they are registered to the DataDomain
-                @this.Model.PrimaryKeyProperties[primaryKeyPropertyId].Name == dataPartition.PartitionProperty.Name)
+                Equals(@this.Model.PrimaryKeyProperties[primaryKeyPropertyId].Name, dataPartition.PartitionProperty.Name))
             {
                 var modifier = new FilterExpressionModifier(FilterExpressionModifierAction.SetFilterValue,
                     typeof(T), dataPartition.PartitionProperty);

@@ -808,7 +808,7 @@ public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
 
         if (_primaryKeyProperties != null)
         {
-            var primaryKeyField = _primaryKeyProperties.FirstOrDefault(pkf => pkf.Name == eventArgs.PropertyName);
+            var primaryKeyField = _primaryKeyProperties.FirstOrDefault(pkf => Equals(pkf.Name, eventArgs.PropertyName));
             if (primaryKeyField != null)
             {
                 var pair = _primaryKeyIndex.FirstOrDefault(pair => pair.Value == sender);
