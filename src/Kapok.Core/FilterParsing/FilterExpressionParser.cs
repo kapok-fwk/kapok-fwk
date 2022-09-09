@@ -86,7 +86,6 @@ public class FilterExpressionParser
         Type resultType = typeof(bool);
 
         // we first try to parse the complete text as static filter
-
         Expression? expr = null;
         try
         {
@@ -99,6 +98,27 @@ public class FilterExpressionParser
         catch (Exception)
         {
             // ignored
+        }
+
+        // then we use a like operation when the destination type is string and it contains */? chars
+        if (_propertyInfo.PropertyType == typeof(string) && _textParser._text.Any(c => c == '*' || c == '?'))
+        {
+            var filterString = _textParser._text;
+
+            bool invert = false;
+
+            if (filterString.TrimStart().StartsWith("!"))
+            {
+                invert = true;
+                filterString = filterString.Substring(filterString.IndexOf('!') + 1);
+            }
+
+            expr = _expressionHelper.GenerateLike(
+                _propertyMemberExpression,
+                Expression.Constant(filterString, typeof(string)));
+
+            if (invert)
+                expr = Expression.Not(expr);
         }
 
         // if that did not work, we go forward with the filter string parsing

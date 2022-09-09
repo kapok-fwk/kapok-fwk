@@ -1,8 +1,8 @@
 ﻿using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
 using Microsoft.EntityFrameworkCore;
-
 namespace Kapok.Core.FilterParsing;
 
 internal class ExpressionHelper : IExpressionHelper
@@ -22,6 +22,54 @@ internal class ExpressionHelper : IExpressionHelper
         return Expression.Subtract(left, right);
     }
 
+    internal static string? TransformLikeStringToSqlLike(string? likeString)
+    {
+        if (likeString == null)
+            return null;
+
+        if (likeString == string.Empty)
+            return null;
+
+        var sqlLikeString = new StringBuilder();
+
+        int pos = 0;
+        while(pos < likeString.Length)
+        {
+            char c = likeString[pos++];
+
+            if (c == '[')
+            {
+                sqlLikeString.Append("[[]");
+            }
+            else if (c == ']')
+            {
+                sqlLikeString.Append("[]]");
+            }
+            else if (c == '%')
+            {
+                sqlLikeString.Append("[%]");
+            }
+            else if (c == '_')
+            {
+                sqlLikeString.Append("[_]");
+            }
+            else if (c == '*')
+            {
+                sqlLikeString.Append('%');
+            }
+            else if (c == '?')
+            {
+                sqlLikeString.Append("_");
+            }
+            else
+            {
+                sqlLikeString.Append(c);
+            }
+        }
+
+        return sqlLikeString.ToString();
+    }
+
     public Expression GenerateLike(Expression left, Expression right)
     {
         // TODO: this probably only works when it is passed to EF core!
@@ -29,6 +77,12 @@ internal class ExpressionHelper : IExpressionHelper
         var likeMethod = typeof(DbFunctionsExtensions).GetMethod("Like", new[] { typeof(DbFunctions), typeof(string), typeof(string) });
         if (likeMethod == null)
             throw new NotSupportedException("Could not find the EF core method Like");
+
+        if (right.Type == typeof(string) && right.NodeType == ExpressionType.Constant)
+        {
+            string? value = (string?)((ConstantExpression)right).Value;
+            right = Expression.Constant(TransformLikeStringToSqlLike(value), typeof(string));
+        }
 
         return Expression.Call(null, likeMethod, Expression.Constant(EF.Functions), left, right);
     }
