@@ -548,9 +548,9 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
         // pass config of Insert/Modify/Delete allowed over to the base DataSetView
         if (// does not run when BaseDataSet is not yet initialized
             DataSets.ContainsKey(BaseDataSet) &&
-            (propertyName == nameof(AllowCreateNewEntry) ||
-             propertyName == nameof(Editable) ||
-             propertyName == nameof(AllowDeleteEntry)))
+            (Equals(propertyName, nameof(AllowCreateNewEntry)) ||
+             Equals(propertyName, nameof(Editable)) ||
+             Equals(propertyName, nameof(AllowDeleteEntry))))
         {
             UpdateBaseDataSetViewAllowedOption(DataSet);
         }

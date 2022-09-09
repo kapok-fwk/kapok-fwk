@@ -80,7 +80,7 @@ public class CsvDataPortSource : IDataPortTableSource
             }
             else
             {
-                cellObjectValues[i] = cellString == NullValueString ? null : cellString;
+                cellObjectValues[i] = Equals(cellString, NullValueString) ? null : cellString;
             }
         }
 

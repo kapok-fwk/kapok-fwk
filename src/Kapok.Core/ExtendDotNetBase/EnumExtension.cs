@@ -97,7 +97,7 @@ public static class EnumExtension
 
             var displayString = EnumValueToDisplayName(enumValue, cultureInfo);
 
-            if (displayString == s)
+            if (Equals(displayString, s))
             {
                 result = enumValue;
                 return true;
@@ -114,7 +114,7 @@ public static class EnumExtension
         var functionResult = TryParseDisplayName(typeof(TEnum), s, out object? dataResult, cultureInfo);
         if (functionResult)
         {
-            result = (TEnum)dataResult;
+            result = (TEnum?)dataResult;
             return true;
         }
 

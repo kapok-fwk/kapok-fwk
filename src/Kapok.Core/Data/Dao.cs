@@ -135,7 +135,7 @@ public class Dao<T> : DaoBase<T>
         var references = Model.References
             .Where(r => r.RelationshipType == RelationshipType.ManyToOne &&
                         r.DependentEntityType == typeof(TNested) &&
-                        (referenceName == null || r.Name == referenceName))
+                        (referenceName == null || Equals(r.Name, referenceName)))
             .ToList();
         if (references.Count == 0)
         {

@@ -86,7 +86,7 @@ public static class AutoCalculatePropertiesExtension
             var propertyInfo = typeof(T).GetProperty(propertyName,
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty |
                 BindingFlags.GetProperty);
-            var propertyModel = model.Properties.FirstOrDefault(p => p.PropertyName == propertyName);
+            var propertyModel = model.Properties.FirstOrDefault(p => Equals(p.PropertyName, propertyName));
                         
             if (propertyInfo != null && propertyModel != null && propertyModel.CalculateDefinition != null &&
                     

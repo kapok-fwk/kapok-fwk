@@ -108,7 +108,7 @@ public static class FilterSetExtension
         object? GetFromFilterLayer(IPropertyFilterCollection<TEntry> propertyFilterCollection)
         {
             var propertyFilter = propertyFilterCollection.Properties
-                .FirstOrDefault(p => p.PropertyInfo.Name == propertyName);
+                .FirstOrDefault(p => Equals(p.PropertyInfo.Name, propertyName));
             if (propertyFilter == null)
                 return null;
 

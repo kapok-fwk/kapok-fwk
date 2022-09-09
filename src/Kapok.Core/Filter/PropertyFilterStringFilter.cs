@@ -28,9 +28,9 @@ public class PropertyFilterStringFilter : PropertyFilter, IPropertyFilterStringF
 
     protected override void ValidatePropertyInternal(object? value, string? propertyName, ICollection<BusinessLayerMessage> validationErrors)
     {
-        if (propertyName == nameof(FilterString))
+        if (Equals(propertyName, nameof(FilterString)))
         {
-            BuildFilterExpression((string)value, out ParseException? parseException);
+            BuildFilterExpression((string?)value, out ParseException? parseException);
             if (parseException != null)
             {
                 validationErrors.Add(new BusinessLayerMessage(parseException.Message, MessageSeverity.Error));
@@ -38,7 +38,7 @@ public class PropertyFilterStringFilter : PropertyFilter, IPropertyFilterStringF
         }
     }
 
-    private void BuildFilterExpression(string expression, out ParseException? parseException)
+    private void BuildFilterExpression(string? expression, out ParseException? parseException)
     {
         // don't use an actual filter on nested data filtering
         if (Attribute.IsDefined(PropertyInfo, typeof(NestedDataFilterAttribute)))
@@ -101,9 +101,9 @@ public class PropertyFilterStringFilter<T> : PropertyFilter<T>, IPropertyFilterS
 
     protected override void ValidatePropertyInternal(object? value, string? propertyName, ICollection<BusinessLayerMessage> validationErrors)
     {
-        if (propertyName == nameof(FilterString))
+        if (Equals(propertyName, nameof(FilterString)))
         {
-            BuildFilterExpression((string)value, out ParseException? parseException);
+            BuildFilterExpression((string?)value, out ParseException? parseException);
             if (parseException != null)
             {
                 validationErrors.Add(new BusinessLayerMessage(parseException.Message, MessageSeverity.Error));
@@ -111,7 +111,7 @@ public class PropertyFilterStringFilter<T> : PropertyFilter<T>, IPropertyFilterS
         }
     }
 
-    private void BuildFilterExpression(string expression, out ParseException? parseException)
+    private void BuildFilterExpression(string? expression, out ParseException? parseException)
     {
         // don't use an actual filter on nested data filtering
         if (Attribute.IsDefined(PropertyInfo, typeof(NestedDataFilterAttribute)))

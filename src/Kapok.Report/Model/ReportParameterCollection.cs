@@ -27,7 +27,7 @@ public class ReportParameterCollection : ICollection<ReportParameter>, IReadOnly
         if (string.IsNullOrEmpty(parameter.Name))
             throw new ArgumentException($"The parameter.Name {nameof(parameter.Name)} can not be null or empty.");
 
-        if (_reportParameters.Values.Any(p => p.Name == parameter.Name))
+        if (_reportParameters.Values.Any(p => Equals(p.Name, parameter.Name)))
             throw new ArgumentException($"A parameter with name {parameter.Name} has already been added to the report collection.", nameof(parameter));
             
         _reportParameters.Add(parameter.Name, parameter);

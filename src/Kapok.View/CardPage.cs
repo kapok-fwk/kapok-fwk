@@ -31,7 +31,7 @@ public abstract class CardPage<TEntry> : DataPage<TEntry>, ICardPage, ICardPage<
         
     private void DataSet_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(IDataSetView<TEntry>.Current))
+        if (Equals(e.PropertyName, nameof(IDataSetView<TEntry>.Current)))
             PropertyViewDefinitions.RefreshPropertyLookups(true);
     }
 

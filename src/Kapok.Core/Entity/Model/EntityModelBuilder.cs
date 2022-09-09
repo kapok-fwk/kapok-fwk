@@ -164,7 +164,7 @@ public sealed class EntityModelBuilder<T>
 
     public PropertyModelBuilder<T> GetProperty(PropertyInfo property)
     {
-        var propertyModel = Model.Properties.FirstOrDefault(p => p.PropertyName == property.Name);
+        var propertyModel = Model.Properties.FirstOrDefault(p => Equals(p.PropertyName, property.Name));
 
         if (propertyModel == null)
         {
@@ -209,7 +209,7 @@ public sealed class EntityModelBuilder<T>
             
         name ??= navigationProperty?.Name ?? typeof(TDestinationType).Name;
 
-        if (Model.References.Any(r => r.Name == name))
+        if (Model.References.Any(r => Equals(r.Name, name)))
             throw new ArgumentException($"A reference with the name '{name}' exist already for this entity", nameof(name));
 
         var reference = new EntityRelationship
@@ -236,7 +236,7 @@ public sealed class EntityModelBuilder<T>
 
         name ??= navigationProperty?.Name ?? typeof(TDestinationType).Name;
             
-        if (Model.References.Any(r => r.Name == name))
+        if (Model.References.Any(r => Equals(r.Name, name)))
             throw new ArgumentException($"A reference with the name '{name}' exist already for this entity", nameof(name));
 
         var reference = new EntityRelationship
@@ -263,7 +263,7 @@ public sealed class EntityModelBuilder<T>
             
         name ??= navigationProperty?.Name ?? typeof(TDestinationType).Name;
 
-        if (Model.References.Any(r => r.Name == name))
+        if (Model.References.Any(r => Equals(r.Name, name)))
             throw new ArgumentException($"A reference with the name '{name}' exist already for this entity", nameof(name));
 
         var reference = new EntityRelationship

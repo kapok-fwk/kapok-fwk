@@ -70,7 +70,9 @@ public class RoleClaim : EditableEntityBase, IEquatable<RoleClaim>
     {
         if (other == null) return false;
 
-        return RoleId == other.RoleId && ClaimType == other.ClaimType && ClaimValue == other.ClaimValue;
+        return RoleId == other.RoleId &&
+            Equals(ClaimType, other.ClaimType) &&
+            Equals(ClaimValue, other.ClaimValue);
     }
 
     #endregion

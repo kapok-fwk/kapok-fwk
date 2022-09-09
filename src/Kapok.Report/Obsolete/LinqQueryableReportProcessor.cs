@@ -144,7 +144,7 @@ public class LinqQueryableReportProcessor : DataTableReportProcessor<Model.LinqQ
                     innerSelectClause.Append(",");
                 }
 
-                innerSelectClause.Append(reportField.SourceName == reportField.Name
+                innerSelectClause.Append(Equals(reportField.SourceName, reportField.Name)
                     ? $"{reportField.SourceName}"
                     : $"{reportField.SourceName} as {reportField.Name}");
             }

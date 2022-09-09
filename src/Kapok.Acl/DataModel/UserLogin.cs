@@ -80,7 +80,8 @@ public class UserLogin : EditableEntityBase, IEquatable<UserLogin>
     {
         if (other == null) return false;
 
-        return UserId == other.UserId && LoginProvider == other.LoginProvider;
+        return UserId == other.UserId &&
+            Equals(LoginProvider, other.LoginProvider);
     }
 
     #endregion

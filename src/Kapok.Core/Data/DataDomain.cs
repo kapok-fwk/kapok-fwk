@@ -111,7 +111,7 @@ public abstract class DataDomain : IDataDomain
                         parameterValues[i] = repository;
                     }
                     else if (parameterInfo.ParameterType == typeof(bool) &&
-                             parameterInfo.Name == "isReadOnly")
+                             Equals(parameterInfo.Name, "isReadOnly"))
                     {
                         parameterValues[i] = Entities[entityType].IsReadOnly;
                     }
