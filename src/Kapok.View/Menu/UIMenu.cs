@@ -77,7 +77,7 @@ public class UIMenu
             }
         }
 
-        UIMenuItem vmTab;
+        UIMenuItem? vmTab;
         if (string.IsNullOrEmpty(tabName))
         {
             var defaultMenuItem = MenuItems.FirstOrDefault(l => l.Label.LanguageOrDefault(viewDomain.Culture) == Res.DefaultMenuTab_Label);
@@ -102,7 +102,7 @@ public class UIMenu
         }
 
         string finalGroupName = groupName ?? Res.DefaultMenuGroup_Label;
-        UIMenuItem vmGroup = vmTab.SubMenuItems.FirstOrDefault(i => i.Label.LanguageOrDefault(viewDomain.Culture) == finalGroupName);
+        UIMenuItem? vmGroup = vmTab.SubMenuItems.FirstOrDefault(i => i.Label.LanguageOrDefault(viewDomain.Culture) == finalGroupName);
         if (vmGroup == null)
         {
             vmGroup = new UIMenuItem(finalGroupName);
@@ -173,7 +173,7 @@ public class UIMenu
             }
 
             UIMenuItem menuItem;
-            object action = prop.GetGetMethod(false).Invoke(_basePage, new object[] {});
+            object? action = prop.GetGetMethod(false).Invoke(_basePage, new object[] {});
             if (action == null) // skip action which is not defined
                 continue;
 
@@ -213,7 +213,7 @@ public class UIMenu
                 continue;
             }
 
-            string groupName = null;
+            string? groupName = null;
             int groupSortOrder = 2;
 
             var displayAttribute = prop.GetCustomAttribute<DisplayAttribute>();
@@ -301,7 +301,7 @@ public class UIMenu
         {
             if (menuItem.RibbonKeyTip != null)
                 return menuItem.RibbonKeyTip;
-            string label = menuItem.Label.LanguageOrDefault(viewDomain.Culture);
+            string? label = menuItem.Label.LanguageOrDefault(viewDomain.Culture);
             if (label == null)
                 return null;
             if (label == string.Empty)
