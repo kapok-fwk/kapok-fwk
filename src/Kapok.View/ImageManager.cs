@@ -134,6 +134,12 @@ public static class ImageManager
             case "button-help":
             case "button-info":
             case "button-ok":
+            case "calendar-selection-all":
+            case "calendar-selection-day":
+            case "calendar-selection-week":
+            case "calendar-selection":
+            case "calendar2":
+            case "calendar":
             case "command-redo":
             case "command-redo-gray":
             case "command-undo":
