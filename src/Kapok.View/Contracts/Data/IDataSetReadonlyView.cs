@@ -49,6 +49,13 @@ public interface IDataSetReadonlyView<TEntry> : IDataSetReadonlyView
     new IList<TEntry>? SelectedEntries { get; set; }
     new IFilterSet<TEntry> Filter { get; }
 
+    /// <summary>
+    /// Returns a IDisposable object. Refreshing of the DataSet is hold until the
+    /// object is disposed.
+    /// </summary>
+    /// <returns></returns>
+    IDisposable DeferRefresh();
+
     new IQueryable<TEntry> AsQueryable();
 
     ICollection<TEntry> Collection { get; }
