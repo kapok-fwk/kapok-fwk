@@ -1,9 +1,11 @@
-﻿namespace Kapok.View;
+﻿using System.Diagnostics;
+
+namespace Kapok.View;
 
 public class QuestionDialogPage : DialogPage
 {
     private DialogButton? _dialogResultButton;
-    private IList<DialogButton> _dialogButton;
+    private IList<DialogButton> _dialogButton = new List<DialogButton>();
         
     public QuestionDialogPage(IViewDomain? viewDomain = null)
         : base(viewDomain ?? View.ViewDomain.Default)
@@ -18,7 +20,7 @@ public class QuestionDialogPage : DialogPage
     // ReSharper disable MemberCanBeProtected.Global
     // ReSharper disable UnusedAutoPropertyAccessor.Global
     // ReSharper disable UnusedMember.Global
-    public string Message { get; set; }
+    public string? Message { get; set; }
 
     public IList<DialogButton> DialogButtons
     {
@@ -76,8 +78,9 @@ public class QuestionDialogPage : DialogPage
         }
     }
 
-    private void DialogButtonExecute(DialogButton dialogButton)
+    private void DialogButtonExecute(DialogButton? dialogButton)
     {
+        Debug.Assert(dialogButton != null);
         if (!dialogButton.IsEnabled)
             return;
 
@@ -86,8 +89,9 @@ public class QuestionDialogPage : DialogPage
         Close();
     }
 
-    private bool CanDialogButtonExecute(DialogButton dialogButton)
+    private bool CanDialogButtonExecute(DialogButton? dialogButton)
     {
+        Debug.Assert(dialogButton != null);
         return dialogButton.IsEnabled;
     }
 
