@@ -95,19 +95,12 @@ public class DataTableReportProcessor<TReportModel> : ReportProcessor<TReportMod
 #pragma warning restore CS8604
     }
 
-    public override void ValidateReportModel()
-    {
-        base.ValidateReportModel();
-
-#pragma warning disable CS8602
-        if (ReportModel.Fields == null)
-#pragma warning restore CS8602
-            throw new NotSupportedException($"The report {ReportModel.Name} does not have any out fields. Property: {nameof(DataTableReport.Fields)}");
-    }
-
     [Obsolete]
     protected ReportXmlTableResult DataTableToXmlModel(DataTable dataTable)
     {
+        if (ReportModel.Fields == null)
+            throw new NotSupportedException($"The report model has property Fields not defined. This is required to use the method {nameof(DataTableReportProcessor<TReportModel>)}.{nameof(DataTableToXmlModel)}");
+
         ReportXmlTableResult rr = new ReportXmlTableResult();
 
         rr.Head = new ReportXmlTableResult.HeadDefinition();

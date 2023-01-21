@@ -34,7 +34,7 @@ public class LinqQueryableReportProcessor : DataTableReportProcessor<Model.LinqQ
             StringBuilder newWhereClause = new StringBuilder(ReportModel.WhereClause.Length);
 
             int pos = 0;
-            string variable = null;
+            string? variable = null;
             int variableCounter = 0;
             List<object> paramValues = new List<object>();
             while (pos < ReportModel.WhereClause.Length)
@@ -136,6 +136,11 @@ public class LinqQueryableReportProcessor : DataTableReportProcessor<Model.LinqQ
 
         if (string.IsNullOrWhiteSpace(selectClause))
         {
+            if (ReportModel.Fields == null || ReportModel.Fields.Count == 0)
+            {
+                return query;
+            }
+
             StringBuilder innerSelectClause = new StringBuilder();
             foreach (var reportField in ReportModel.Fields)
             {
@@ -170,13 +175,18 @@ public class LinqQueryableReportProcessor : DataTableReportProcessor<Model.LinqQ
 
     public override DataTable ProcessToDataTable()
     {
+        ValidateReportModel();
+
+        if (ReportModel.Fields == null)
+            throw new NotSupportedException($"The report model has property Fields not defined. This is required to use the method {nameof(LinqQueryableReportProcessor)}.{nameof(ProcessToDataTable)}");
+
         var query = ProcessToQueryable();
 
         DataTable dataTable = new DataTable(ReportModel.Name);
 
         bool columnsCreated = false;
 
-        Type type = null;
+        Type? type = null;
         foreach (var entry in query)
         {
             if (!columnsCreated)
