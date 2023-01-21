@@ -71,6 +71,123 @@ public static class ExcelHelper
     }
 
     /// <summary>
+    /// Converts a .NET format into a excel format.
+    /// </summary>
+    private static string? FormatToExcelFormat(string format)
+    {
+        // Convert C# standard number formats to custom formats which excel can understand.
+        // See also: https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings
+        if (format.StartsWith("D") || format.StartsWith("d"))
+        {
+            if (format.Length > 1)
+            {
+                if (int.TryParse(format.Substring(1), out int precisionSpecifier))
+                {
+                    if (precisionSpecifier == 0)
+                    {
+                        return "0";
+                    }
+                    else if (precisionSpecifier > 0)
+                    {
+                        return string.Join("", Enumerable.Repeat("0", precisionSpecifier));
+                    }
+                }
+            }
+            else
+            {
+                return "0";
+            }
+        }
+        else if (format.StartsWith("F") || format.StartsWith("f"))
+        {
+            if (format.Length > 1)
+            {
+                if (int.TryParse(format.Substring(1), out int precisionSpecifier))
+                {
+                    if (precisionSpecifier == 0)
+                    {
+                        return "0";
+                    }
+                    else if (precisionSpecifier > 0)
+                    {
+                        return "0." + String.Join("", Enumerable.Repeat("#", precisionSpecifier));
+                    }
+                }
+            }
+            else
+            {
+                return "0.##";
+            }
+        }
+        else if (format.StartsWith("N") || format.StartsWith("n"))
+        {
+            if (format.Length > 1)
+            {
+                if (int.TryParse(format.Substring(1), out int precisionSpecifier))
+                {
+                    if (precisionSpecifier == 0)
+                    {
+                        return "#,##0";
+                    }
+                    else if (precisionSpecifier > 0)
+                    {
+                        return "#,##0." + String.Join("", Enumerable.Repeat("#", precisionSpecifier));
+                    }
+                }
+            }
+            else
+            {
+                return "#,##0.##";
+            }
+        }
+        else if (format.StartsWith("P") || format.StartsWith("p"))
+        {
+            if (format.Length > 1)
+            {
+                if (int.TryParse(format.Substring(1), out int precisionSpecifier))
+                {
+                    if (precisionSpecifier == 0)
+                    {
+                        return "0.00%";
+                    }
+                    else if (precisionSpecifier > 0)
+                    {
+                        return "0." + String.Join("", Enumerable.Repeat("#", precisionSpecifier)) + "%";
+                    }
+                }
+            }
+            else
+            {
+                return "0.00%";
+            }
+        }
+        else
+        {
+            // TODO: Add additional standard formats here. Missing formats are:
+            //       C c Currency
+            //       E e Exponential (scientific)
+            //       G g General
+            //       R r Round-trip
+            //       X x Hexadecimal
+            // See also: https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings
+        }
+
+        // TODO: parsing of the Standard date and time format strings is not implemented
+        // See here: https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings
+
+        // TODO: parsing of the Standard TimeSpan format strings is not implemented
+        // See here: https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-timespan-format-strings
+
+        // check if it is a custom format
+        if (format.Contains("#") || format.StartsWith("0"))
+            // we assume here that the C# custom formats match the excel custom formats logic
+            // and we trust that the user passed over a valid format.
+            return format;
+
+        return null;
+    }
+
+    /// <summary>
     /// Loads the rows from a report data set into a excel table starting at <para>range</para>.
     /// </summary>
     /// <param name="reportDataSet">
@@ -151,9 +268,6 @@ public static class ExcelHelper
                 var dateStyle = excelWorkbook.Styles.CreateNamedStyle("Kapok_Date");
                 dateStyle.Style.Numberformat.Format = "mm-dd-yy"; // Built in Format 13 "Date"
 
-                //var textStyle = excelWorkbook.Styles.CreateNamedStyle("Kapok_Text");
-                //textStyle.Style.Numberformat.Format = ExcelCellDataFormat.Text;
-
                 var numberStyle = excelWorkbook.Styles.CreateNamedStyle("Kapok_Number");
                 numberStyle.Style.Numberformat.Format = ExcelCellDataFormat.Accounting;
 
@@ -195,15 +309,24 @@ public static class ExcelHelper
 
                         if (format != null)
                         {
-                            if (!customFormats.ContainsKey(format))
+                            var excelFormat = FormatToExcelFormat(format);
+                            if (excelFormat != null)
                             {
-                                var customStyle = excelWorkbook.Styles.CreateNamedStyle($"Kapok_Custom_{nextCustomStyleNum++}");
-                                customStyle.Style.Numberformat.Format = format; // todo redesign format to excel format
+                                if (!customFormats.ContainsKey(format))
+                                {
+                                    var customStyle = excelWorkbook.Styles.CreateNamedStyle($"Kapok_Custom_{nextCustomStyleNum++}");
+                                    customStyle.Style.Numberformat.Format = format; // todo redesign format to excel format
 
-                                customFormats.Add(format, customStyle.Name);
+                                    customFormats.Add(format, customStyle.Name);
+                                }
+
+                                styleName = customFormats[format];
                             }
-
-                            styleName = customFormats[format];
+                            else
+                            {
+                                // fallback to number formatting
+                                styleName = numberStyle.Name;
+                            }
                         }
                         else
                         {
