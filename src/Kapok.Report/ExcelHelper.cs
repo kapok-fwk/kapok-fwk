@@ -141,8 +141,8 @@ public static class ExcelHelper
             var table = worksheet.Tables.Add(worksheet.Cells[
                 startRow,
                 startColumn,
-                startRow + dataTable.Rows.Count + 1 /* header row */,
-                startColumn + dataTable.Columns.Count
+                startRow + 1 /* header row */ + dataTable.Rows.Count - 1,
+                startColumn + dataTable.Columns.Count - 1
             ], name);
             table.TableStyle = TableStyles.Light1;
 
