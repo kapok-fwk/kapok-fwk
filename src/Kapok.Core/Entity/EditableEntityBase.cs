@@ -11,7 +11,16 @@ namespace Kapok.Entity;
 
 public abstract class EditableEntityBase : EntityBase, IEditableObject, INotifyDataErrorInfo
 {
-    public static void SetBusinessLayerService(EditableEntityBase editableEntityBase, IBusinessLayerService service)
+    /// <summary>
+    /// Sets the business layer service to which the entity reports to.
+    /// </summary>
+    /// <param name="editableEntityBase">
+    /// The entity class where the business layer service shall be changed.
+    /// </param>
+    /// <param name="service">
+    /// The business layer service class. To remove the business layer service, use <c>null</c>.
+    /// </param>
+    public static void SetBusinessLayerService(EditableEntityBase editableEntityBase, IBusinessLayerService? service)
     {
         editableEntityBase._service = service;
     }

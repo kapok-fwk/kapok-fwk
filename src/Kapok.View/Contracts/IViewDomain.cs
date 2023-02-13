@@ -35,7 +35,9 @@ public interface IViewDomain
     IHierarchyDataSetView<TEntry> CreateHierarchyDataSetView<TEntry>(IDataDomainScope dataDomainScope, IDao<TEntry>? dao = null)
         where TEntry : class, IHierarchyEntry<TEntry>, new();
 
+    [Obsolete]
     void RegisterPageContainer(IPage owningPage, ICollection<IPage> pageContainer);
+    void RegisterPageContainer(IPage owningPage, IEnumerable<IPage> pageContainer);
     void UnregisterPageContainer(IPage owningPage);
 
     // messaging

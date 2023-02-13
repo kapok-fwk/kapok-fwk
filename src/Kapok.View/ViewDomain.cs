@@ -223,7 +223,12 @@ public abstract class ViewDomain : IViewDomain
     public abstract IHierarchyDataSetView<TEntry> CreateHierarchyDataSetView<TEntry>(IDataDomainScope dataDomainScope, IDao<TEntry>? repository = null)
         where TEntry : class, IHierarchyEntry<TEntry>, new();
 
-    public abstract void RegisterPageContainer(IPage owningPage, ICollection<IPage> pageContainer);
+    [Obsolete]
+    public virtual void RegisterPageContainer(IPage owningPage, ICollection<IPage> pageContainer)
+    {
+        RegisterPageContainer(owningPage, (IEnumerable<IPage>)pageContainer);
+    }
+    public abstract void RegisterPageContainer(IPage owningPage, IEnumerable<IPage> pageContainer);
     public abstract void UnregisterPageContainer(IPage owningPage);
 
     public abstract void ShowInfoMessage(string message, string? title = null, IPage? ownerPage = null);
@@ -245,7 +250,7 @@ public abstract class ViewDomain : IViewDomain
 
     public abstract void OpenFile(string filename);
 
-    public abstract void BusinessLayerMessageEventToSingleUIMessage(object businessLayerObject, ReportBusinessLayerMessageEventArgs eventArgs);
+    public abstract void BusinessLayerMessageEventToSingleUIMessage(object? businessLayerObject, ReportBusinessLayerMessageEventArgs eventArgs);
 
     #region Menu
 

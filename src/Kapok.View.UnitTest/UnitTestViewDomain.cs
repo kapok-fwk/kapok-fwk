@@ -151,7 +151,7 @@ public class UnitTestViewDomain : ViewDomain
         throw new NotImplementedException();
     }
 
-    public override void BusinessLayerMessageEventToSingleUIMessage(object businessLayerObject,
+    public override void BusinessLayerMessageEventToSingleUIMessage(object? businessLayerObject,
         ReportBusinessLayerMessageEventArgs eventArgs)
     {
         throw new NotImplementedException();
