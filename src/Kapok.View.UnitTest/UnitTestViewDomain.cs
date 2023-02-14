@@ -35,7 +35,7 @@ public class UnitTestViewDomain : ViewDomain
         throw new NotImplementedException();
     }
 
-    public override void RegisterPageContainer(IPage owningPage, ICollection<IPage> pageContainer)
+    public override void RegisterPageContainer(IPage owningPage, IEnumerable<IPage> pageContainer)
     {
         throw new NotImplementedException();
     }
