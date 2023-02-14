@@ -9,6 +9,8 @@ namespace Kapok.View.UnitTest;
 
 public class UnitTestViewDomain : ViewDomain
 {
+    private Dictionary<IPage, IEnumerable<IPage>> _registeredPageContainer = new Dictionary<IPage, IEnumerable<IPage>>();
+
     public override Type GetPageControlType(Type pageType)
     {
         throw new NotImplementedException();
@@ -37,12 +39,39 @@ public class UnitTestViewDomain : ViewDomain
 
     public override void RegisterPageContainer(IPage owningPage, IEnumerable<IPage> pageContainer)
     {
-        throw new NotImplementedException();
+        if (owningPage is null)
+        {
+            throw new ArgumentNullException(nameof(owningPage));
+        }
+
+        if (pageContainer is null)
+        {
+            throw new ArgumentNullException(nameof(pageContainer));
+        }
+
+        if (_registeredPageContainer.ContainsKey(owningPage))
+        {
+            if (_registeredPageContainer[owningPage] == pageContainer)
+            {
+                throw new ArgumentException("You cannot register a page container twice for a page");
+            }
+            else
+            {
+                throw new ArgumentException("You cannot register multiple page containers for a page");
+            }
+        }
+
+        _registeredPageContainer.Add(owningPage, pageContainer);
     }
 
     public override void UnregisterPageContainer(IPage owningPage)
     {
-        throw new NotImplementedException();
+        if (!_registeredPageContainer.ContainsKey(owningPage))
+        {
+            throw new ArgumentException("No page container is registered. You cannot unregister it");
+        }
+
+        _registeredPageContainer.Remove(owningPage);
     }
 
     public override void ShowInfoMessage(string message, string? title = null, IPage? ownerPage = null)
