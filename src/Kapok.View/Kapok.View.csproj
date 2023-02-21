@@ -6,7 +6,7 @@
 	<Nullable>enable</Nullable>
 
 	<PackageId>Kapok.View</PackageId>
-	<Version>0.1.3</Version>
+	<Version>0.1.4</Version>
 	<Authors>Kapok Framework Community</Authors>
 	<RepositoryUrl>https://github.com/kapok-fwk/kapok-fwk</RepositoryUrl>
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>

@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.1.4 (2023-02-21)
+
+### Kapok.Core
+
+- :rocket: *change* change like operators from %/_ to */? and implement to use automatically like when property type is string and */? is used
+
+### Kapok.Report
+
+- :tada: *feat* implement converting of some standard number formats to excel formats
+- :rocket: *change* make DataTableReport.Fields optional
+- :bug: *fix* excel correct table row and column size
+
+### Kapok.View
+
+- :tada: *feat* add calendar images
+- :rocket: *change* expose DeferRefresh() method in IDataSetReadonlyView
+- :bug: *fix* null value in DialogButtons
+- :bug: *fix* missing PageContainer registration for InteractivePage.DetailPages
+
 ## 0.1.3 (2022-05-22)
 
 ### Kapok.Report
