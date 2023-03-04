@@ -1,5 +1,6 @@
-using System.Linq;
-using Kapok.Core;
+using System.Collections.Generic;
+using System.Diagnostics;
+using Kapok.Data;
 using Kapok.Data.InMemory;
 using Kapok.Entity;
 using Xunit;
@@ -18,13 +19,15 @@ public class ViewDomainPageConstruction
     {
         ViewDomain = new UnitTestViewDomain();
 
-        Kapok.Core.DataDomain.RegisterEntity<SampleEntity>();
+        Data.DataDomain.RegisterEntity<SampleEntity>();
         DataDomain = new InMemoryDataDomain();
     }
 
     public class SampleEntity : EditableEntityBase
     {
+#pragma warning disable CS8618
         public string SampleProperty { get; set; }
+#pragma warning restore CS8618
     }
 
     public class SampleListPage : ListPage<SampleEntity>
@@ -61,11 +64,16 @@ public class ViewDomainPageConstruction
             SampleProperty = "Sample data"
         };
 
+        Assert.NotNull(listPage.DataSet);
+        Debug.Assert(listPage.DataSet != null);
+
         listPage.DataSet.Load();
         listPage.DataSet.Add(entity);
 
         // test if the construction of the card page works here
-        listPage.OpenCardPageAction.Execute(new[] { entity }.ToList());
+        Assert.NotNull(listPage.OpenCardPageAction);
+        Debug.Assert(listPage.OpenCardPageAction != null);
+        listPage.OpenCardPageAction.Execute(new List<SampleEntity?> {entity });
 
         Assert.False(ViewDomain.HasErrors);
     }

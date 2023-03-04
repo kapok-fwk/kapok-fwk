@@ -9,6 +9,7 @@ public class ExcelReportParameter
     [Fact]
     public void ExcelReport_ReplaceReportParameters()
     {
+        // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
         var result = ExcelReport.ReplaceReportParameters("{variable} YTD", getVariableValue: name =>
             {
                 Assert.Equal("variable", name);

@@ -19,18 +19,25 @@ public class PropertyViewModel
         {
             var resourceManager = (System.Resources.ResourceManager?)displayAttribute.ResourceType?
                 .GetProperty("ResourceManager", BindingFlags.Public | BindingFlags.Static)?.GetMethod
-                .Invoke(null, null);
+                ?.Invoke(null, null);
 
             if (resourceManager != null)
             {
-                Name = resourceManager.GetString(displayAttribute.Name) ?? displayAttribute.Name;
+                if (displayAttribute.Name != null)
+                {
+                    Name = resourceManager.GetString(displayAttribute.Name) ?? displayAttribute.Name ?? propertyInfo.Name;
+                }
+                else
+                {
+                    Name = displayAttribute.Name ?? propertyInfo.Name;
+                }
 
                 if (!string.IsNullOrEmpty(displayAttribute.Description))
                     Description = resourceManager.GetString(displayAttribute.Description) ?? displayAttribute.Description;
             }
             else
             {
-                Name = displayAttribute.Name;
+                Name = displayAttribute.Name ?? propertyInfo.Name;
             }
         }
     }
@@ -41,5 +48,5 @@ public class PropertyViewModel
     public string Name { get; }
 
     [LookupColumn]
-    public string Description { get; }
+    public string? Description { get; }
 }

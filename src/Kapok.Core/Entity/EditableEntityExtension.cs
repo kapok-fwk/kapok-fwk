@@ -35,9 +35,9 @@ public static class EditableEntityExtension
         }
     }
 
-    internal static object[] GetPrimaryKeyValues(this object entity, PropertyInfo[] primaryKeyProperties)
+    internal static object?[] GetPrimaryKeyValues(this object entity, PropertyInfo[] primaryKeyProperties)
     {
-        object[] primaryKeyValues = new object[primaryKeyProperties.Length];
+        object?[] primaryKeyValues = new object?[primaryKeyProperties.Length];
 
         int index = 0;
         foreach (var propertyInfo in primaryKeyProperties)
@@ -51,10 +51,18 @@ public static class EditableEntityExtension
         return primaryKeyValues;
     }
 
-    public static object[] GetPrimaryKeyValues(this object entity)
+    private static PropertyInfo[] GetPrimaryKeyFromEntity(object entity)
     {
-        var model = EntityBase.GetEntityModel(entity.GetType());
-        return GetPrimaryKeyValues(entity, model.PrimaryKeyProperties);
+        var entityType = entity.GetType();
+        var model = EntityBase.GetEntityModel(entityType);
+        if (model.PrimaryKeyProperties == null)
+            throw new ArgumentException($"The entity type {entityType.FullName} has no primary key.", nameof(entity));
+        return model.PrimaryKeyProperties;
+    }
+
+    public static object?[] GetPrimaryKeyValues(this object entity)
+    {
+        return GetPrimaryKeyValues(entity, GetPrimaryKeyFromEntity(entity));
     }
 
     internal static string GetPrimaryKeyAsString<T>(this T entity, PropertyInfo[] primaryKeyProperties)
@@ -82,8 +90,7 @@ public static class EditableEntityExtension
     public static string GetPrimaryKeyAsString<T>(this T entity)
         where T : class
     {
-        var model = EntityBase.GetEntityModel<T>();
-        return GetPrimaryKeyAsString<T>(entity, model.PrimaryKeyProperties);
+        return GetPrimaryKeyAsString(entity, GetPrimaryKeyFromEntity(entity));
     }
 
     internal static int GetPrimaryKeyHash<T>(this T entity, PropertyInfo[] primaryKeyProperties)
@@ -92,18 +99,19 @@ public static class EditableEntityExtension
 
         return BuildValuesHash(
             primaryKeyProperties
+#pragma warning disable CS8602
                 .Select(pi => pi.GetMethod.Invoke(entity, Array.Empty<object>()))
+#pragma warning restore CS8602
                 .ToArray());
     }
 
     public static int GetPrimaryKeyHash<T>(this T entity)
         where T : class
     {
-        var model = EntityBase.GetEntityModel<T>();
-        return GetPrimaryKeyHash<T>(entity, model.PrimaryKeyProperties);
+        return GetPrimaryKeyHash(entity, GetPrimaryKeyFromEntity(entity));
     }
 
-    public static int BuildValuesHash(params object[] values)
+    public static int BuildValuesHash(params object?[] values)
     {
         unchecked
         {

@@ -26,6 +26,6 @@ public interface IDbReportDataSet : IReportDataSet
     /// e.g. store the database query.
     /// </param>
     void ExecuteQuery(IDbConnection connection,
-        IReadOnlyDictionary<string, object>? parameters = default,
+        IReadOnlyDictionary<string, object?>? parameters = default,
         IReportResourceProvider? resourceProvider = default);
 }

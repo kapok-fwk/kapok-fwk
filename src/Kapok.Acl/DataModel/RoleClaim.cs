@@ -21,7 +21,7 @@ public class RoleClaim : EditableEntityBase, IEquatable<RoleClaim>
 
     private byte[]? _rowVersion;
     private string _claimType = string.Empty;
-    private string _claimValue;
+    private string? _claimValue;
     private Guid _roleId;
 
     [Timestamp]
@@ -57,7 +57,7 @@ public class RoleClaim : EditableEntityBase, IEquatable<RoleClaim>
     [StringLength(255)]
     [Display(Name = "ClaimValue", ResourceType = typeof(Res))]
     [LookupColumn]
-    public string ClaimValue
+    public string? ClaimValue
     {
         get => _claimValue;
         set => SetValidateProperty(ref _claimValue, value);

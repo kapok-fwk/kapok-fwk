@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using Kapok.Data;
 using Kapok.Entity;
 using Kapok.Entity.Model;
+using Res = Kapok.Core.Resources.Data.DaoBase;
 
-namespace Kapok.Core;
+namespace Kapok.BusinessLayer;
 
 public abstract class DaoBase<T> : IDao<T>
     where T : class, new()
@@ -75,7 +77,7 @@ public abstract class DaoBase<T> : IDao<T>
     {
     }
 
-    public virtual bool ValidateProperty(T entry, string? propertyName, object? value, out ICollection<string> validationErrors)
+    public virtual bool ValidateProperty(T entry, string propertyName, object? value, out ICollection<string> validationErrors)
     {
         validationErrors = new List<string>();
 
@@ -83,7 +85,7 @@ public abstract class DaoBase<T> : IDao<T>
             BindingFlags.Public | BindingFlags.Instance | BindingFlags.GetProperty);
 
         if (propertyInfo == null)
-            throw new ArgumentException($"Could not find property with name {propertyName}.", nameof(propertyName));
+            throw new ArgumentException(string.Format(Res.ValidationProprertyNotFound, propertyName), nameof(propertyName));
 
         bool isValid = true;
 
@@ -94,8 +96,7 @@ public abstract class DaoBase<T> : IDao<T>
             {
                 MemberName = propertyName,
 
-                // TODO: here we should get the client culture, not just use the server culture information
-                DisplayName = propertyInfo.GetDisplayAttributeNameOrDefault() ?? propertyName
+                DisplayName = propertyInfo.GetDisplayAttributeNameOrDefault()
             };
         var validatorResult = Validator.TryValidateProperty(value, validationContext, validationResults);
 
@@ -103,7 +104,7 @@ public abstract class DaoBase<T> : IDao<T>
         {
             foreach (var validationResult in validationResults)
             {
-                validationErrors.Add(validationResult.ErrorMessage ?? $"Validation error for property '{propertyName}'");
+                validationErrors.Add(validationResult.ErrorMessage ?? string.Format(Res.ValidationError, propertyName));
             }
 
             isValid = validationErrors.Count == 0;
@@ -121,7 +122,9 @@ public abstract class DaoBase<T> : IDao<T>
     protected bool IsOnCreateImplemented()
     {
         // ReSharper disable once PossibleNullReferenceException
+#pragma warning disable CS8602
         return GetType().GetMethod(nameof(OnCreate), BindingFlags.Instance | BindingFlags.NonPublic).DeclaringType != typeof(DaoBase<T>);
+#pragma warning restore CS8602
     }
 
     /// <summary>
@@ -131,7 +134,9 @@ public abstract class DaoBase<T> : IDao<T>
     protected bool IsOnUpdateImplemented()
     {
         // ReSharper disable once PossibleNullReferenceException
+#pragma warning disable CS8602
         return GetType().GetMethod(nameof(OnUpdate), BindingFlags.Instance | BindingFlags.NonPublic).DeclaringType != typeof(DaoBase<T>);
+#pragma warning restore CS8602
     }
 
     /// <summary>
@@ -141,7 +146,9 @@ public abstract class DaoBase<T> : IDao<T>
     protected bool IsOnDeleteImplemented()
     {
         // ReSharper disable once PossibleNullReferenceException
+#pragma warning disable CS8602
         return GetType().GetMethod(nameof(OnDelete), BindingFlags.Instance | BindingFlags.NonPublic).DeclaringType != typeof(DaoBase<T>);
+#pragma warning restore CS8602
     }
 
     protected virtual async Task OnCreate(ICollection<T> entries, CancellationToken cancellationToken = default)
@@ -179,7 +186,7 @@ public abstract class DaoBase<T> : IDao<T>
         OnPropertyChanged((T)entry, propertyName);
     }
 
-    bool IBusinessLayerService.ValidateProperty(object entry, string? propertyName, object? value, out ICollection<string> validationErrors)
+    bool IBusinessLayerService.ValidateProperty(object entry, string propertyName, object? value, out ICollection<string>? validationErrors)
     {
         return ValidateProperty((T) entry, propertyName, value, out validationErrors);
     }

@@ -1,11 +1,12 @@
 ﻿using System.Globalization;
-using Kapok.Core.FilterParsing;
+using Kapok.BusinessLayer.FilterParsing;
 
-namespace Kapok.Core;
+namespace Kapok.BusinessLayer;
 
 public static class PropertyFilterExtension
 {
-    public static string AsFilterString(this IPropertyStaticFilter filter, CultureInfo? cultureInfo = null)
+    // ReSharper disable once MemberCanBePrivate.Global
+    public static string? AsFilterString(this IPropertyStaticFilter filter, CultureInfo? cultureInfo = null)
     {
         return FilterExpressionParser.PropertyValueToFilterString(
             filter.PropertyInfo, filter.FilterValue,

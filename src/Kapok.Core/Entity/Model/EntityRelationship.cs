@@ -5,26 +5,44 @@ namespace Kapok.Entity.Model;
 
 public class EntityRelationship : IEntityRelationship
 {
-    public string Name { get; set; }
-    public Type PrincipalEntityType { get; set; }
-    public Type DependentEntityType { get; set; }
-    public List<PropertyInfo> PrincipalKeyProperties { get; set; }
-    public List<PropertyInfo> ForeignKeyProperties { get; set; }
+    public EntityRelationship(string name, Type principalEntityType, Type dependentEntityType, RelationshipType relationshipType,
+        DeleteBehavior deleteBehavior, PropertyInfo? principalNavigationProperty = null)
+    {
+        Name = name;
+        PrincipalEntityType = principalEntityType;
+        DependentEntityType = dependentEntityType;
+        PrincipalNavigationProperty = principalNavigationProperty;
+        RelationshipType = relationshipType;
+        DeleteBehavior = deleteBehavior;
+    }
+
+    public string Name { get; private set; }
+    public Type PrincipalEntityType { get; private set; }
+    public Type DependentEntityType { get; private set; }
+    public List<PropertyInfo>? PrincipalKeyProperties { get; set; }
+    public List<PropertyInfo>? ForeignKeyProperties { get; set; }
     public RelationshipType RelationshipType { get; set; }
     public DeleteBehavior DeleteBehavior { get; set; }
         
-    public PropertyInfo PrincipalNavigationProperty { get; set; }
-    public PropertyInfo ForeignNavigationProperty { get; set; }
+    public PropertyInfo? PrincipalNavigationProperty { get; set; }
+    public PropertyInfo? ForeignNavigationProperty { get; set; }
 
     // TODO: generate this automatically
-    public Expression MatchExpression { get; set; }
+    public Expression? MatchExpression { get; set; }
 
-    IReadOnlyCollection<PropertyInfo> IEntityRelationship.PrincipalKeyProperties => PrincipalKeyProperties;
-    IReadOnlyCollection<PropertyInfo> IEntityRelationship.ForeignKeyProperties => ForeignKeyProperties;
+    IReadOnlyCollection<PropertyInfo>? IEntityRelationship.PrincipalKeyProperties => PrincipalKeyProperties;
+    IReadOnlyCollection<PropertyInfo>? IEntityRelationship.ForeignKeyProperties => ForeignKeyProperties;
 
     public LambdaExpression? GenerateChildrenWherePartExpression(Expression currentEntityExpression)
     {
         var entityDestinationModel = EntityBase.GetEntityModel(DependentEntityType);
+
+        if (ForeignKeyProperties == null)
+            throw new NullReferenceException(
+                $"The property {nameof(ForeignKeyProperties)} must be set before calling {nameof(GenerateChildrenWherePartExpression)}");
+        if (entityDestinationModel.PrimaryKeyProperties == null)
+            throw new NullReferenceException(
+                $"The property {nameof(entityDestinationModel.PrimaryKeyProperties)} of the destination model must be set before calling {nameof(GenerateChildrenWherePartExpression)}");
 
         // build lambda expression for e => e.Property == current.Property),
         var whereExpressionParam = Expression.Parameter(DependentEntityType, "e");
@@ -57,11 +75,11 @@ public class EntityRelationship : IEntityRelationship
         return whereLambdaExpression;
     }
 
-    public Func<TEntity, bool> GenerateChildrenWherePredicate<TEntity>(TEntity currentEntity)
+    public Func<TEntity, bool>? GenerateChildrenWherePredicate<TEntity>(TEntity currentEntity)
         where TEntity : class
     {
         var currentEntityExpression = Expression.Constant(currentEntity);
         var whereLambdaExpression = GenerateChildrenWherePartExpression(currentEntityExpression);
-        return (Func<TEntity, bool>) whereLambdaExpression.Compile();
+        return (Func<TEntity, bool>?) whereLambdaExpression?.Compile();
     }
 }

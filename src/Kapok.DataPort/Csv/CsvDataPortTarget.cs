@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace Kapok.DataPort.Csv;
+﻿namespace Kapok.DataPort.Csv;
 
 public class CsvDataPortTarget : IDataPortTableTarget
 {

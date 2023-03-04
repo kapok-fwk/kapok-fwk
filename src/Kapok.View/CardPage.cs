@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
-using Kapok.Core;
+using Kapok.Data;
+using Kapok.Entity;
 
 namespace Kapok.View;
 
@@ -10,22 +11,28 @@ namespace Kapok.View;
 public abstract class CardPage<TEntry> : DataPage<TEntry>, ICardPage, ICardPage<TEntry>
     where TEntry : class, new()
 {
+    private PropertyViewCollection<TEntry>? _propertyViewDefinitions;
+
     protected CardPage(IDataSetView<TEntry> tableData, IViewDomain? viewDomain = null, IDataDomainScope? dataDomainScope = null)
         : base(tableData, viewDomain, dataDomainScope)
     {
-        PropertyViewDefinitions = new PropertyViewCollection<TEntry>(ViewDomain, DataDomainScope.DataDomain, DataSet.GetDao().Model, DataSet);
-        DataSet.PropertyChanged += DataSet_PropertyChanged;
     }
 
     protected override void OnLoaded()
     {
+#pragma warning disable CS8602
+        DataSet.PropertyChanged += DataSet_PropertyChanged;
+#pragma warning restore CS8602
         base.OnLoaded();
         PropertyViewDefinitions.RefreshPropertyLookups(false);
     }
 
     protected override void OnClosed()
     {
-        DataSet.PropertyChanged -= DataSet_PropertyChanged;
+        if (DataSet != null)
+        {
+            DataSet.PropertyChanged -= DataSet_PropertyChanged;
+        }
         base.OnClosed();
     }
         
@@ -38,9 +45,11 @@ public abstract class CardPage<TEntry> : DataPage<TEntry>, ICardPage, ICardPage<
     /// <summary>
     /// Contains the properties which are shown in the view.
     /// </summary>
-    public PropertyViewCollection<TEntry> PropertyViewDefinitions { get; }
+    public PropertyViewCollection<TEntry> PropertyViewDefinitions =>
+        _propertyViewDefinitions ??= new PropertyViewCollection<TEntry>(ViewDomain, DataDomainScope.DataDomain,
+            EntityBase.GetEntityModel<TEntry>(), DataSet);
 
-    protected override void DeleteEntry(IList<TEntry> selectedEntries)
+    protected override void DeleteEntry(IList<TEntry?>? selectedEntries)
     {
         base.DeleteEntry(selectedEntries);
         Close();
@@ -48,7 +57,7 @@ public abstract class CardPage<TEntry> : DataPage<TEntry>, ICardPage, ICardPage<
 
     #region ICardPage<TEntry>
 
-    IList<PropertyView> ICardPage<TEntry>.PropertyViewDefinitions => this.PropertyViewDefinitions;
+    IList<PropertyView> ICardPage<TEntry>.PropertyViewDefinitions => PropertyViewDefinitions;
 
     #endregion
 }

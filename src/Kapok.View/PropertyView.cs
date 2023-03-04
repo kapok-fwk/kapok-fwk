@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Reflection;
-using Kapok.Entity;
+using Kapok.Entity.Model;
 
 namespace Kapok.View;
 
@@ -97,9 +97,9 @@ public class PropertyView
 
     public int? ArrayIndex { get; set; }
 
-    public ILookupDefinition LookupDefinition { get; set; }
+    public ILookupDefinition? LookupDefinition { get; set; }
 
-    public IDrillDownDefinition DrillDownDefinition { get; set; }
+    public IDrillDownDefinition? DrillDownDefinition { get; set; }
 
     #region Display members
 
@@ -110,20 +110,20 @@ public class PropertyView
     /// general, in some UIs only when the visible space for
     /// 'DisplayName' is not enough.
     /// </summary>
-    public Caption DisplayShortName { get; set; }
+    public Caption? DisplayShortName { get; set; }
 
     /// <summary>
     /// The name which is displayed in the UI.
     /// </summary>
-    public Caption DisplayName { get; set; }
+    public Caption? DisplayName { get; set; }
 
     /// <summary>
     /// The description which is displayed for the column.
     /// </summary>
-    public Caption DisplayDescription { get; set; }
+    public Caption? DisplayDescription { get; set; }
 
-    public string StringFormat { get; set; }
-    public string NullDisplayText { get; set; }
+    public string? StringFormat { get; set; }
+    public string? NullDisplayText { get; set; }
 
     #endregion
 }

@@ -1,4 +1,4 @@
-﻿namespace Kapok.Core;
+﻿namespace Kapok.BusinessLayer;
 
 public interface IBatchTask
 {

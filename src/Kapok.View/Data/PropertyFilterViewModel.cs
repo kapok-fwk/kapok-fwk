@@ -1,5 +1,5 @@
-﻿using Kapok.Core;
-using Kapok.Core.FilterParsing;
+﻿using Kapok.BusinessLayer;
+using Kapok.BusinessLayer.FilterParsing;
 
 namespace Kapok.View;
 
@@ -13,7 +13,7 @@ public class PropertyFilterViewModel<TEntry> : ValidatableBindableObjectBase
     private FilterLayer _filterLayer;
     private PropertyViewModel? _property;
     private bool _isReadOnly;
-    private object _value;
+    private object? _value;
 
     public FilterLayer FilterLayer
     {
@@ -33,7 +33,7 @@ public class PropertyFilterViewModel<TEntry> : ValidatableBindableObjectBase
         set => SetProperty(ref _isReadOnly, value);
     }
 
-    public object Value
+    public object? Value
     {
         get => _value;
         set
@@ -45,20 +45,22 @@ public class PropertyFilterViewModel<TEntry> : ValidatableBindableObjectBase
 
     public bool ValueIsChanged { get; set; }
 
-    public IPropertyFilter PropertyFilter { get; set; }
+    public IPropertyFilter? PropertyFilter { get; set; }
 
-    protected override void ValidatePropertyInternal(object value, string propertyName, ICollection<BusinessLayerMessage> validationErrors)
+    protected override void ValidatePropertyInternal(object? value, string? propertyName, ICollection<BusinessLayerMessage> validationErrors)
     {
         if (propertyName == nameof(Value))
         {
-            if (PropertyFilter != null && value != null)
+            if (Property != null && PropertyFilter != null && value != null)
             {
+#pragma warning disable CS8604
                 var parser = new FilterExpressionParser(typeof(TEntry), Property.PropertyInfo.Name, value.ToString(),
+#pragma warning restore CS8604
                     Thread.CurrentThread.CurrentUICulture
                 );
-                if (!parser.TryParse(out _, out ParseException parseException))
+                if (!parser.TryParse(out _, out ParseException? parseException))
                 {
-                    validationErrors.Add(new BusinessLayerMessage(parseException.Message, MessageSeverity.Error));
+                    validationErrors.Add(new BusinessLayerMessage(parseException?.Message ?? "Filter not parsable", MessageSeverity.Error));
                 }
             }
         }

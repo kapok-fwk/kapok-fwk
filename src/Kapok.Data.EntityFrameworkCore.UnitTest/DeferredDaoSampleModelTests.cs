@@ -1,6 +1,8 @@
 using System.Data;
-using Kapok.Core;
+using System.Diagnostics;
+using Kapok.BusinessLayer;
 using Kapok.Data.EntityFrameworkCore.UnitTest.SampleModel;
+using Kapok.Module;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -25,6 +27,7 @@ public class DeferredDaoSampleModelTests : IDisposable
 
         // oping a connection to SQLite
         _cacheScope = (EFCoreDataDomainScope)_dataDomain.CreateScope();
+        Debug.Assert(_cacheScope.DbContext != null);
         _cacheDbConnection = _cacheScope.DbContext.Database.GetDbConnection();
         _cacheDbConnection.Open();
 
@@ -37,8 +40,8 @@ public class DeferredDaoSampleModelTests : IDisposable
 
     public void Dispose()
     {
-        _cacheDbConnection?.Close();
-        _cacheScope?.Dispose();
+        _cacheDbConnection.Close();
+        _cacheScope.Dispose();
     }
 
     public static IDataDomain InitializeDataDomain(DbContextOptions? dbContextOptions = null)
@@ -143,7 +146,8 @@ public class DeferredDaoSampleModelTests : IDisposable
 
         var mathCourse = courseDao.AsQueryable().FirstOrDefault();
         Assert.NotNull(mathCourse);
-        Assert.NotEqual(default(int), mathCourse.CourseId);
+        Debug.Assert(mathCourse != null);
+        Assert.NotEqual(default, mathCourse.CourseId);
         Assert.Equal(15, mathCourse.Credits);
         Assert.StartsWith("Math course", mathCourse.Title);
 
@@ -154,7 +158,8 @@ public class DeferredDaoSampleModelTests : IDisposable
 
         var johnAdams = studentDao.AsQueryable().FirstOrDefault();
         Assert.NotNull(johnAdams);
-        Assert.NotEqual(default(int), johnAdams.Id);
+        Debug.Assert(johnAdams != null);
+        Assert.NotEqual(default, johnAdams.Id);
         Assert.Equal("John", johnAdams.FirstMidName);
         Assert.Equal("Adams", johnAdams.LastName);
         Assert.Equal(DateTime.Now.Date, johnAdams.EnrollmentDate);
@@ -166,9 +171,10 @@ public class DeferredDaoSampleModelTests : IDisposable
 
         var johnAdamsMathCourseEnrollment = enrollmentDao.AsQueryable().FirstOrDefault();
         Assert.NotNull(johnAdamsMathCourseEnrollment);
-        Assert.NotEqual(default(int), johnAdamsMathCourseEnrollment.EnrollmentId); 
-        Assert.NotEqual(default(int), johnAdamsMathCourseEnrollment.CourseId);
-        Assert.NotEqual(default(int), johnAdamsMathCourseEnrollment.StudentId);
+        Debug.Assert(johnAdamsMathCourseEnrollment != null);
+        Assert.NotEqual(default, johnAdamsMathCourseEnrollment.EnrollmentId); 
+        Assert.NotEqual(default, johnAdamsMathCourseEnrollment.CourseId);
+        Assert.NotEqual(default, johnAdamsMathCourseEnrollment.StudentId);
         Assert.Equal(Grade.F, johnAdamsMathCourseEnrollment.Grade);
     }
 
@@ -355,8 +361,10 @@ public class DeferredDaoSampleModelTests : IDisposable
 
         var mathCourse = courseDao.AsQueryableForUpdate().First();
         Assert.NotNull(mathCourse);
+        Debug.Assert(mathCourse != null);
 
         Assert.NotNull(mathCourse.RowVersion);
+        Debug.Assert(mathCourse.RowVersion != null);
         Assert.NotEmpty(mathCourse.RowVersion);
 
         byte[] oldRowVersion = new byte[mathCourse.RowVersion.Length];

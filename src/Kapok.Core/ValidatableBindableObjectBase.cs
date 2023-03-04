@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Kapok.Entity;
 
-namespace Kapok.Core;
+namespace Kapok.BusinessLayer;
 
 public class ValidatableBindableObjectBase : BindableObjectBase, INotifyDataErrorInfo
 {

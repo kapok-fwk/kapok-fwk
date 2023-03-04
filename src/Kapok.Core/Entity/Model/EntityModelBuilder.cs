@@ -74,11 +74,15 @@ public sealed class EntityModelBuilder<T>
                             autoCalculateProperty.PropertyType);
 
                     var propertyCalculateDefinition =
-                        (IPropertyCalculateDefinition?)Activator.CreateInstance(propertyCalculateDefinitionType,
+#pragma warning disable CS8600
+                        (IPropertyCalculateDefinition)Activator.CreateInstance(propertyCalculateDefinitionType,
                             expression);
+#pragma warning restore CS8600
 
                     GetProperty(autoCalculateProperty)
+#pragma warning disable CS8604
                         .AddCalculation(propertyCalculateDefinition);
+#pragma warning restore CS8604
                 }
                 else
                 {
@@ -212,15 +216,12 @@ public sealed class EntityModelBuilder<T>
         if (Model.References.Any(r => r.Name == name))
             throw new ArgumentException($"A reference with the name '{name}' exist already for this entity", nameof(name));
 
-        var reference = new EntityRelationship
-        {
-            Name = name,
-            PrincipalEntityType = typeof(T),
-            PrincipalNavigationProperty = navigationProperty,
-            DependentEntityType = typeof(TDestinationType),
-            RelationshipType = RelationshipType.OneToMany,
-            DeleteBehavior = DeleteBehavior.Restrict
-        };
+        var reference = new EntityRelationship(name,
+            principalEntityType: typeof(T),
+            dependentEntityType: typeof(TDestinationType),
+            relationshipType: RelationshipType.OneToMany,
+            deleteBehavior: DeleteBehavior.Restrict,
+            principalNavigationProperty: navigationProperty);
 
         Model.References.Add(reference);
 
@@ -239,15 +240,12 @@ public sealed class EntityModelBuilder<T>
         if (Model.References.Any(r => r.Name == name))
             throw new ArgumentException($"A reference with the name '{name}' exist already for this entity", nameof(name));
 
-        var reference = new EntityRelationship
-        {
-            Name = name,
-            PrincipalEntityType = typeof(T),
-            PrincipalNavigationProperty = navigationProperty,
-            DependentEntityType = typeof(TDestinationType),
-            RelationshipType = RelationshipType.OneToOne,
-            DeleteBehavior = DeleteBehavior.Restrict
-        };
+        var reference = new EntityRelationship(name,
+            principalEntityType: typeof(T),
+            dependentEntityType: typeof(TDestinationType),
+            relationshipType: RelationshipType.OneToOne,
+            deleteBehavior: DeleteBehavior.Restrict,
+            principalNavigationProperty: navigationProperty);
 
         Model.References.Add(reference);
 
@@ -266,15 +264,12 @@ public sealed class EntityModelBuilder<T>
         if (Model.References.Any(r => r.Name == name))
             throw new ArgumentException($"A reference with the name '{name}' exist already for this entity", nameof(name));
 
-        var reference = new EntityRelationship
-        {
-            Name = name,
-            PrincipalEntityType = typeof(T),
-            PrincipalNavigationProperty = navigationProperty,
-            DependentEntityType = typeof(TDestinationType),
-            RelationshipType = RelationshipType.ManyToOne,
-            DeleteBehavior = DeleteBehavior.Restrict
-        };
+        var reference = new EntityRelationship(name,
+            principalEntityType: typeof(T),
+            dependentEntityType: typeof(TDestinationType),
+            relationshipType: RelationshipType.ManyToOne,
+            deleteBehavior: DeleteBehavior.Restrict,
+            principalNavigationProperty: navigationProperty);
 
         Model.References.Add(reference);
 

@@ -1,4 +1,4 @@
-﻿namespace Kapok.Core;
+﻿namespace Kapok.Data;
 
 public interface IReadOnlyRepository<out T>
     where T : class

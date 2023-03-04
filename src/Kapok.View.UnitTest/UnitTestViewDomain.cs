@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Kapok.Core;
-using Kapok.Entity;
+using Kapok.BusinessLayer;
+using Kapok.Data;
+using Kapok.Entity.Model;
 
 namespace Kapok.View.UnitTest;
 
 public class UnitTestViewDomain : ViewDomain
 {
-    private Dictionary<IPage, IEnumerable<IPage>> _registeredPageContainer = new Dictionary<IPage, IEnumerable<IPage>>();
+    private readonly Dictionary<IPage, IEnumerable<IPage>> _registeredPageContainer = new();
 
     public override Type GetPageControlType(Type pageType)
     {
@@ -51,6 +52,7 @@ public class UnitTestViewDomain : ViewDomain
 
         if (_registeredPageContainer.ContainsKey(owningPage))
         {
+            // ReSharper disable once PossibleUnintendedReferenceComparison
             if (_registeredPageContainer[owningPage] == pageContainer)
             {
                 throw new ArgumentException("You cannot register a page container twice for a page");
@@ -86,7 +88,7 @@ public class UnitTestViewDomain : ViewDomain
         }
     }
 
-    public bool HasErrors { get; set; } = false;
+    public bool HasErrors { get; set; }
 
     public override void ShowErrorMessage(string message, string? title = null, IPage? ownerPage = null, Exception? exception = null)
     {
@@ -118,7 +120,7 @@ public class UnitTestViewDomain : ViewDomain
 
         if (page is Page pageInstance)
         {
-            pageInstance.OnLoadingAction?.Execute();
+            pageInstance.OnLoadingAction.Execute();
             pageInstance.OnLoadedAction.Execute();
         }
     }
@@ -160,24 +162,26 @@ public class UnitTestViewDomain : ViewDomain
         throw new NotImplementedException();
     }
 
+    // ReSharper disable once ReturnTypeCanBeNotNullable
     public override string? OpenOpenFileDialog(string title, string fileMask, IPage? ownerPage = null)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
+    // ReSharper disable once ReturnTypeCanBeNotNullable
     public override string? OpenSaveFileDialog(string title, string fileMask, IPage? ownerPage = null)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public override bool OpenReportDialog(object model, IDataDomain dataDomain, object? reportLayout = null, IPage? ownerPage = null)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public override void OpenFile(string filename)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public override void BusinessLayerMessageEventToSingleUIMessage(object? businessLayerObject,

@@ -35,7 +35,7 @@ public class DeletingEntryEventArgs : EventArgs
 
 public class EntryPropertyChangingEventArgs : PropertyChangingEventArgs
 {
-    public EntryPropertyChangingEventArgs(object entry, string propertyName) : base(propertyName)
+    public EntryPropertyChangingEventArgs(object entry, string? propertyName) : base(propertyName)
     {
         Entry = entry;
     }
@@ -45,7 +45,7 @@ public class EntryPropertyChangingEventArgs : PropertyChangingEventArgs
 
 public class EntryPropertyChangedEventArgs : PropertyChangedEventArgs
 {
-    public EntryPropertyChangedEventArgs(object entry, string propertyName) : base(propertyName)
+    public EntryPropertyChangedEventArgs(object entry, string? propertyName) : base(propertyName)
     {
         Entry = entry;
     }
@@ -55,7 +55,7 @@ public class EntryPropertyChangedEventArgs : PropertyChangedEventArgs
 
 public class EntryDataErrorsChangedEventArgs : DataErrorsChangedEventArgs
 {
-    public EntryDataErrorsChangedEventArgs(object entry, string propertyName) : base(propertyName)
+    public EntryDataErrorsChangedEventArgs(object entry, string? propertyName) : base(propertyName)
     {
         Entry = entry;
     }
@@ -65,7 +65,7 @@ public class EntryDataErrorsChangedEventArgs : DataErrorsChangedEventArgs
     
 public class DataSetEntityColoringEventArgs : EventArgs
 {
-    public DataSetEntityColoringEventArgs(object entity, string propertyName)
+    public DataSetEntityColoringEventArgs(object entity, string? propertyName)
     {
         Entity = entity;
         PropertyName = propertyName;

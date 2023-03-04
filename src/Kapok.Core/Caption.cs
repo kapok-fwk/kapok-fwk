@@ -113,7 +113,7 @@ public class Caption : IXmlSerializable, ICollection<KeyValuePair<string, string
     {
         while (reader.Read() && reader.Name.Equals("Caption") && reader.NodeType == System.Xml.XmlNodeType.Element)
         {
-            string? lang = reader.GetAttribute("lang") ?? EmptyLanguage;
+            string lang = reader.GetAttribute("lang") ?? EmptyLanguage;
             string caption = reader.ReadElementContentAsString();
 
             Add(lang, caption);
@@ -224,7 +224,7 @@ public class Caption : IXmlSerializable, ICollection<KeyValuePair<string, string
         {
             int hash = GetType().FullName?.GetHashCode() ?? 0;
 
-            hash = (hash * 7) ^ _captionPerLanguage?.GetHashCode() ?? 0;
+            hash = (hash * 7) ^ _captionPerLanguage.GetHashCode();
 
             return hash;
         }
@@ -239,15 +239,7 @@ public static class CaptionExtensions
 
         var displayName = propertyInfo.GetDisplayAttributeNameOrDefault();
 
-        if (displayName == null)
-        {
-            caption[Caption.EmptyLanguage] = propertyInfo.Name;
-        }
-        else
-        {
-            // TODO: not sure if CultureInfo.CurrentUICulture or CultureInfo.CurrentCulture would be right here; don't know what the default used culture by the ResourceManager is
-            caption[CultureInfo.CurrentUICulture] = displayName;
-        }
+        caption[CultureInfo.CurrentUICulture] = displayName;
 
         return caption;
     }
@@ -268,7 +260,7 @@ public class CaptionJsonSerializer : JsonConverter<Caption>
         serializer.Serialize(writer, dict);
     }
 
-    public override Caption? ReadJson(JsonReader reader, Type objectType, Caption? existingValue, bool hasExistingValue,
+    public override Caption ReadJson(JsonReader reader, Type objectType, Caption? existingValue, bool hasExistingValue,
         JsonSerializer serializer)
     {
         JToken jsonToken = JToken.Load(reader);
@@ -295,10 +287,7 @@ public class CaptionJsonSerializer : JsonConverter<Caption>
             // JSON formant:
             // {"en-US": "<text>", ...}
 
-            var jsonObject = jsonToken as JObject;
-
-            if (jsonObject == null)
-                return null;
+            var jsonObject = (JObject)jsonToken;
 
             var caption = new Caption();
 
@@ -311,7 +300,7 @@ public class CaptionJsonSerializer : JsonConverter<Caption>
         }
 
         if (jsonToken.Type == JTokenType.Null)
-            return null;
+            return new Caption();
 
         throw new JsonException($"Unexpected json token for object {typeof(Caption).FullName}: {jsonToken}");
     }

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.ComponentModel;
 using System.Reflection;
-using Kapok.Core;
+using Kapok.BusinessLayer;
 
 namespace Kapok.View;
 

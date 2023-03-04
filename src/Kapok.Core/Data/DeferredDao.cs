@@ -4,10 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq.Expressions;
 using System.Reflection;
+using Kapok.Data;
 using Kapok.Entity;
 using Res = Kapok.Core.Resources.Data.DeferredDao;
 
-namespace Kapok.Core;
+namespace Kapok.BusinessLayer;
 
 public static class DeferredDaoIQueryable
 {
@@ -37,7 +38,7 @@ public static class DeferredDaoIQueryable
 
             expression = qtProvider.Visit(expression);
 
-            return qtProvider._source.Provider.CreateQuery<T>(expression);
+            return qtProvider.Source.Provider.CreateQuery<T>(expression);
         }
 
         // do nothing, is not of the right type
@@ -85,15 +86,15 @@ internal class QueryTranslator<T> : IOrderedQueryable<T>
 internal class QueryTranslatorProvider<T> : ExpressionVisitor, IQueryProvider
 #pragma warning restore 693
 {
-    internal readonly IQueryable _source;
-    internal readonly ChangeTracker _changeTracker;
+    internal readonly IQueryable Source;
+    internal readonly ChangeTracker ChangeTracker;
     private readonly PropertyInfo[] _primaryKeyProperties;
-    private readonly Dictionary<int, object> _primaryKeyIndex;
+    private readonly Dictionary<int, object>? _primaryKeyIndex;
 
     public QueryTranslatorProvider(IQueryable source, ChangeTracker changeTracker, PropertyInfo[] primaryKeyProperties, Dictionary<int, object>? primaryKeyIndex = null)
     {
-        _source = source ?? throw new ArgumentNullException(nameof(source));
-        _changeTracker = changeTracker;
+        Source = source ?? throw new ArgumentNullException(nameof(source));
+        ChangeTracker = changeTracker;
         _primaryKeyProperties = primaryKeyProperties ?? throw new ArgumentNullException(nameof(primaryKeyProperties));
         _primaryKeyIndex = primaryKeyIndex;
     }
@@ -102,16 +103,20 @@ internal class QueryTranslatorProvider<T> : ExpressionVisitor, IQueryProvider
     {
         if (expression == null) throw new ArgumentNullException(nameof(expression));
 
-        return new QueryTranslator<TElement>(_source, expression, _changeTracker, _primaryKeyProperties, _primaryKeyIndex);
+        return new QueryTranslator<TElement>(Source, expression, ChangeTracker, _primaryKeyProperties, _primaryKeyIndex);
     }
 
     public IQueryable CreateQuery(Expression expression)
     {
         if (expression == null) throw new ArgumentNullException(nameof(expression));
         Type elementType = expression.Type.GetGenericArguments().First();
+#pragma warning disable CS8600
         IQueryable result = (IQueryable)Activator.CreateInstance(typeof(QueryTranslator<>).MakeGenericType(elementType),
-            new object[] { _source, expression });
+            new object[] { Source, expression });
+#pragma warning restore CS8600
+#pragma warning disable CS8603
         return result;
+#pragma warning restore CS8603
     }
 
     private IEnumerable ExecuteExtension(IEnumerable result)
@@ -127,8 +132,14 @@ internal class QueryTranslatorProvider<T> : ExpressionVisitor, IQueryProvider
     public TResult Execute<TResult>(Expression expression)
     {
         if (expression == null) throw new ArgumentNullException(nameof(expression));
-        object result = (this as IQueryProvider).Execute(expression);
+#pragma warning disable CS8600
+        object result = ((IQueryProvider)this).Execute(expression);
+#pragma warning restore CS8600
+#pragma warning disable CS8600
+#pragma warning disable CS8603
         return (TResult)result;
+#pragma warning restore CS8603
+#pragma warning restore CS8600
     }
 
     public object Execute(Expression expression)
@@ -136,12 +147,14 @@ internal class QueryTranslatorProvider<T> : ExpressionVisitor, IQueryProvider
         if (expression == null) throw new ArgumentNullException(nameof(expression));
 
         Expression translated = this.Visit(expression);
-        var entity = _source.Provider.Execute(translated);
+        var entity = Source.Provider.Execute(translated);
 
         if (entity != null)
             TrackCreateIfNotAlreadyTracked(ref entity);
 
+#pragma warning disable CS8603
         return entity;
+#pragma warning restore CS8603
     }
 
     internal IEnumerable<T> ExecuteEnumerableTyped(Expression expression)
@@ -149,12 +162,14 @@ internal class QueryTranslatorProvider<T> : ExpressionVisitor, IQueryProvider
         if (expression == null) throw new ArgumentNullException(nameof(expression));
 
         Expression translated = this.Visit(expression);
-        var result = (IEnumerable<T>)_source.Provider.CreateQuery(translated);
+        var result = (IEnumerable<T>)Source.Provider.CreateQuery(translated);
 
         foreach (var entity in result)
         {
-            object currentEntity = entity;
+            object? currentEntity = entity;
+#pragma warning disable CS8601
             TrackCreateIfNotAlreadyTracked(ref currentEntity);
+#pragma warning restore CS8601
             yield return (T)currentEntity;
         }
     }
@@ -163,14 +178,9 @@ internal class QueryTranslatorProvider<T> : ExpressionVisitor, IQueryProvider
         if (expression == null) throw new ArgumentNullException(nameof(expression));
 
         Expression translated = this.Visit(expression);
-        var result = _source.Provider.CreateQuery(translated);
+        var result = Source.Provider.CreateQuery(translated);
 
-        foreach (var entity in result)
-        {
-            var currentEntity = entity;
-            TrackCreateIfNotAlreadyTracked(ref currentEntity);
-            yield return currentEntity;
-        }
+        return ExecuteExtension(result);
     }
 
     private static void Map(object oldEntry, object newEntry, Type entityType)
@@ -183,7 +193,7 @@ internal class QueryTranslatorProvider<T> : ExpressionVisitor, IQueryProvider
         // via reflection copy all values
         foreach (var propertyInfo in type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
                      // skip all primary keys
-                     .Where(e => properties.Any(e2 => e2.Name != e.Name)))
+                     .Where(e => properties?.Any(e2 => e2.Name != e.Name) ?? true))
         {
             // ignore all fields which are not mapped on data-level
             if (Attribute.IsDefined(propertyInfo, typeof(NotMappedAttribute)))
@@ -199,25 +209,23 @@ internal class QueryTranslatorProvider<T> : ExpressionVisitor, IQueryProvider
         }
     }
 
-    internal void TrackCreateIfNotAlreadyTracked(ref object _entity)
+    internal void TrackCreateIfNotAlreadyTracked(ref object entity)
     {
-        T entity = (T)_entity;
-
         var entityPkHash = entity.GetPrimaryKeyHash(_primaryKeyProperties);
-        if (_primaryKeyProperties != null)
+        if (_primaryKeyIndex != null)
         {
             if (_primaryKeyIndex.ContainsKey(entityPkHash))
             {
                 if (!ReferenceEquals(_primaryKeyIndex[entityPkHash], entity))
                 {
                     var oldTrackedEntity = _primaryKeyIndex[entityPkHash];
-                    var oldTrackObject = _changeTracker.Get(oldTrackedEntity);
+                    var oldTrackObject = ChangeTracker.Get(oldTrackedEntity);
                     if (oldTrackObject != null)
                     {
-                        _changeTracker.Detach(oldTrackObject);
+                        ChangeTracker.Detach(oldTrackObject);
                     }
                     Map(oldTrackedEntity, entity, typeof(T));
-                    _entity = entity = (T)oldTrackedEntity;
+                    entity = oldTrackedEntity;
                 }
             }
             else
@@ -226,10 +234,10 @@ internal class QueryTranslatorProvider<T> : ExpressionVisitor, IQueryProvider
             }
         }
 
-        var trackingObject = _changeTracker.Get(entity);
+        var trackingObject = ChangeTracker.Get(entity);
         if (trackingObject == null)
         {
-            _changeTracker.Add(entity);
+            ChangeTracker.Add(entity);
         }
         else if (trackingObject.OriginalEntity == null)
         {
@@ -243,7 +251,7 @@ internal class QueryTranslatorProvider<T> : ExpressionVisitor, IQueryProvider
         // fix up the Expression tree to work with EF again
         if (c.Type == typeof(QueryTranslator<T>))
         {
-            return _source.Expression;
+            return Source.Expression;
         }
         else
         {
@@ -285,7 +293,7 @@ internal class QueryTranslatorExpressionVisitor : ExpressionVisitor
 public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
     where T : class, new()
 {
-    private readonly ChangeTracker _changeTracker = new ChangeTracker();
+    private readonly ChangeTracker _changeTracker = new();
 
     /// <summary>
     /// A list of all properties of the <c>T</c> entity which are part of
@@ -296,16 +304,29 @@ public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
 
     // key = hash of the primary key fields
     // value = entity object
-    private readonly Dictionary<int, object> _primaryKeyIndex = new Dictionary<int, object>();
+    private readonly Dictionary<int, object> _primaryKeyIndex = new();
 
-    public DeferredDao(IDataDomainScope dataDomainScope, IRepository<T> repository) : base(dataDomainScope, repository)
+    public DeferredDao(IDataDomainScope dataDomainScope, IRepository<T> repository)
+        : base(dataDomainScope, repository)
     {
-        _primaryKeyProperties = EntityBase.GetEntityModel<T>().PrimaryKeyProperties;
+        var primaryKeys = EntityBase.GetEntityModel<T>().PrimaryKeyProperties;
+
+        if (primaryKeys == null)
+            throw new NotSupportedException(
+                $"You cannot use {nameof(DeferredDao<T>)} with a Type T which does not have a primary key. T = {typeof(T).FullName}");
+
+        _primaryKeyProperties = primaryKeys;
     }
 
     public DeferredDao(IDataDomainScope dataDomainScope) : base(dataDomainScope)
     {
-        _primaryKeyProperties = EntityBase.GetEntityModel<T>().PrimaryKeyProperties;
+        var primaryKeys = EntityBase.GetEntityModel<T>().PrimaryKeyProperties;
+
+        if (primaryKeys == null)
+            throw new NotSupportedException(
+                $"You cannot use {nameof(DeferredDao<T>)} with a Type T which does not have a primary key. T = {typeof(T).FullName}");
+
+        _primaryKeyProperties = primaryKeys;
     }
 
     public override IQueryable<T> AsQueryableForUpdate()
@@ -335,8 +356,7 @@ public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
         if (entity == null) throw new ArgumentNullException(nameof(entity));
 
         var entityPkHash = entity.GetPrimaryKeyHash(_primaryKeyProperties);
-        if (_primaryKeyProperties != null &&
-            _primaryKeyIndex.ContainsKey(entityPkHash))
+        if (_primaryKeyIndex.ContainsKey(entityPkHash))
         {
             foreach (var primaryKeyProperty in _primaryKeyProperties)
             {
@@ -367,8 +387,7 @@ public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
         if (entity == null) throw new ArgumentNullException(nameof(entity));
 
         var entityPkHash = entity.GetPrimaryKeyHash(_primaryKeyProperties);
-        if (_primaryKeyProperties != null &&
-            _primaryKeyIndex.ContainsKey(entityPkHash) &&
+        if (_primaryKeyIndex.ContainsKey(entityPkHash) &&
             !ReferenceEquals(_primaryKeyIndex[entityPkHash], entity))
         {
             var oldTrackedEntity = _primaryKeyIndex[entityPkHash];
@@ -402,8 +421,7 @@ public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
         if (entity == null) throw new ArgumentNullException(nameof(entity));
 
         var entityPkHash = entity.GetPrimaryKeyHash(_primaryKeyProperties);
-        if (_primaryKeyProperties != null &&
-            _primaryKeyIndex.ContainsKey(entityPkHash) &&
+        if (_primaryKeyIndex.ContainsKey(entityPkHash) &&
             !ReferenceEquals(_primaryKeyIndex[entityPkHash], entity))
         {
             var oldTrackedEntity = _primaryKeyIndex[entityPkHash];
@@ -616,7 +634,7 @@ public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
 
     public void PostSave()
     {
-        if (_primaryKeyProperties != null)
+        if (_primaryKeyIndex.Count > 0)
             _primaryKeyIndex.Clear();
 
         if (_lastChangedObjects == null || _lastChangedObjects.Count == 0)
@@ -659,13 +677,16 @@ public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
                     lock (entity)
                     {
                         // TODO: here we get the whole item but we should change it so that we just get the scalar value "RowVersion" to reduce db traffic!
+#pragma warning disable CS8604
                         var newEntry = scopeDao.FindByKey(entity.GetPrimaryKeyValues());
+#pragma warning restore CS8604
 
                         if (newEntry != null)
                         {
                             UnregisterEvent(entity);
                             _changeTracker.Detach(trackingObject);
 
+#pragma warning disable CS8602
                             rowVersionProperty.SetMethod.Invoke(
                                 entity,
                                 new[]
@@ -673,6 +694,7 @@ public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
                                     rowVersionProperty.GetMethod.Invoke(newEntry, null)
                                 }
                             );
+#pragma warning restore CS8602
 
                             _changeTracker.Add(entity);
                             RegisterEvent(entity);
@@ -699,8 +721,7 @@ public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
 
         var entityPkHash = entity.GetPrimaryKeyHash(_primaryKeyProperties);
         ChangeTrackingState? newChangeTrackingState = null;
-        if (_primaryKeyProperties != null &&
-            _primaryKeyIndex.ContainsKey(entityPkHash) &&
+        if (_primaryKeyIndex.ContainsKey(entityPkHash) &&
             !ReferenceEquals(_primaryKeyIndex[entityPkHash], entity))
         {
             var oldTrackedEntity = _primaryKeyIndex[entityPkHash];
@@ -716,7 +737,7 @@ public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
                             
                         // since we marked a row here for update, we override the entity properties
 
-                        foreach (var propertyInfo in Model.PrimaryKeyProperties.Where(p => p.CanRead && p.CanWrite))
+                        foreach (var propertyInfo in _primaryKeyProperties.Where(p => p.CanRead && p.CanWrite))
                         {
                             var timestampAttribute = propertyInfo.GetCustomAttribute<TimestampAttribute>();
                             if (timestampAttribute != null)
@@ -802,25 +823,25 @@ public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="eventArgs"></param>
-    private void EntityPropertyChanged(object sender, PropertyChangedEventArgs eventArgs)
+    private void EntityPropertyChanged(object? sender, PropertyChangedEventArgs eventArgs)
     {
+        if (sender == null || eventArgs.PropertyName == null)
+            return;
+
         var entity = (T)sender;
 
-        if (_primaryKeyProperties != null)
+        var primaryKeyField = _primaryKeyProperties.FirstOrDefault(pkf => pkf.Name == eventArgs.PropertyName);
+        if (primaryKeyField != null)
         {
-            var primaryKeyField = _primaryKeyProperties.FirstOrDefault(pkf => pkf.Name == eventArgs.PropertyName);
-            if (primaryKeyField != null)
+            var pair = _primaryKeyIndex.FirstOrDefault(pair => pair.Value == sender);
+
+            var newHash = sender.GetPrimaryKeyHash(_primaryKeyProperties);
+
+            if (pair.Key != newHash)
             {
-                var pair = _primaryKeyIndex.FirstOrDefault(pair => pair.Value == sender);
-
-                var newHash = sender.GetPrimaryKeyHash(_primaryKeyProperties);
-
-                if (pair.Key != newHash)
-                {
-                    // the primary key changed here! we update the has at this code point.
-                    _primaryKeyIndex.Remove(pair.Key);
-                    _primaryKeyIndex.Add(newHash, entity);
-                }
+                // the primary key changed here! we update the has at this code point.
+                _primaryKeyIndex.Remove(pair.Key);
+                _primaryKeyIndex.Add(newHash, entity);
             }
         }
     }

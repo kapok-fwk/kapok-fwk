@@ -1,6 +1,6 @@
 ﻿using System.Net.Http.Headers;
 
-namespace Kapok.Core;
+namespace Kapok.Data;
 
 public interface IServiceDataDomain : IDataDomain
 {

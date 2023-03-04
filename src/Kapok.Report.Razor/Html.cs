@@ -8,8 +8,6 @@ public static class Html
     {
         var html = new HtmlContentBuilder();
 
-        html.AppendHtml(@string);
-
-        return html;
+        return html.AppendHtml(@string);
     }
 }

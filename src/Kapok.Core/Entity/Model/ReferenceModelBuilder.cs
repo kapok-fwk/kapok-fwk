@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
-using Kapok.Core;
+using Kapok.BusinessLayer;
+using Kapok.Data;
 
 namespace Kapok.Entity.Model;
 
@@ -163,6 +164,8 @@ public class ReferenceModelBuilder<T, TDestinationType>
 
             // build lambda expression for e => e.Property == current.Property),
             var whereLambdaExpression = _entityReference.GenerateChildrenWherePartExpression(currentParameter);
+            if (whereLambdaExpression == null)
+                throw new Exception($"Could not generate where expression for entity reference {_entityReference.Name}");
 
             // create dds => dds.GetDao<TDestinationType>().AsQueryable().Where(.. condition for fields ..)
             LambdaExpression lookupExpression =

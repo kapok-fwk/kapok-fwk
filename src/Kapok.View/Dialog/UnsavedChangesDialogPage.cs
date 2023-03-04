@@ -9,6 +9,9 @@ public class UnsavedChangesDialogPage : QuestionDialogPage
         var questionWindow = new UnsavedChangesDialogPage(viewDomain, allowCancel);
         ((QuestionDialogPage)questionWindow).ShowDialog();
 
+        if (questionWindow.DialogResultButton == null)
+            return UnsavedChangesDialogResult.Cancel;
+
         int index = questionWindow.DialogButtons.IndexOf(questionWindow.DialogResultButton);
         return (UnsavedChangesDialogResult) index;
     }
@@ -20,39 +23,39 @@ public class UnsavedChangesDialogPage : QuestionDialogPage
 
         if (questionWindow.DialogResultButton == null)
         {
-            // TODO implement here a woraround so that it does not break the execution
+            // TODO implement here a workaround so that it does not break the execution
             throw new NotSupportedException("Unknown dialog button was pressed");
         }
 
         int index = questionWindow.DialogButtons.IndexOf(questionWindow.DialogResultButton);
         if (index == -1)
         {
-            // TODO implement here a woraround so that it does not break the execution
+            // TODO implement here a workaround so that it does not break the execution
             throw new NotSupportedException("Unknown dialog button was pressed");
         }
         return (UnsavedChangesDialogResult) index;
     }
 
-    private static List<DialogButton> _staticDialogButtons;
+    private static List<DialogButton>? _staticDialogButtons;
 
     private static List<DialogButton> StaticDialogButtons =>
         _staticDialogButtons ??= new List<DialogButton>
         {
             // ReSharper disable PossiblyMissingIndexerInitializerComma
-            new DialogButton
+            new()
             {
                 Image = "save",
                 Label = Res.Save_Label,
                 Description = Res.Save_Description,
                 IsDefault = true
             },
-            new DialogButton
+            new()
             {
                 Image = "trash",
                 Label = Res.Discard_Label,
                 Description = Res.Discard_Description
             },
-            new DialogButton
+            new()
             {
                 Image = "command-undo",
                 Label = Res.Cancel_Label,

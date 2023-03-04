@@ -1,6 +1,4 @@
-﻿using Kapok.Module;
-
-namespace Kapok.Core;
+﻿namespace Kapok.Module;
 
 public abstract class ModuleBase
 {

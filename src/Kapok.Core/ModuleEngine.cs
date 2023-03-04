@@ -1,16 +1,20 @@
-﻿using Kapok.DataModel;
-using NLog;
+﻿using NLog;
 using System.Diagnostics;
+using Kapok.Core.BusinessLayer;
+using Kapok.Core.DataModel;
+using Kapok.Data;
 
-namespace Kapok.Core;
+namespace Kapok.Module;
 
 public static class ModuleEngine
 {
     internal static readonly List<Type> LoadedModulesInternal = new();
     internal static readonly Dictionary<Type, ModuleBase> InitiatedModules = new();
+
+    // ReSharper disable once InconsistentlySynchronizedField
     public static IReadOnlyList<Type> LoadedModules => LoadedModulesInternal;
 
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
 
     public static void InitiateModule(Type moduleType)
     {
@@ -24,14 +28,21 @@ public static class ModuleEngine
 
             var dependsOnModulePropertyInfo = typeof(ModuleBase).GetProperty(nameof(ModuleBase.DependsOnModule));
             Debug.Assert(dependsOnModulePropertyInfo != null);
+            Debug.Assert(dependsOnModulePropertyInfo.GetMethod != null);
 
             var module = (ModuleBase?) Activator.CreateInstance(moduleType);
+            if (module == null)
+                throw new NotSupportedException($"The module type {moduleType.FullName} does not have a parameter-less constructor.");
 
-            foreach (var dependentModuleType in (IEnumerable<Type>)dependsOnModulePropertyInfo.GetMethod.Invoke(module, Array.Empty<object>()))
+            var dependsOnModule = dependsOnModulePropertyInfo.GetMethod.Invoke(module, Array.Empty<object>());
+            if (dependsOnModule is IEnumerable<Type> dependsOnModuleEnumerable)
             {
-                if (!LoadedModules.Contains(dependentModuleType))
+                foreach (var dependentModuleType in dependsOnModuleEnumerable)
                 {
-                    InitiateModule(dependentModuleType);
+                    if (!LoadedModules.Contains(dependentModuleType))
+                    {
+                        InitiateModule(dependentModuleType);
+                    }
                 }
             }
 
@@ -52,7 +63,7 @@ public static class ModuleEngine
             {
                 foreach (var migration in module.Migrations)
                 {
-                    ModuleMigrationsHistory? dbMigration = null;
+                    ModuleMigrationsHistory? dbMigration;
                     using (var scope = dataDomain.CreateScope())
                     {
                         var migrationHistoryDao = scope.GetDao<ModuleMigrationsHistory, IModuleMigrationsHistoryDao>();
@@ -72,7 +83,7 @@ public static class ModuleEngine
         Logger.Info("End module migration");
     }
 
-    private static void DoMigration(IDataDomain dataDomain, ModuleBase module, Module.Migration migration)
+    private static void DoMigration(IDataDomain dataDomain, ModuleBase module, Migration migration)
     {
         try
         {
@@ -91,7 +102,7 @@ public static class ModuleEngine
         }
         catch (Exception e)
         {
-            throw new Module.MigrateException(moduleName: module.Name, migration, e);
+            throw new MigrateException(moduleName: module.Name, migration, e);
         }
     }
 }

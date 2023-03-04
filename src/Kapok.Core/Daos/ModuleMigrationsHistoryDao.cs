@@ -1,6 +1,8 @@
-﻿using Kapok.DataModel;
+﻿using Kapok.BusinessLayer;
+using Kapok.Core.DataModel;
+using Kapok.Data;
 
-namespace Kapok.Core;
+namespace Kapok.Core.BusinessLayer;
 
 public class ModuleMigrationsHistoryDao : Dao<ModuleMigrationsHistory>, IModuleMigrationsHistoryDao
 {
@@ -15,12 +17,12 @@ public class ModuleMigrationsHistoryDao : Dao<ModuleMigrationsHistory>, IModuleM
         return moduleName;
     }
 
-    public ModuleMigrationsHistory New(string moduleName, Kapok.Module.Migration migration)
+    public ModuleMigrationsHistory New(string moduleName, Module.Migration migration)
     {
         if (moduleName is null)
-            throw new System.ArgumentNullException(nameof(moduleName));
+            throw new ArgumentNullException(nameof(moduleName));
         if (migration is null)
-            throw new System.ArgumentNullException(nameof(migration));
+            throw new ArgumentNullException(nameof(migration));
 
         moduleName = TrimModuleName(moduleName);
 
@@ -31,12 +33,12 @@ public class ModuleMigrationsHistoryDao : Dao<ModuleMigrationsHistory>, IModuleM
         return entity;
     }
 
-    public ModuleMigrationsHistory? Find(string moduleName, Kapok.Module.Migration migration)
+    public ModuleMigrationsHistory? Find(string moduleName, Module.Migration migration)
     {
         if (moduleName is null)
-            throw new System.ArgumentNullException(nameof(moduleName));
+            throw new ArgumentNullException(nameof(moduleName));
         if (migration is null)
-            throw new System.ArgumentNullException(nameof(migration));
+            throw new ArgumentNullException(nameof(migration));
 
         moduleName = TrimModuleName(moduleName);
         var migrationId = migration.GetType().Name;

@@ -4,8 +4,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Kapok.Core;
+using Kapok.BusinessLayer;
 using Newtonsoft.Json;
+using DaoBaseRes = Kapok.Core.Resources.Data.DaoBase;
 
 namespace Kapok.Entity;
 
@@ -94,8 +95,12 @@ public abstract class EditableEntityBase : EntityBase, IEditableObject, INotifyD
 
     protected virtual void CancelPropertyEdit(PropertyInfo propertyInfo)
     {
-        var oldValue = propertyInfo.GetMethod.Invoke(_backupCopy, new object[0]);
-        propertyInfo.SetMethod.Invoke(this, new [] {oldValue});
+        if (propertyInfo.GetMethod == null || propertyInfo.SetMethod == null)
+            throw new ArgumentException($"Property {propertyInfo.Name} does not have a getter or setter.",
+                nameof(propertyInfo));
+
+        var oldValue = propertyInfo.GetMethod?.Invoke(_backupCopy, Array.Empty<object>());
+        propertyInfo.SetMethod?.Invoke(this, new [] {oldValue});
     }
 
     public virtual void EndEdit()
@@ -219,7 +224,7 @@ public abstract class EditableEntityBase : EntityBase, IEditableObject, INotifyD
 
         bool isValid;
 
-        ICollection<string> validationErrors;
+        ICollection<string>? validationErrors;
 
         try
         {
@@ -235,19 +240,18 @@ public abstract class EditableEntityBase : EntityBase, IEditableObject, INotifyD
             isValid = false;
         }
 
-#if DEBUG
-            if (validationErrors == null)
+        if (validationErrors == null)
+        {
+            Debug.WriteLine("ERROR: validation error list was not set by business layer service!");
+            validationErrors = new List<string> { string.Format(DaoBaseRes.ValidationError, propertyName) };
+        }
+        else
+        {
+            foreach (var businessLayerMessage in validationErrors)
             {
-                Debug.WriteLine("ERROR: validation error list was not set by business layer service!");
+                Debug.WriteLine($"Validation error: {GetType().Name}.{propertyName}: {businessLayerMessage}");
             }
-            else
-            {
-                foreach (var businessLayerMessage in validationErrors)
-                {
-                    Debug.WriteLine($"Validation error: {GetType().Name}.{propertyName}: {businessLayerMessage}");
-                }
-            }
-#endif
+        }
 
         if (!isValid)
         {

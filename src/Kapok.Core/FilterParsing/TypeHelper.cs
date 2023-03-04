@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 
-namespace Kapok.Core.FilterParsing;
+namespace Kapok.BusinessLayer.FilterParsing;
 
 internal static class TypeHelper
 {
@@ -311,7 +311,7 @@ internal static class TypeHelper
         return IsNullableType(type) ? type.GetTypeInfo().GetGenericArguments()[0] : type;
     }
 
-    public static object? ParseNumber(string text, Type type)
+    public static object? ParseNumber(string? text, Type type)
     {
 #if !(NETFX_CORE || WINDOWS_APP || DOTNET5_1 || UAP10_0 || NETSTANDARD)
         switch (Type.GetTypeCode(GetNonNullableType(type)))
@@ -422,8 +422,11 @@ internal static class TypeHelper
         return null;
     }
 
-    public static object? ParseEnum(string value, Type type)
+    public static object? ParseEnum(string? value, Type type)
     {
+        if (value == null)
+            return null;
+
         if (type.GetTypeInfo().IsEnum && Enum.IsDefined(type, value))
         {
             return Enum.Parse(type, value, true);

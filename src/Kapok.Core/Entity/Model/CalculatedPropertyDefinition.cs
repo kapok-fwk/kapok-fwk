@@ -1,17 +1,17 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Kapok.Entity;
+namespace Kapok.Entity.Model;
 
 public interface IPropertyCalculateDefinition
 {
-    Expression? BuildCalculateExpression(IReadOnlyDictionary<string, object>? filterData = null);
+    Expression? BuildCalculateExpression(IReadOnlyDictionary<string, object?>? filterData = null);
 }
 
 public interface IPropertyCalculateDefinition<TBaseEntry, TFieldType> : IPropertyCalculateDefinition
     where TBaseEntry : class
 {
-    new Expression<Func<TBaseEntry, TFieldType>>? BuildCalculateExpression(IReadOnlyDictionary<string, object>? filterData = null);
+    new Expression<Func<TBaseEntry, TFieldType>>? BuildCalculateExpression(IReadOnlyDictionary<string, object?>? filterData = null);
 }
 
 public class PropertyCalculateDefinition<TBaseEntry, TFieldType> : IPropertyCalculateDefinition<TBaseEntry, TFieldType>
@@ -30,7 +30,7 @@ public class PropertyCalculateDefinition<TBaseEntry, TFieldType> : IPropertyCalc
         _dynamicCalculateFuncMethodInfo = dynamicCalculateFunc;
     }
 
-    public Expression<Func<TBaseEntry, TFieldType>>? BuildCalculateExpression(IReadOnlyDictionary<string, object>? filterData = null)
+    public Expression<Func<TBaseEntry, TFieldType>>? BuildCalculateExpression(IReadOnlyDictionary<string, object?>? filterData = null)
     {
         if (_dynamicCalculateFuncMethodInfo != null)
         {
@@ -45,7 +45,7 @@ public class PropertyCalculateDefinition<TBaseEntry, TFieldType> : IPropertyCalc
             {
                 if (parameters[i].ParameterType == typeof(IReadOnlyDictionary<string, object>))
                 {
-                    paramValues[i] = filterData ?? new Dictionary<string, object>();
+                    paramValues[i] = filterData ?? new Dictionary<string, object?>();
                 }
                 else
                 {
@@ -62,7 +62,7 @@ public class PropertyCalculateDefinition<TBaseEntry, TFieldType> : IPropertyCalc
 
     #region IPropertyCalculationDefinition
 
-    Expression? IPropertyCalculateDefinition.BuildCalculateExpression(IReadOnlyDictionary<string, object>? filterData)
+    Expression? IPropertyCalculateDefinition.BuildCalculateExpression(IReadOnlyDictionary<string, object?>? filterData)
     {
         return BuildCalculateExpression(filterData);
     }

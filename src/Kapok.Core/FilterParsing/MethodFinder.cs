@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Kapok.Core.FilterParsing;
+namespace Kapok.BusinessLayer.FilterParsing;
 
 internal class MethodFinder
 {
@@ -56,10 +56,20 @@ internal class MethodFinder
         if (applicable.Length == 1)
         {
             MethodData md = applicable[0];
-            for (int i = 0; i < args.Length; i++)
+            if (md.Args == null)
             {
-                args[i] = md.Args[i];
+                if (args.Length > 0)
+                    // the MethodData object has not enough parameters as parameter args provides
+                    throw new ArgumentOutOfRangeException();
             }
+            else
+            {
+                for (int i = 0; i < args.Length; i++)
+                {
+                    args[i] = md.Args[i];
+                }
+            }
+
             method = md.MethodBase;
         }
         else
@@ -86,7 +96,7 @@ internal class MethodFinder
                 return false;
             }
 
-            Expression promoted = _expressionPromoter.Promote(args[i], pi.ParameterType, false, true);
+            Expression? promoted = _expressionPromoter.Promote(args[i], pi.ParameterType, false, true);
             if (promoted == null)
             {
                 return false;

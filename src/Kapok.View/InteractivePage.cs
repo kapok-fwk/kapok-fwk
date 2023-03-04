@@ -17,9 +17,9 @@ public abstract class InteractivePage : Page, IInteractivePage
 
         AddMenu(UIMenu.BaseMenuName);
 
-        Menu[UIMenu.BaseMenuName].GroupSortOrder = new string[] { Res.New, Res.Manage, Res.General, Res.Process, Res.Reports, "Group3", "Group4", "Group5", Res.SendTo, Res.Page };
+        Menu[UIMenu.BaseMenuName].GroupSortOrder = new[] { Res.New, Res.Manage, Res.General, Res.Process, Res.Reports, "Group3", "Group4", "Group5", Res.SendTo, Res.Page };
 
-        ViewDomain.RegisterPageContainer(this, DetailPages.Cast<IPage>());
+        ViewDomain.RegisterPageContainer(this, DetailPages);
     }
 
     protected void AddMenu(string menuName, IDataSetView? referencingDataSet = null)
@@ -44,7 +44,7 @@ public abstract class InteractivePage : Page, IInteractivePage
 
     #region IInteractivePage
 
-    ICollection<IDetailPage> IInteractivePage.DetailPages => this.DetailPages;
+    ICollection<IDetailPage> IInteractivePage.DetailPages => DetailPages;
 
     #endregion
 }

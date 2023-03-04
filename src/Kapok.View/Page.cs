@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel;
+using Kapok.BusinessLayer;
 #if DEBUG
 using System.Diagnostics;
 #endif
-using Kapok.Core;
 using NLog;
 
 namespace Kapok.View;
@@ -12,12 +12,14 @@ namespace Kapok.View;
 /// </summary>
 public abstract class Page : ValidatableBindableObjectBase, IPage
 {
-    protected static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    protected static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
 
     private string? _title;
     private bool _canClose;
 
+#pragma warning disable CS8618
     protected Page(IViewDomain? viewDomain = null)
+#pragma warning restore CS8618
     {
         if (viewDomain == null && View.ViewDomain.Default == null)
             throw new NotSupportedException(
@@ -66,7 +68,7 @@ public abstract class Page : ValidatableBindableObjectBase, IPage
 
     public virtual bool? ShowDialog(IPage owner)
     {
-        Logger.Info("Open dialog page {page}; {pageOwner}", GetType().Name, owner?.GetType().Name);
+        Logger.Info("Open dialog page {page}; {pageOwner}", GetType().Name, owner.GetType().Name);
         return ViewDomain.ShowDialogPage(this, owner);
     }
 
@@ -209,7 +211,7 @@ public abstract class Page : ValidatableBindableObjectBase, IPage
 
     private void RaiseReportMessage(MessageSeverity messageSeverity, string message)
     {
-        Report(new BusinessLayerMessage { Severity = messageSeverity, Text = message });
+        Report(new BusinessLayerMessage(message, messageSeverity));
     }
 
     protected void ReportDebug(string message)

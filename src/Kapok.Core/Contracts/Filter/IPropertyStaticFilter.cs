@@ -1,8 +1,8 @@
-﻿namespace Kapok.Core;
+﻿namespace Kapok.BusinessLayer;
 
 public interface IPropertyStaticFilter : IPropertyFilter
 {
-    object FilterValue { get; set; }
+    object? FilterValue { get; set; }
 }
 
 public interface IPropertyStaticFilter<T> : IPropertyFilter<T>, IPropertyStaticFilter

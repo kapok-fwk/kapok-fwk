@@ -31,6 +31,9 @@ public abstract class EntityDataPortSourceBase<TEntity> : IDataPortTableSource
         var columnIndex = 0;
         foreach (var column in _schema.Cast<DataPortPropertyColumn>())
         {
+            if (column.PropertyInfo.GetMethod == null)
+                throw new NotSupportedException(
+                    $"You cannot read from property {column.PropertyInfo.Name} because it has no getter method");
             newRow[columnIndex++] = column.PropertyInfo.GetMethod.Invoke(newEntity, Array.Empty<object>());
         }
 

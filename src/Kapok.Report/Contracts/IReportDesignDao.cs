@@ -1,4 +1,4 @@
-﻿using Kapok.Core;
+﻿using Kapok.BusinessLayer;
 using Kapok.Report.DataModel;
 
 namespace Kapok.Report;

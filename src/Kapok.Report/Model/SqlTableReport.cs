@@ -10,20 +10,20 @@ namespace Kapok.Report.Model;
 /// </summary>
 public class SqlTableReport : Report
 {
-    public string SqlQuery { get; set; }
+    public string? SqlQuery { get; set; }
 
     [XmlArray("DataSourceParameters")]
     [XmlArrayItem("Param")]
-    public List<string> DataSourceParameters { get; set; }
+    public List<string>? DataSourceParameters { get; set; }
 
-    public string DataSourceName { get; set; }
+    public string? DataSourceName { get; set; }
 }
 
 public class DataSetField
 {
-    public string SourceName { get; set; }
+    public string? SourceName { get; set; }
 
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
-    public Caption Caption { get; set; }
+    public Caption? Caption { get; set; }
 }

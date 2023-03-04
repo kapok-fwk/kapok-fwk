@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.12" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="NLog" Version="4.6.4" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
   </ItemGroup>
@@ -26,6 +26,11 @@
       <DependentUpon>MessageSeverity.resx</DependentUpon>
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="Resources\Data\DaoBase.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DaoBase.resx</DependentUpon>
     </Compile>
     <Compile Update="Resources\Data\DataDomainScope.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -53,6 +58,10 @@
     <EmbeddedResource Update="Resources\BusinessLayer\MessageSeverity.resx">
       <LastGenOutput>MessageSeverity.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Data\DaoBase.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>DaoBase.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="Resources\Data\DataDomainScope.resx">
       <Generator>ResXFileCodeGenerator</Generator>

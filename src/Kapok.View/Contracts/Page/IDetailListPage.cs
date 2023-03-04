@@ -8,5 +8,5 @@ public interface IDetailListPage<TEntry, TSubEntry> : IDetailPage<TEntry>
     where TEntry : class, new()
     where TSubEntry : class, new()
 {
-    IDataSetSelectionAction<TSubEntry> OpenCardPageAction { get; }
+    IDataSetSelectionAction<TSubEntry>? OpenCardPageAction { get; }
 }

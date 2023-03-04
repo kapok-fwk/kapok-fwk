@@ -2,14 +2,14 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
-using Kapok.Core;
+using Kapok.Data;
 using Kapok.Entity;
 using Kapok.Entity.Model;
 
 namespace Kapok.View;
 
 // TODO: planned to implement here INotifyPropertyChanged, INotifyCollectionChanged
-public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>, INotifyCollectionChanged
+public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>
     where TEntity : class, new()
 {
     private readonly IViewDomain _viewDomain;
@@ -62,7 +62,7 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>,
     protected virtual void OnAdd(PropertyView item)
     {
         // NOTE: move this maybe into the PropertyView constructor?
-        item.LookupDefinition ??= _entityModel?.Properties
+        item.LookupDefinition ??= _entityModel.Properties
             .FirstOrDefault(p => p.PropertyName == item.PropertyInfo.Name)?.LookupDefinition;
 
         if (item.LookupDefinition != null)
@@ -77,7 +77,7 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>,
         }
 
         // NOTE: move this maybe into the PropertyView constructor?
-        item.DrillDownDefinition ??= _entityModel?.Properties
+        item.DrillDownDefinition ??= _entityModel.Properties
             .FirstOrDefault(p => p.PropertyName == item.PropertyInfo.Name)?.DrillDownDefinition;
 
         if (item.DrillDownDefinition != null &&
@@ -88,7 +88,7 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>,
            )
         {
             var drillDownActionName = $"DrillDownOn{item.PropertyInfo.Name}";
-            IDataSetSelectionAction<TEntity> drillDownAction;
+            IDataSetSelectionAction<TEntity>? drillDownAction;
 
             /*if (newItem.DrillDownDefinition.DrillDownAction != null)
             {
@@ -127,7 +127,8 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>,
                 drillDownAction = null;
             }
 
-            _drillDown.Add(item.PropertyInfo.Name, drillDownAction);
+            if (drillDownAction != null)
+                _drillDown.Add(item.PropertyInfo.Name, drillDownAction);
         }
     }
 
@@ -205,35 +206,40 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>,
         
     #region IList
 
-    int IList.Add(object value)
+    int IList.Add(object? value)
     {
-        this.Add((PropertyView) value);
+        if (value == null) throw new ArgumentNullException(nameof(value));
+        this.Add((PropertyView)value);
         return this.IndexOf((PropertyView)value);
     }
         
-    bool IList.Contains(object value)
+    bool IList.Contains(object? value)
     {
+        if (value == null) throw new ArgumentNullException(nameof(value));
         if (value is PropertyView propertyView)
             return this.Contains(propertyView);
             
         return false;
     }
 
-    int IList.IndexOf(object value)
+    int IList.IndexOf(object? value)
     {
+        if (value == null) throw new ArgumentNullException(nameof(value));
         if (value is PropertyView propertyView)
             return this.IndexOf(propertyView);
 
         return -1;
     }
 
-    void IList.Insert(int index, object value)
+    void IList.Insert(int index, object? value)
     {
+        if (value == null) throw new ArgumentNullException(nameof(value));
         this.Insert(index, (PropertyView)value);
     }
         
-    void IList.Remove(object value)
+    void IList.Remove(object? value)
     {
+        if (value == null) throw new ArgumentNullException(nameof(value));
         this.Remove((PropertyView) value);
     }
 
@@ -244,7 +250,13 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>,
     object IList.this[int index]
     {
         get => this[index];
-        set => this[index] = (PropertyView)value;
+#pragma warning disable CS8769
+        set
+#pragma warning restore CS8769
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+            this[index] = (PropertyView)value;
+        }
     }
 
     #endregion

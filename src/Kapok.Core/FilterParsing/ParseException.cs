@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace Kapok.Core.FilterParsing;
+namespace Kapok.BusinessLayer.FilterParsing;
 
 public sealed class ParseException : Exception
 {

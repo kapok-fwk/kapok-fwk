@@ -1,8 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
-using Kapok.Core;
+using Kapok.BusinessLayer;
+using Kapok.Data;
 using Kapok.Entity;
+using Kapok.Entity.Model;
 
 namespace Kapok.View;
 
@@ -13,7 +15,7 @@ public class PageConstructionException : Exception
 {
     public PageConstructionException(Type pageType, Exception innerException)
         // TODO translate exception message
-        : base($"An error occurred during page construction. Page type: {pageType}")
+        : base($"An error occurred during page construction. Page type: {pageType}", innerException: innerException)
     {
     }
 }
@@ -30,8 +32,7 @@ public abstract class ViewDomain : IViewDomain
     {
         Culture = Thread.CurrentThread.CurrentUICulture;
 
-        if (Default == null)
-            Default = this;
+        Default ??= this;
     }
 
     public CultureInfo Culture { get; }
@@ -266,18 +267,18 @@ public abstract class ViewDomain : IViewDomain
     ///     UIMenuItem = menu item
     /// )
     /// </summary>
-    internal readonly Dictionary<(Type, string), List<(string, UIMenuItem)>> DynamicMenuItems = new();
+    internal readonly Dictionary<(Type, string), List<(string?, UIMenuItem)>> DynamicMenuItems = new();
 
     public void RegisterDynamicMenuItem(Type destinationType, UIMenuItem menuItem, string? menuName = null, string? menuPath = null)
     {
         var tuple = (destinationType, menuName ?? UIMenu.BaseMenuName);
 
-        List<(string, UIMenuItem)> l1;
+        List<(string?, UIMenuItem)> l1;
         if (DynamicMenuItems.ContainsKey(tuple))
             l1 = DynamicMenuItems[tuple];
         else
         {
-            l1 = new List<(string, UIMenuItem)>();
+            l1 = new List<(string?, UIMenuItem)>();
             DynamicMenuItems.Add(tuple, l1);
         }
 

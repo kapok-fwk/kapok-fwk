@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Kapok.Core;
+namespace Kapok.BusinessLayer;
 
 public class FilterSet<T> : FilterBase<T>, IDisposable, IFilterSet<T>
     where T : class
@@ -232,7 +232,7 @@ public class FilterSet<T> : FilterBase<T>, IDisposable, IFilterSet<T>
             _layers[layer].Clear();
     }
 
-    public static implicit operator Expression<Func<T, bool>>(FilterSet<T>? filterSet)
+    public static implicit operator Expression<Func<T, bool>>?(FilterSet<T>? filterSet)
     {
         return filterSet?.FilterExpression;
     }

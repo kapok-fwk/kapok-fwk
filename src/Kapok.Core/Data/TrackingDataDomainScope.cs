@@ -1,4 +1,4 @@
-﻿namespace Kapok.Core;
+﻿namespace Kapok.Data;
 
 public abstract class TrackingDataDomainScope : DataDomainScope
 {

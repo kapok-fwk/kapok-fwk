@@ -1,9 +1,10 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Kapok.Data;
 using Kapok.Entity.Model;
 
-namespace Kapok.Core;
+namespace Kapok.BusinessLayer;
 
 public class Dao<T> : DaoBase<T>
     where T : class, new()
@@ -13,11 +14,13 @@ public class Dao<T> : DaoBase<T>
     /// </summary>
     protected readonly IRepository<T> Repository;
 
+    private bool _isReadOnly;
+
     public Dao(IDataDomainScope dataDomainScope, IRepository<T> repository, bool isReadOnly = false)
         : base(dataDomainScope)
     {
         Repository = repository;
-        IsReadOnly = isReadOnly;
+        _isReadOnly = isReadOnly;
 
         foreach (var dataScope in DataDomainScope.DataPartitions.Values)
         {
@@ -49,7 +52,11 @@ public class Dao<T> : DaoBase<T>
     }
 
     // TODO: replace the IsReadOnly to a ForUpdate or IsTrackingActivated option with the tracking happing right here in the DAO before it is passed to the repository
-    public override bool IsReadOnly { get; protected set; }
+    public override bool IsReadOnly
+    {
+        get => _isReadOnly;
+        protected set => _isReadOnly = value;
+    }
 
     protected void TestIsNotReadonly([CallerMemberName] string? methodName = null)
     {
@@ -74,7 +81,7 @@ public class Dao<T> : DaoBase<T>
 
             dataScope.PartitionProperty.SetMethod.Invoke(
                 entry,
-                new object?[]
+                new[]
                 {
                     Filter.GetDataPartitionValue(dataScope)
                 }
@@ -154,9 +161,20 @@ public class Dao<T> : DaoBase<T>
         var nestedDao = DataDomainScope.GetDao<TNested>();
 
         var reference = references.First();
+
+        if (reference.ForeignKeyProperties == null)
+            throw new NotSupportedException(
+                $"The reference {reference.Name} has no foreign key properties defined. Please check your definition again. You can't use this reference with the method {nameof(GetNestedAsQueryable)}");
+
+        if (reference.PrincipalKeyProperties == null && nestedDao.Model.PrimaryKeyProperties == null)
+            throw new NotSupportedException(
+                $"The reference {reference.Name} has no principal key and primary key properties defined. Please check your definition again. You can't use this reference with the method {nameof(GetNestedAsQueryable)}");
+
         var foreignKeyProperties = reference.ForeignKeyProperties.ToList();
         var principalKeyProperties =
+#pragma warning disable CS8604
             (reference.PrincipalKeyProperties ?? nestedDao.Model.PrimaryKeyProperties).ToList();
+#pragma warning restore CS8604
             
         var nestedEntityParameter = Expression.Parameter(typeof(TNested), "nested");
         Expression? whereBodyExpression = null;
@@ -165,6 +183,10 @@ public class Dao<T> : DaoBase<T>
         {
             var principalKeyProperty = principalKeyProperties[i];
             var foreignKeyProperty = foreignKeyProperties[i];
+
+            if (foreignKeyProperty.GetMethod == null)
+                throw new Exception(
+                    $"Foreign key Property {foreignKeyProperty.Name} of relationship {reference.Name} has no getter method. All properties used in a reference must have a public getter method.");
 
             var conditionExpression = Expression.Equal(
                 Expression.Property(nestedEntityParameter, principalKeyProperty),

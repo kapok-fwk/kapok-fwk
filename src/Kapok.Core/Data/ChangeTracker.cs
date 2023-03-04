@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Reflection;
 
-namespace Kapok.Core;
+namespace Kapok.Data;
 
 public enum ChangeTrackingState
 {
@@ -15,13 +15,20 @@ public enum ChangeTrackingState
 
 public class ChangeTracking
 {
-    public Type EntityType;
-    public object? OriginalEntity;
-    public object Entity;
-    public ChangeTrackingState State;
+    public ChangeTracking(object entity, Type entityType, object? originalEntity = null)
+    {
+        EntityType = entityType;
+        Entity = entity;
+        OriginalEntity = originalEntity;
+    }
 
-    public string LastPropertyNameChanging;
-    public object LastPropertyValueChanging;
+    public readonly object Entity;
+    public readonly Type EntityType;
+    public object? OriginalEntity;
+    public ChangeTrackingState State = ChangeTrackingState.None;
+
+    public string? LastPropertyNameChanging;
+    public object? LastPropertyValueChanging;
 }
 
 public static class DtoMapper
@@ -34,14 +41,18 @@ public static class DtoMapper
     public static object Map(Type dtoType, object dto)
     {
         var instance = Activator.CreateInstance(dtoType);
+#pragma warning disable CS8604
         Map(dtoType, dto, instance);
+#pragma warning restore CS8604
         return instance;
     }
 
     public static object Map(Type dtoType, PropertyInfo[] propertyList, object dto)
     {
         var instance = Activator.CreateInstance(dtoType);
+#pragma warning disable CS8604
         Map(propertyList, dto, instance);
+#pragma warning restore CS8604
         return instance;
     }
 
@@ -49,10 +60,12 @@ public static class DtoMapper
     {
         foreach (var p in GetProperties(dtoType))
         {
+#pragma warning disable CS8602
             p.SetMethod.Invoke(
                 toDto,
                 new[] { p.GetMethod.Invoke(fromDto, null) }
             );
+#pragma warning restore CS8602
         }
     }
 
@@ -60,10 +73,12 @@ public static class DtoMapper
     {
         foreach (var p in propertyList)
         {
+#pragma warning disable CS8602
             p.SetMethod.Invoke(
                 toDto,
                 new[] { p.GetMethod.Invoke(fromDto, null) }
             );
+#pragma warning restore CS8602
         }
     }
 }
@@ -126,8 +141,8 @@ public class ChangeTracker : IEnumerable<ChangeTracking>
 
     private void EntityNotifyPropertyChanging_PropertyChanging(object? sender, PropertyChangingEventArgs e)
     {
-        if (sender == null) return;
-
+        if (sender == null || e.PropertyName == null) return;
+        
         var trackingObject = Get(sender);
         if (trackingObject == null)
             return;
@@ -136,12 +151,12 @@ public class ChangeTracker : IEnumerable<ChangeTracking>
             return;
             
         trackingObject.LastPropertyNameChanging = e.PropertyName;
-        trackingObject.LastPropertyValueChanging = propertyInfo.GetMethod.Invoke(sender, null);
+        trackingObject.LastPropertyValueChanging = propertyInfo.GetMethod?.Invoke(sender, null);
     }
 
     private void EntityNotifyPropertyChanged_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (sender == null) return;
+        if (sender == null || e.PropertyName == null) return;
 
         var trackingObject = Get(sender);
         if (trackingObject == null)
@@ -156,8 +171,8 @@ public class ChangeTracker : IEnumerable<ChangeTracking>
             trackingObject.State != ChangeTrackingState.Detached
            )
         {
-            var currentValue = propertyInfo.GetMethod.Invoke(sender, null);
-            object oldValue;
+            var currentValue = propertyInfo.GetMethod?.Invoke(sender, null);
+            object? oldValue;
 
             if (typeof(INotifyPropertyChanging).IsAssignableFrom(trackingObject.EntityType))
             {
@@ -171,7 +186,7 @@ public class ChangeTracker : IEnumerable<ChangeTracking>
             }
             else // base on original entity
             {
-                oldValue = propertyInfo.GetMethod.Invoke(trackingObject.OriginalEntity, null);
+                oldValue = propertyInfo.GetMethod?.Invoke(trackingObject.OriginalEntity, null);
             }
 
             if (oldValue != currentValue)
@@ -190,13 +205,7 @@ public class ChangeTracker : IEnumerable<ChangeTracking>
 
         var clonedEntity = DtoMapper.Map(entityType, entity);
 
-        var trackingObject = new ChangeTracking
-        {
-            Entity = entity,
-            OriginalEntity = clonedEntity,
-            EntityType = entityType,
-            State = ChangeTrackingState.None
-        };
+        var trackingObject = new ChangeTracking(entity, entityType, originalEntity: clonedEntity);
         lock (_changeTracker)
         {
             _changeTracker.Add(trackingObject);

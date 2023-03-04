@@ -1,4 +1,4 @@
-﻿using Kapok.Core;
+﻿using Kapok.Module;
 
 namespace Kapok.Data.EntityFrameworkCore.UnitTest.SampleModel;
 
@@ -12,7 +12,7 @@ public sealed class SampleModelModule : ModuleBase
     public SampleModelModule()
         : base(nameof(SampleModelModule))
     {
-        AddDependsOnModule(typeof(Kapok.Core.CoreModule));
+        AddDependsOnModule(typeof(Core.CoreModule));
     }
 
     public override void Initiate()

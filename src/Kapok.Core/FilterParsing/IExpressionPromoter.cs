@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Kapok.Core.FilterParsing;
+namespace Kapok.BusinessLayer.FilterParsing;
 
 /// <summary>
 /// Expression promoter is used to promote object or value types

@@ -13,7 +13,9 @@ public class DataPortPropertyColumn : DataPortColumn
 
         // TODO: we get here just one language; maybe we should load all languages here
         DisplayName = propertyInfo.GetDisplayAttributeNameOrDefault();
+#pragma warning disable CS8604
         DisplayDescription = propertyInfo.GetDisplayAttributeDescriptionOrDefault();
+#pragma warning restore CS8604
 
         var requiredAttr = propertyInfo.GetCustomAttribute<RequiredAttribute>();
         Required = requiredAttr != null;

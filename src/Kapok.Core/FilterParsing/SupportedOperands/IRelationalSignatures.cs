@@ -1,4 +1,4 @@
-﻿namespace Kapok.Core.FilterParsing.SupportedOperands;
+﻿namespace Kapok.BusinessLayer.FilterParsing.SupportedOperands;
 
 internal interface IRelationalSignatures : IArithmeticSignatures
 {

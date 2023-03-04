@@ -11,5 +11,5 @@ public interface IListPage : IDataPage
 public interface IListPage<TEntry> : IListPage, IDataPage<TEntry>
     where TEntry : class, new()
 {
-    IDataSetSelectionAction<TEntry> OpenCardPageAction { get; }
+    IDataSetSelectionAction<TEntry>? OpenCardPageAction { get; }
 }

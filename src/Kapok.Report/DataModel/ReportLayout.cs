@@ -102,6 +102,6 @@ public class ReportLayout : EditableEntityBase, IEquatable<ReportLayout>
 
     public override string ToString()
     {
-        return $"{Name.LanguageOrDefault(CultureInfo.CurrentUICulture)} ({ReportLayoutId:N})";
+        return $"{Name?.LanguageOrDefault(CultureInfo.CurrentUICulture) ?? GetType().FullName} ({ReportLayoutId:N})";
     }
 }

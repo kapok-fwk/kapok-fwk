@@ -35,7 +35,7 @@ public class UIMenuItemAction : UIMenuItem, IAction
 
     #region IAction members
 
-    public event EventHandler CanExecuteChanged
+    public event EventHandler? CanExecuteChanged
     {
         add => Action.CanExecuteChanged += value;
         remove => Action.CanExecuteChanged -= value;
@@ -87,7 +87,7 @@ public class UIMenuItemAction<T> : UIMenuItem, IAction<T>
 
     #region IAction members
 
-    public event EventHandler CanExecuteChanged
+    public event EventHandler? CanExecuteChanged
     {
         add => Action.CanExecuteChanged += value;
         remove => Action.CanExecuteChanged -= value;

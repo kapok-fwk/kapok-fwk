@@ -2,7 +2,7 @@
 using Res = Kapok.Core.Resources.BusinessLayer.MessageSeverity;
 // ReSharper disable UnusedMember.Global
 
-namespace Kapok.Core;
+namespace Kapok.BusinessLayer;
 
 public enum MessageSeverity
 {

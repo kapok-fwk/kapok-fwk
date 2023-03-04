@@ -1,18 +1,16 @@
-﻿namespace Kapok.Core;
+﻿namespace Kapok.BusinessLayer;
 
 public class BusinessLayerMessage : IBusinessLayerMessage
 {
-    public BusinessLayerMessage() { }
-
     public BusinessLayerMessage(string text, MessageSeverity severity)
     {
         Text = text;
         Severity = severity;
     }
 
-    public MessageSeverity Severity { get; set; }
+    public MessageSeverity Severity { get; protected set; }
 
-    public string Text { get; set; }
+    public string Text { get; protected set; }
 
     public override string ToString()
     {
@@ -27,7 +25,11 @@ public class Error : Exception, IBusinessLayerMessage
     {
     }
 
+    #region IBusinessLayerMessage
+
     MessageSeverity IBusinessLayerMessage.Severity => MessageSeverity.Error;
 
     string IBusinessLayerMessage.Text => Message;
+
+    #endregion
 }

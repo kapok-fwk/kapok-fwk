@@ -1,6 +1,6 @@
-﻿using Kapok.Core;
+﻿using Kapok.BusinessLayer;
 
-namespace Kapok.Entity;
+namespace Kapok.Entity.Model;
 
 public interface IDrillDownDefinition
 {
@@ -14,7 +14,7 @@ public interface IDrillDownDefinition
     /// 2. object is the entity which was selected on drill-down.
     /// 3. IReadOnlyDictionary&lt;string,object&gt; is a list of all static filters applied to properties on the object which is drilled-down (this list will contain e.g. flow-filters which shall be passed over to the detail data).
     /// </summary>
-    Action<IFilterSet, object, IReadOnlyDictionary<string, object>> Filter { get; }
+    Action<IFilterSet, object, IReadOnlyDictionary<string, object?>> Filter { get; }
 
     /* TODO: not implemented yet
     /// <summary>
@@ -28,19 +28,19 @@ public interface IDrillDownDefinition<TDestinationEntry, in TSourceEntry> : IDri
     where TDestinationEntry : class
     where TSourceEntry : class
 {
-    new Action<IFilterSet<TDestinationEntry>, TSourceEntry, IReadOnlyDictionary<string, object>> Filter { get; }
+    new Action<IFilterSet<TDestinationEntry>, TSourceEntry, IReadOnlyDictionary<string, object?>> Filter { get; }
 }
 
 public class DrillDownDefinition : IDrillDownDefinition
 {
-    public DrillDownDefinition(Type pageType, Action<IFilterSet, object, IReadOnlyDictionary<string, object>> filter)
+    public DrillDownDefinition(Type pageType, Action<IFilterSet, object, IReadOnlyDictionary<string, object?>> filter)
     {
         PageType = pageType;
         Filter = filter;
     }
 
     public Type PageType { get; protected set; }
-    public Action<IFilterSet, object, IReadOnlyDictionary<string, object>> Filter { get; protected set; }
+    public Action<IFilterSet, object, IReadOnlyDictionary<string, object?>> Filter { get; protected set; }
     public Action? DrillDownAction { get; protected set; }
 }
 
@@ -49,7 +49,7 @@ public class DrillDownDefinition<TDestinationEntry, TSourceEntry> : DrillDownDef
     where TSourceEntry : class
 {
     public DrillDownDefinition(Type pageType,
-        Action<IFilterSet<TDestinationEntry>, TSourceEntry, IReadOnlyDictionary<string, object>> filter)
+        Action<IFilterSet<TDestinationEntry>, TSourceEntry, IReadOnlyDictionary<string, object?>> filter)
         : base(
             pageType,
             (filterSet, entry, entryStaticFilters) => filter.Invoke((IFilterSet<TDestinationEntry>)filterSet,
@@ -58,6 +58,6 @@ public class DrillDownDefinition<TDestinationEntry, TSourceEntry> : DrillDownDef
     {
     }
 
-    Action<IFilterSet<TDestinationEntry>, TSourceEntry, IReadOnlyDictionary<string, object>> IDrillDownDefinition<TDestinationEntry, TSourceEntry>.
+    Action<IFilterSet<TDestinationEntry>, TSourceEntry, IReadOnlyDictionary<string, object?>> IDrillDownDefinition<TDestinationEntry, TSourceEntry>.
         Filter => Filter;
 }

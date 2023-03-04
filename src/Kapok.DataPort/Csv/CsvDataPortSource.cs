@@ -87,14 +87,14 @@ public class CsvDataPortSource : IDataPortTableSource
         return cellObjectValues;
     }
 
-    public IEnumerator<object[]> GetEnumerator()
+    public IEnumerator<object?[]> GetEnumerator()
     {
         if (HasHeader && Schema == null)
             ReadSchema();
 
         while (true)
         {
-            object[]? row = ReadNextRow();
+            object?[]? row = ReadNextRow();
 
             if (row == null)
                 yield break;

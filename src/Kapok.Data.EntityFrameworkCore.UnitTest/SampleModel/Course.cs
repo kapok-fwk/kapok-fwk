@@ -17,7 +17,7 @@ public class Course : EditableEntityBase
 
     private byte[]? _rowVersion;
     private int _courseId;
-    private string _title;
+    private string _title = string.Empty;
     private int _credits;
 
     [Timestamp]

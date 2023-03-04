@@ -1,7 +1,8 @@
-﻿using Kapok.Core;
-using Kapok.Acl.DataModel;
+﻿using Kapok.Acl.DataModel;
+using Kapok.BusinessLayer;
+using Kapok.Data;
 
-namespace Kapok.Acl;
+namespace Kapok.Acl.BusinessLayer;
 
 public sealed class UserRoleDao : Dao<UserRole>, IUserRoleDao
 {

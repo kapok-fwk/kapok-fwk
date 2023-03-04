@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Kapok.Core;
+namespace Kapok;
 
 public class TypeNotFoundException : Exception
 {

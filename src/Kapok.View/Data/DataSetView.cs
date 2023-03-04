@@ -7,7 +7,8 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Kapok.Core;
+using Kapok.BusinessLayer;
+using Kapok.Data;
 using Kapok.Entity;
 using Res = Kapok.View.Resources.Data.DataSetView;
 
@@ -130,31 +131,25 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
 
     protected virtual void OnAddColumn(ColumnPropertyView column)
     {
-        if (column.PropertyInfo != null)
+        if (column.PropertyInfo.GetCustomAttribute<AutoCalculateAttribute>() != null)
         {
-            if (column.PropertyInfo.GetCustomAttribute<AutoCalculateAttribute>() != null)
+            if (!AutoCalculateProperties.Contains(column.PropertyInfo.Name))
             {
-                if (!AutoCalculateProperties.Contains(column.PropertyInfo.Name))
-                {
-                    AutoCalculateProperties.Add(column.PropertyInfo.Name);
-                }
+                AutoCalculateProperties.Add(column.PropertyInfo.Name);
             }
         }
     }
 
     protected virtual void OnRemoveColumn(ColumnPropertyView column)
     {
-        if (column.PropertyInfo != null)
+        if (column.PropertyInfo.GetCustomAttribute<AutoCalculateAttribute>() != null)
         {
-            if (column.PropertyInfo.GetCustomAttribute<AutoCalculateAttribute>() != null)
-            {
-                if (AutoCalculateProperties.Contains(column.PropertyInfo.Name) &&
+            if (AutoCalculateProperties.Contains(column.PropertyInfo.Name) &&
 
-                    // make sure that we don't remove the autocalc. when another column view uses the same PropertyInfo
-                    Columns.All(c => c.PropertyInfo != column.PropertyInfo))
-                {
-                    AutoCalculateProperties.Remove(column.PropertyInfo.Name);
-                }
+                // make sure that we don't remove the autocalc. when another column view uses the same PropertyInfo
+                Columns.All(c => c.PropertyInfo != column.PropertyInfo))
+            {
+                AutoCalculateProperties.Remove(column.PropertyInfo.Name);
             }
         }
     }
@@ -297,7 +292,7 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
             }
             IsNewEntry = value != null;
             _newEntry = value;
-            OnPropertyChanged(nameof(NewEntry));
+            OnPropertyChanged();
         }
     }
 
@@ -340,7 +335,7 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
                 
             if (_current != null)
                 RefreshPropertyLookups(true); // this could maybe be done deferred
-            OnPropertyChanged(nameof(Current));
+            OnPropertyChanged();
         }
     }
 
@@ -366,7 +361,7 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
             _staticFilterCache.Clear();
 
         _staticFilterCache.AddRange(
-            FilterExpressionParsing.ParseStaticFilters(Filter?.FilterExpression)
+            FilterExpressionParsing.ParseStaticFilters(Filter.FilterExpression)
         );
     }
 
@@ -485,7 +480,11 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
                 // required so that the dao starts tracking the deletion
                 if (e.OldItems.Count == 1)
                 {
+#pragma warning disable CS8604
+#pragma warning disable CS8600
                     Dao.Delete((TEntry)e.OldItems[0]);
+#pragma warning restore CS8600
+#pragma warning restore CS8604
                 }
                 else
                 {
@@ -711,12 +710,6 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
             throw new NotSupportedException($"Insert is currently not allowed to this DataSetView. Caller method: {methodName}");
     }
 
-    private void CheckModifyAllowed([CallerMemberName] string? methodName = default)
-    {
-        if (!ModifyAllowed)
-            throw new NotSupportedException($"Modify is currently not allowed to this DataSetView. Caller method: {methodName}");
-    }
-
     private void CheckDeleteAllowed([CallerMemberName] string? methodName = default)
     {
         if (!DeleteAllowed)
@@ -764,16 +757,14 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
         Dao.Init(entry);
 
         // init entry fields from filter predicate
-        if (Filter != null)
-        {
-            CheckRefreshStaticFilterCache();
+
+        CheckRefreshStaticFilterCache();
 
 #pragma warning disable CS8602 // Dereferenzierung eines möglichen Nullverweises.
-            foreach (var cache in _staticFilterCache)
+        foreach (var cache in _staticFilterCache)
 #pragma warning restore CS8602 // Dereferenzierung eines möglichen Nullverweises.
-            {
-                cache.Key.SetMethod?.Invoke(entry, new[] {cache.Value});
-            }
+        {
+            cache.Key.SetMethod?.Invoke(entry, new[] {cache.Value});
         }
     }
 
@@ -800,7 +791,7 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
                 return true;
         }
 
-        return DataDomainScope?.CanSave() ?? false;
+        return DataDomainScope.CanSave();
     }
 
     public virtual void PrepareSave()
@@ -889,12 +880,12 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
         Collection.Add(newEntry);
     }
 
-    protected virtual bool CanDeleteEntry(IList<TEntry> selectedEntries)
+    protected virtual bool CanDeleteEntry(IList<TEntry?>? selectedEntries)
     {
         return DeleteAllowed && selectedEntries?.Count > 0;
     }
 
-    protected virtual void DeleteEntry(IList<TEntry> selectedEntries)
+    protected virtual void DeleteEntry(IList<TEntry?>? selectedEntries)
     {
         if (selectedEntries == null) return;
 
@@ -988,7 +979,7 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
         Refresh();
     }
 
-    protected virtual void OnEntryErrorsChanged(TEntry entry, string propertyName)
+    protected virtual void OnEntryErrorsChanged(TEntry entry, string? propertyName)
     {
         if (((INotifyDataErrorInfo) entry).HasErrors)
         {
@@ -1012,13 +1003,13 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
         }
     }
 
-    protected virtual void OnEntryPropertyChanging(TEntry entry, string propertyName)
+    protected virtual void OnEntryPropertyChanging(TEntry entry, string? propertyName)
     {
         if (!typeof(TEntry).IsSubclassOf(typeof(EditableEntityBase)))
             Dao.OnPropertyChanging(entry, propertyName);
     }
 
-    protected virtual void OnEntryPropertyChanged(TEntry entry, string propertyName)
+    protected virtual void OnEntryPropertyChanged(TEntry entry, string? propertyName)
     {
         if (!typeof(TEntry).IsSubclassOf(typeof(EditableEntityBase)))
             Dao.OnPropertyChanged(entry, propertyName);
@@ -1061,18 +1052,21 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
 
     private void Entry_PropertyChanging(object? sender, PropertyChangingEventArgs e)
     {
+        if (sender == null) return;
         OnEntryPropertyChanging((TEntry)sender, e.PropertyName);
         EntryPropertyChanging?.Invoke(this, new EntryPropertyChangingEventArgs(sender, e.PropertyName));
     }
 
     private void Entry_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (sender == null) return;
         OnEntryPropertyChanged((TEntry)sender, e.PropertyName);
         EntryPropertyChanged?.Invoke(this, new EntryPropertyChangedEventArgs(sender, e.PropertyName));
     }
 
     private void Entry_ErrorsChanged(object? sender, DataErrorsChangedEventArgs e)
     {
+        if (sender == null) return;
         OnEntryErrorsChanged((TEntry)sender, e.PropertyName);
         EntryErrorsChanged?.Invoke(this, new EntryDataErrorsChangedEventArgs((TEntry)sender, e.PropertyName));
     }
@@ -1129,7 +1123,9 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
             foreach (var entry in Collection)
             {
                 if (basedOnEditableEntityViewModelBase)
+#pragma warning disable CS8604
                     EditableEntityBase.SetBusinessLayerService(entry as EditableEntityBase, Dao);
+#pragma warning restore CS8604
                 if (implementsINotifyPropertyChanging)
                     ((INotifyPropertyChanging)entry).PropertyChanging += Entry_PropertyChanging;
                 if (implementsINotifyPropertyChanged)
@@ -1164,7 +1160,9 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
             foreach (var entry in Collection)
             {
                 if (basedOnEditableEntityViewModelBase)
+#pragma warning disable CS8604
                     EditableEntityBase.SetBusinessLayerService(entry as EditableEntityBase, null);
+#pragma warning restore CS8604
                 if (implementsINotifyPropertyChanging)
                     ((INotifyPropertyChanging) entry).PropertyChanging -= Entry_PropertyChanging;
                 if (implementsINotifyPropertyChanged)
@@ -1208,7 +1206,7 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
     object? IDataSetReadonlyView.Current
     {
         get => Current;
-        set => Current = (TEntry)value;
+        set => Current = (TEntry?)value;
     }
 
     IQueryable IDataSetReadonlyView.AsQueryable()

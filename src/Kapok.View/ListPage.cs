@@ -7,7 +7,7 @@ using System.Diagnostics;
 #endif
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using Kapok.Core;
+using Kapok.Data;
 using Kapok.Entity;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
@@ -65,8 +65,9 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
         return dataSetView;
     }
 
-    private void UpdateBaseDataSetViewAllowedOption(IDataSetView<TEntry> baseDataSetView)
+    private void UpdateBaseDataSetViewAllowedOption(IDataSetView<TEntry>? baseDataSetView)
     {
+        if (baseDataSetView == null) return;
         baseDataSetView.InsertAllowed = AllowCreateNewEntry && (Editable || OpenCardPageAction != null);
         baseDataSetView.ModifyAllowed = Editable;
         baseDataSetView.DeleteAllowed = AllowDeleteEntry && (Editable || OpenCardPageAction != null);
@@ -79,20 +80,25 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
 
         base.OnLoaded();
 
-        if (((ICollection)DataSet.Columns).Count == 0 && CurrentListView == null && ListViews.Count > 0)
+        if (DataSet == null || ((ICollection)DataSet.Columns).Count == 0 && CurrentListView == null && ListViews.Count > 0)
         {
             CurrentListView = ListViews[0];
         }
 
         UpdateBaseDataSetViewAllowedOption(DataSet);
 
+#pragma warning disable CS8602
         DataSet.Load();
         DataSet.CanSaveChanged += DataSet_CanSaveChanged;
+#pragma warning restore CS8602
     }
 
     protected override void OnClosed()
     {
-        DataSet.CanSaveChanged -= DataSet_CanSaveChanged;
+        if (DataSet != null)
+        {
+            DataSet.CanSaveChanged -= DataSet_CanSaveChanged;
+        }
         base.OnClosed();
     }
 
@@ -107,7 +113,9 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
     public ObservableCollection<DataSetListView> ListViews
     {
         get => _listViews;
+#pragma warning disable CS8601
         set => SetProperty(ref _listViews, value);
+#pragma warning restore CS8601
     }
 
     /// <summary>
@@ -206,7 +214,7 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
 
         if (OpenCardPageAction != null)
         {
-            var args = new[] {DataSet.Current}.ToList();
+            var args = new[] {DataSet?.Current}.ToList();
             if (OpenCardPageAction.CanExecute(args))
             {
                 OpenCardPageAction.Execute(args);
@@ -218,23 +226,23 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
         }
     }
 
-    protected virtual bool CanEditEntry(IList<TEntry> selectedEntries)
+    protected virtual bool CanEditEntry(IList<TEntry?>? selectedEntries)
     {
         if (IsEditable)
             return true;
 
-        if (selectedEntries.Count > 1)
+        if ((selectedEntries?.Count ?? 0) > 1)
             return false;
 
         return true;
     }
 
-    protected virtual void EditEntry(IList<TEntry> selectedEntries)
+    protected virtual void EditEntry(IList<TEntry?>? selectedEntries)
     {
         ViewDomain.StartEditingDefaultDataGridCurrentEntity(this, false);
     }
 
-    private static string StringFormatToExcelNumberFormat(Type type, string stringFormat)
+    private static string StringFormatToExcelNumberFormat(Type type, string? stringFormat)
     {
         // excel build-in formats
         const string defaultFormat = "General"; // Build-In format 0
@@ -246,7 +254,9 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
 
         if (type.IsArray)
         {
+#pragma warning disable CS8600
             type = type.GetElementType();
+#pragma warning restore CS8600
             if (type == null)
                 return defaultFormat;
         }
@@ -354,7 +364,7 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
 
     public static void ExportAsExcelSheet(IViewDomain viewDomain, IDataSetView<TEntry> dataSet, CultureInfo cultureInfo)
     {
-        string filename = viewDomain.OpenSaveFileDialog(
+        string? filename = viewDomain.OpenSaveFileDialog(
             title: "Save table content as excel sheet", // TODO: translation missing here
             fileMask: "Excel sheet (*.xlsx)|*.xlsx|All files|*"
         );
@@ -406,12 +416,14 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
 
             foreach (var column in columnCache)
             {
+#pragma warning disable CS8602
                 var value = column.Key.PropertyInfo.GetMethod.Invoke(entry, null) ??
                             column.Key.PropertyInfo.PropertyType.GetTypeDefault();
+#pragma warning restore CS8602
 
                 if (column.Key.PropertyInfo.PropertyType.IsEnum)
                 {
-                    newRow[column.Value] = EnumExtension.EnumValueToDisplayName(value, cultureInfo);
+                    newRow[column.Value] = value != null ? EnumExtension.EnumValueToDisplayName(value, cultureInfo) : DBNull.Value;
                 }
                 else
                 {
@@ -426,53 +438,51 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
 
         #region write DataTable to excel file
 
-        Stream fileStream = null;
+        Stream? fileStream = null;
         try
         {
             fileStream = File.OpenWrite(filename);
 
-            using (var p = new ExcelPackage(fileStream))
+            using var p = new ExcelPackage(fileStream);
+            var worksheet = p.Workbook.Worksheets.Add("Sheet 1"); // TODO use resource for 'Sheet 1' and translate it
+
+            worksheet.Cells.Style.Font.Size = 11;
+            worksheet.Cells.Style.Font.Name = "Calibri";
+
+            //Merging cells and create a center heading for out table
+
+            if (dataTable.Columns.Count > 0)
             {
-                var worksheet = p.Workbook.Worksheets.Add("Sheet 1"); // TODO use resource for 'Sheet 1' and translate it
+                // fill rows from dataTable
+                worksheet.Cells[1, 1].LoadFromDataTable(dataTable, true, TableStyles.Light1);
 
-                worksheet.Cells.Style.Font.Size = 11;
-                worksheet.Cells.Style.Font.Name = "Calibri";
+                var columns = dataSet.Columns.Where(c => !((ColumnPropertyView) c).IsHidden).ToArray();
 
-                //Merging cells and create a center heading for out table
-
-                if (dataTable.Columns.Count > 0)
+                // override the header with new captions and style
+                int n = 1;
+                foreach (DataColumn col in dataTable.Columns)
                 {
-                    // fill rows from dataTable
-                    worksheet.Cells[1, 1].LoadFromDataTable(dataTable, true, TableStyles.Light1);
+                    var columnDefinition = columns[n - 1];
 
-                    var columns = dataSet.Columns.Where(c => !((ColumnPropertyView) c).IsHidden).ToArray();
+                    worksheet.Column(n).Style.Numberformat.Format = StringFormatToExcelNumberFormat(col.DataType, columnDefinition.StringFormat);
 
-                    // override the header with new captions and style
-                    int n = 1;
-                    foreach (DataColumn col in dataTable.Columns)
-                    {
-                        var columnDefinition = columns[n - 1];
+                    var cell = worksheet.Cells[1, n++];
 
-                        worksheet.Column(n).Style.Numberformat.Format = StringFormatToExcelNumberFormat(col.DataType, columnDefinition?.StringFormat);
+                    cell.Value = columnDefinition.DisplayName?.LanguageOrDefault(CultureInfo.CurrentUICulture)
+                                 ?? col.ColumnName;
 
-                        var cell = worksheet.Cells[1, n++];
-
-                        cell.Value = columnDefinition?.DisplayName?.LanguageOrDefault(CultureInfo.CurrentUICulture)
-                                     ?? col.ColumnName;
-
-                        cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        cell.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightBlue);
-                        cell.Style.Border.Bottom.Style = cell.Style.Border.Top.Style = cell.Style.Border.Left.Style =
-                            cell.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                    }
-
-                    // Auto size columns
-                    for (int j = 1; j <= dataTable.Columns.Count; j++)
-                        worksheet.Cells[1, j, dataTable.Rows.Count + 1 /* add 1 for header line */, j].AutoFitColumns(10, 75);
+                    cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    cell.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightBlue);
+                    cell.Style.Border.Bottom.Style = cell.Style.Border.Top.Style = cell.Style.Border.Left.Style =
+                        cell.Style.Border.Right.Style = ExcelBorderStyle.Thin;
                 }
 
-                p.Save();
+                // Auto size columns
+                for (int j = 1; j <= dataTable.Columns.Count; j++)
+                    worksheet.Cells[1, j, dataTable.Rows.Count + 1 /* add 1 for header line */, j].AutoFitColumns(10, 75);
             }
+
+            p.Save();
         }
         finally
         {
@@ -488,31 +498,32 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
 
     protected virtual void ExportAsExcelSheet()
     {
+        if (DataSet == null) return;
         ExportAsExcelSheet(ViewDomain, DataSet, ViewDomain.Culture);
     }
 
     protected virtual bool CanSortUpEntry()
     {
-        return DataSet.CanSortUp();
+        return DataSet?.CanSortUp() ?? false;
     }
 
     protected virtual bool CanSortDownEntry()
     {
-        return DataSet.CanSortDown();
+        return DataSet?.CanSortDown() ?? false;
     }
 
     protected virtual void SortUpEntry()
     {
         EndEdit();
         if (RequestSaveData())
-            DataSet.SortUp();
+            DataSet?.SortUp();
     }
 
     protected virtual void SortDownEntry()
     {
         EndEdit();
         if (RequestSaveData())
-            DataSet.SortDown();
+            DataSet?.SortDown();
     }
 
     protected virtual bool CanToggleFilterVisible()
@@ -529,7 +540,7 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
         // We set here the `IsChecked` field manually, because the command is bound
         // with an short-key, and when using the short-key instead of an ToggleButton
         // control, the IsChecked field is not automatically set.
-        ToggleFilterVisibleAction.IsChecked = DataSet.IsFilterVisible;
+        ToggleFilterVisibleAction.IsChecked = DataSet?.IsFilterVisible ?? false;
     }
 
     protected virtual bool CanClearUserFilter()
@@ -560,10 +571,10 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
 
     #region IListPage
 
-    IDataSetListView IListPage.CurrentListView
+    IDataSetListView? IListPage.CurrentListView
     {
         get => CurrentListView;
-        set => CurrentListView = (DataSetListView)value;
+        set => CurrentListView = (DataSetListView?)value;
     }
 
     IEnumerable<IDataSetListView> IListPage.ListViews => ListViews;

@@ -1,6 +1,4 @@
-﻿using Kapok.Core;
-
-namespace Kapok.Data.InMemory;
+﻿namespace Kapok.Data.InMemory;
 
 /// <summary>
 /// A in-memory repository holding the entities in memory until
@@ -31,7 +29,7 @@ public class InMemoryRepository<T> : IRepository<T>
         _list.Add(entity);
     }
 
-    public virtual void Update(T entity, T originalEntity)
+    public virtual void Update(T entity, T? originalEntity)
     {
         // nothing to do; all is already stored in memory
     }
@@ -57,7 +55,7 @@ public class InMemoryRepository<T> : IRepository<T>
         return Task.CompletedTask;
     }
 
-    public virtual Task UpdateAsync(T entity, T originalEntity)
+    public virtual Task UpdateAsync(T entity, T? originalEntity)
     {
         Update(entity, originalEntity);
         return Task.CompletedTask;

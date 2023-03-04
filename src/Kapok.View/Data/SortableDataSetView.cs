@@ -20,7 +20,7 @@ public static class SortableDataSetView
         if (!typeof(ISortableEntity).IsAssignableFrom(typeof(TEntry)))
             throw new NotSupportedException($"The method {nameof(CanSortUp)} can only be used with an TEntry which implements the interface {typeof(ISortableEntity).FullName}.");
 
-        return tableData?.Current != null &&
+        return tableData.Current != null &&
                (from m in tableData.Collection.Cast<ISortableEntity>()
                    where m.SortOrder < ((ISortableEntity)tableData.Current).SortOrder
                    orderby m.SortOrder descending
@@ -40,7 +40,7 @@ public static class SortableDataSetView
         if (!typeof(ISortableEntity).IsAssignableFrom(typeof(TEntry)))
             throw new NotSupportedException($"The method {nameof(CanSortDown)} can only be used with an TEntry which implements the interface {typeof(ISortableEntity).FullName}.");
             
-        return tableData?.Current != null &&
+        return tableData.Current != null &&
                (from m in tableData.Collection.Cast<ISortableEntity>()
                    where m.SortOrder > ((ISortableEntity)tableData.Current).SortOrder
                    orderby m.SortOrder ascending
@@ -59,8 +59,15 @@ public static class SortableDataSetView
         if (!typeof(ISortableEntity).IsAssignableFrom(typeof(TEntry)))
             throw new NotSupportedException($"The method {nameof(SortUp)} can only be used with an TEntry which implements the interface {typeof(ISortableEntity).FullName}.");
 
+        var currMember = tableData.Current as ISortableEntity;
+        if (currMember == null)
+        {
+            Debug.WriteLineIf(currMember != null, "IDataSetView<>.SortUp not possible, because entity is not assignable to ISortableEntity");
+            return;
+        }
+
         var prevMember = (from m in tableData.Collection.Cast<ISortableEntity>()
-                where m.SortOrder < ((ISortableEntity)tableData.Current).SortOrder
+                where m.SortOrder < currMember.SortOrder
                 orderby m.SortOrder descending
                 select m
             ).FirstOrDefault();
@@ -68,7 +75,7 @@ public static class SortableDataSetView
             throw new NotSupportedException(Res.SortUp_IsAlreadyFirstElement);
 
         prevMember.SortOrder++;
-        ((ISortableEntity)tableData.Current).SortOrder--;
+        currMember.SortOrder--;
         tableData.Save();
         tableData.Refresh();
     }
@@ -84,8 +91,15 @@ public static class SortableDataSetView
         if (!typeof(ISortableEntity).IsAssignableFrom(typeof(TEntry)))
             throw new NotSupportedException($"The method {nameof(SortDown)} can only be used with an TEntry which implements the interface {typeof(ISortableEntity).FullName}.");
 
+        var currMember = tableData.Current as ISortableEntity;
+        if (currMember == null)
+        {
+            Debug.WriteLineIf(currMember != null, "IDataSetView<>.SortUp not possible, because entity is not assignable to ISortableEntity");
+            return;
+        }
+
         var nextMember = (from m in tableData.Collection.Cast<ISortableEntity>()
-                where m.SortOrder > ((ISortableEntity)tableData.Current).SortOrder
+                where m.SortOrder > currMember.SortOrder
                 orderby m.SortOrder ascending
                 select m
             ).FirstOrDefault();
@@ -96,7 +110,7 @@ public static class SortableDataSetView
             
 
         nextMember.SortOrder--;
-        ((ISortableEntity)tableData.Current).SortOrder++;
+        currMember.SortOrder++;
         tableData.Save();
         tableData.Refresh();
     }
@@ -124,10 +138,10 @@ public static class SortableDataSetView
         ((INotifyCollectionChanged)dataSet.Collection).CollectionChanged -= CollectionChanged<TEntry>;
     }
 
-    private static void CollectionChanged<TEntry>(object sender, NotifyCollectionChangedEventArgs e)
+    private static void CollectionChanged<TEntry>(object? sender, NotifyCollectionChangedEventArgs e)
         where TEntry : class
     {
-        var collection = (ICollection<TEntry>) sender;
+        var collection = (ICollection<TEntry>?) sender;
         if (collection == null)
             throw new ArgumentException($"The parameter {nameof(sender)} cannot be cast into {nameof(ICollection<TEntry>)}.");
 
@@ -183,7 +197,7 @@ public static class SortableDataSetView
                 if (!(collection is IList<TEntry> list))
                     throw new NotSupportedException($"NotifyCollectionChangedAction.Move is not supported from {nameof(SortableDataSetView)} when collection does not implement IList<T>");
 
-                var leftItem = e.OldItems[0] as ISortableEntity;
+                var leftItem = e.OldItems?[0] as ISortableEntity;
                 var rightItem = list[e.OldStartingIndex] as ISortableEntity;
                 Debug.Assert(leftItem != null, nameof(leftItem) + " != null");
                 Debug.Assert(rightItem != null, nameof(rightItem) + " != null");

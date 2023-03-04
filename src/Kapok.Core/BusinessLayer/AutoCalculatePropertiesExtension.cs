@@ -5,7 +5,7 @@ using System.Reflection.Emit;
 using Kapok.Entity;
 using Kapok.Entity.Model;
 
-namespace Kapok.Core;
+namespace Kapok.BusinessLayer;
 
 public static class AutoCalculatePropertiesExtension
 {
@@ -36,7 +36,7 @@ public static class AutoCalculatePropertiesExtension
         }
     }
 
-    private static TypeInfo? CreateAnonymousTypeForAutoCalculateQuery(Type entryType, IEnumerable<PropertyInfo> autoCalculatePropertyInfos)
+    private static TypeInfo CreateAnonymousTypeForAutoCalculateQuery(Type entryType, IEnumerable<PropertyInfo> autoCalculatePropertyInfos)
     {
         var assemblyName = new AssemblyName("TempAssembly");
         var dynamicAssembly = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
@@ -51,7 +51,7 @@ public static class AutoCalculatePropertiesExtension
             dynamicAnonymousType.DefineField(propertyInfo.Name, propertyInfo.PropertyType, FieldAttributes.Public);
         }
 
-        return dynamicAnonymousType.CreateTypeInfo();
+        return dynamicAnonymousType.CreateTypeInfo() ?? throw new Exception("Could not create anonymous type for auto calculate property");
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ public static class AutoCalculatePropertiesExtension
     /// <param name="nestedDataFilter"></param>
     /// <param name="fields"></param>
     /// <returns></returns>
-    public static IQueryable<T> AutoCalculate<T>(this IQueryable<T> query, IEnumerable<string>? properties, bool noTracking, IReadOnlyDictionary<string, object>? nestedDataFilter = null, string[]? fields = null)
+    public static IQueryable<T> AutoCalculate<T>(this IQueryable<T> query, IEnumerable<string>? properties, bool noTracking, IReadOnlyDictionary<string, object?>? nestedDataFilter = null, string[]? fields = null)
         where T : class, new()
     {
         if (properties == null)
@@ -183,12 +183,14 @@ public static class AutoCalculatePropertiesExtension
                 throw new NotSupportedException(
                     $"When parameter {nameof(fields)} is given the option {nameof(noTracking)} must be true.");
 
-            var anonymousType = CreateAnonymousTypeForAutoCalculateQuery(typeof(T), autoCalculateCache.Select(tu => tu.Item1));
+            TypeInfo anonymousType = CreateAnonymousTypeForAutoCalculateQuery(typeof(T), autoCalculateCache.Select(tu => tu.Item1));
 
             var entryParameter = Expression.Parameter(typeof(T));
 
             var entryFieldBinding = Expression.Bind(
+#pragma warning disable CS8604
                 anonymousType.GetField("__entry"),
+#pragma warning restore CS8604
                 entryParameter
             );
 
@@ -203,7 +205,9 @@ public static class AutoCalculatePropertiesExtension
                     throw new NotSupportedException($"Could not convert the auto-calculate expression from property {propertyInfo.Name} to a lambda expression.");
 
                 var newBinding = Expression.Bind(
+#pragma warning disable CS8604
                     member: anonymousType.GetField(propertyInfo.Name),
+#pragma warning restore CS8604
                     expression: ParameterReplaceVisitor.Replace(
                         calculateFuncLambda.Body
                         , calculateFuncLambda.Parameters[0]
@@ -216,7 +220,9 @@ public static class AutoCalculatePropertiesExtension
             var selectQueryExpression = Expression.Lambda(
                 Expression.MemberInit(
                     // ReSharper disable once AssignNullToNotNullAttribute
+#pragma warning disable CS8604
                     Expression.New(anonymousType.GetConstructor(Type.EmptyTypes)),
+#pragma warning restore CS8604
                     new[] { entryFieldBinding }.Concat(calculatedPropertiesBinding)
                 )
                 , entryParameter
@@ -232,15 +238,19 @@ public static class AutoCalculatePropertiesExtension
                     typeof(Expression<>).MakeGenericType(typeof(Func<,>))
                 });
 
+#pragma warning disable CS8602
             var method = baseMethod.MakeGenericMethod(new Type[]
+#pragma warning restore CS8602
             {
                 typeof(T),
                 anonymousType
             });
 
+#pragma warning disable CS8600
             var newQuery = (IQueryable)method.Invoke(null, new object[] { query, selectQueryExpression });
+#pragma warning restore CS8600
 
-            QueryTranslatorProvider<T> provider = null;
+            QueryTranslatorProvider<T>? provider = null;
 
             if (query is QueryTranslator<T> queryTranslator)
             {
@@ -249,7 +259,7 @@ public static class AutoCalculatePropertiesExtension
                 // we want to use the Entity Framework feature to calculate the auto-calculate columns.
 
                 provider = (QueryTranslatorProvider<T>)queryTranslator.Provider;
-                newQuery = newQuery.NotForUpdate<T>(provider._source);
+                newQuery = queryTranslator.NotForUpdate<T>(provider.Source);
             }
 
             // With this loop we
@@ -259,19 +269,29 @@ public static class AutoCalculatePropertiesExtension
             // NOTE: probably this whole logic could be put in an own enumerable-like IQueryProvider so we don't have to
             //       iterate over it here when e.g. it is never requested in the aftermath.
             var newResultList = new List<T>();
+#pragma warning disable CS8602
             foreach (object o in newQuery)
+#pragma warning restore CS8602
             {
                 var field = anonymousType.GetField("__entry");
+#pragma warning disable CS8602
+#pragma warning disable CS8600
                 T trackedEntry = (T)field.GetValue(o);
+#pragma warning restore CS8600
+#pragma warning restore CS8602
 
                 foreach (var propertyInfo in autoCalculateCache.Select(p => p.Item1))
                 {
                     var calculatedField = anonymousType.GetField(propertyInfo.Name);
 
+#pragma warning disable CS8602
                     propertyInfo.SetMethod.Invoke(trackedEntry, new[] {calculatedField.GetValue(o)});
+#pragma warning restore CS8602
                 }
 
+#pragma warning disable CS8604
                 newResultList.Add(trackedEntry);
+#pragma warning restore CS8604
                 object trackedEntryAsObject = trackedEntry;
                 provider?.TrackCreateIfNotAlreadyTracked(ref trackedEntryAsObject);
             }

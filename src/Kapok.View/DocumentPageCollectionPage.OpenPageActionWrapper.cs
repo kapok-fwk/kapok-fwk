@@ -23,7 +23,7 @@ public partial class DocumentPageCollectionPage
 
         string IAction.Name => _baseAction.Name;
 
-        string IAction.Image => _baseAction.Image;
+        string? IAction.Image => _baseAction.Image;
 
         bool? IAction.ImageIsBig => _baseAction.ImageIsBig;
 
@@ -33,7 +33,7 @@ public partial class DocumentPageCollectionPage
             set => _baseAction.IsVisible = value;
         }
 
-        event EventHandler IAction.CanExecuteChanged
+        event EventHandler? IAction.CanExecuteChanged
         {
             add => _baseAction.CanExecuteChanged += value;
             remove => _baseAction.CanExecuteChanged -= value;

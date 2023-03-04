@@ -27,14 +27,6 @@ public class ExcelReportPackageProcessor : ReportProcessor<ExcelReportPackage>
 
     public override string[] SupportedMimeTypes => new[] { XlsxMimeType };
 
-    public override void ValidateRequiredFields()
-    {
-        // TODO: currently 'ParameterValues' is required. This property is to be deprecated in the future
-        ParameterValues ??= new();
-
-        base.ValidateRequiredFields();
-    }
-
     public override void ProcessToStream(string mimeType, Stream stream)
     {
         ValidateRequiredFields();

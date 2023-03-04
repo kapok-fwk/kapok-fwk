@@ -1,4 +1,4 @@
-﻿namespace Kapok.Core;
+﻿namespace Kapok.BusinessLayer;
 
 public interface IDao<T> : IBusinessLayerService, IReadOnlyDao<T>
     where T : class, new()
@@ -20,10 +20,10 @@ public interface IDao<T> : IBusinessLayerService, IReadOnlyDao<T>
 
     T New();
     void Init(T entry);
-    void OnPropertyChanging(T entry, string propertyName);
-    void OnPropertyChanged(T entry, string propertyName);
-    bool ValidateProperty(T entry, string propertyName, object value,
-        out ICollection<string> validationErrors);
+    void OnPropertyChanging(T entry, string? propertyName);
+    void OnPropertyChanged(T entry, string? propertyName);
+    bool ValidateProperty(T entry, string propertyName, object? value,
+        out ICollection<string>? validationErrors);
 
     IQueryable<T> AsQueryableForUpdate();
 }

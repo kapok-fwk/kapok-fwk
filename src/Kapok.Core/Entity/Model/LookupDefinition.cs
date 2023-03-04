@@ -1,12 +1,12 @@
 ﻿using System.Linq.Expressions;
-using Kapok.Core;
+using Kapok.Data;
 
-namespace Kapok.Entity;
+namespace Kapok.Entity.Model;
 
 public interface ILookupDefinition
 {
     Func<object, IDataDomainScope, IQueryable<object>> EntriesFunc { get; set; }
-    Expression<Func<object, object>> FieldSelectorFunc { get; set; }
+    Expression<Func<object, object>>? FieldSelectorFunc { get; set; }
     bool EntriesFuncDependentOnEntry { get; }
 }
 
@@ -15,17 +15,17 @@ public interface ILookupDefinition<TBaseEntry, TLookupEntry, TFieldType> : ILook
     where TLookupEntry : class
 {
     new Func<TBaseEntry, IDataDomainScope, IQueryable<TLookupEntry>> EntriesFunc { get; set; }
-    new Expression<Func<TLookupEntry, TFieldType>> FieldSelectorFunc { get; set; }
+    new Expression<Func<TLookupEntry, TFieldType>>? FieldSelectorFunc { get; set; }
     new bool EntriesFuncDependentOnEntry { get; }
 }
 
-public class LookupDefinition<TBaseEntry, TLookupEntry, TFieldType> : ILookupDefinition<TBaseEntry, TLookupEntry, TFieldType>, ILookupDefinition
+public class LookupDefinition<TBaseEntry, TLookupEntry, TFieldType> : ILookupDefinition<TBaseEntry, TLookupEntry, TFieldType>
     where TBaseEntry : class
     where TLookupEntry : class
 {
     public LookupDefinition(Func<IDataDomainScope, IQueryable<TLookupEntry>> lookupEntriesFunc)
     {
-        EntriesFunc = (entry, repository) => lookupEntriesFunc.Invoke(repository);
+        EntriesFunc = (_, repository) => lookupEntriesFunc.Invoke(repository);
         EntriesFuncDependentOnEntry = false;
     }
 
@@ -37,7 +37,7 @@ public class LookupDefinition<TBaseEntry, TLookupEntry, TFieldType> : ILookupDef
 
     public LookupDefinition(Func<IDataDomainScope, IQueryable<TLookupEntry>> lookupEntriesFunc, Expression<Func<TLookupEntry, TFieldType>> fieldSelector)
     {
-        EntriesFunc = (entry, repository) => lookupEntriesFunc.Invoke(repository);
+        EntriesFunc = (_, repository) => lookupEntriesFunc.Invoke(repository);
         EntriesFuncDependentOnEntry = false;
         FieldSelectorFunc = fieldSelector;
     }
@@ -51,30 +51,24 @@ public class LookupDefinition<TBaseEntry, TLookupEntry, TFieldType> : ILookupDef
 
     public bool EntriesFuncDependentOnEntry { get; }
 
-    public Func<TBaseEntry, IDataDomainScope, IQueryable<TLookupEntry>>? EntriesFunc { get; set; }
+    public Func<TBaseEntry, IDataDomainScope, IQueryable<TLookupEntry>> EntriesFunc { get; set; }
 
     public Expression<Func<TLookupEntry, TFieldType>>? FieldSelectorFunc { get; set; }
 
     #region ILookupDefinition
         
-    Func<object, IDataDomainScope, IQueryable<object>>? ILookupDefinition.EntriesFunc
+    Func<object, IDataDomainScope, IQueryable<object>> ILookupDefinition.EntriesFunc
     {
         get
         {
-            if (EntriesFunc == null)
-                return null;
-
             return (entry, dataDomainScope) => EntriesFunc.Invoke((TBaseEntry)entry, dataDomainScope);
         }
         set
         {
             if (value == null)
-            {
-                EntriesFunc = null;
-                return;
-            }
-                
-            EntriesFunc = (entry, dataDomainScope) => value.Invoke(entry, dataDomainScope)?.Cast<TLookupEntry>();
+                throw new ArgumentNullException(nameof(value));
+
+            EntriesFunc = (entry, dataDomainScope) => value.Invoke(entry, dataDomainScope).Cast<TLookupEntry>();
         }
     }
 

@@ -3,7 +3,7 @@ using System.Diagnostics;
 #endif
 using NLog;
 
-namespace Kapok.Core;
+namespace Kapok.BusinessLayer;
 
 public class ReportBusinessLayerMessageEventArgs : EventArgs
 {
@@ -17,7 +17,7 @@ public class ReportBusinessLayerMessageEventArgs : EventArgs
 
 public abstract class BusinessLayerBase
 {
-    protected static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    protected static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
 
     // TODO: this is only a temporary solution
     public bool ThrowOnError { get; set; }
@@ -26,7 +26,7 @@ public abstract class BusinessLayerBase
 
     private void RaiseReportMessage(MessageSeverity messageSeverity, string message)
     {
-        Report(new BusinessLayerMessage{Severity = messageSeverity, Text = message});
+        Report(new BusinessLayerMessage(message, messageSeverity));
     }
 
     protected void Report(BusinessLayerMessage businessLayerMessage)

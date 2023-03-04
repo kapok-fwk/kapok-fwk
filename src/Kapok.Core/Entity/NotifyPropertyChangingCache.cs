@@ -29,7 +29,7 @@ public class NotifyPropertyChangingCache
     private readonly Type? _senderType;
 
     private object? _lastSender;
-    private readonly Dictionary<string, object> _propertyOldValueCache = new();
+    private readonly Dictionary<string, object?> _propertyOldValueCache = new();
 
     private object? GetPropertyValue(object sender, string propertyName)
     {
@@ -48,9 +48,9 @@ public class NotifyPropertyChangingCache
         return propertyInfo.GetMethod.Invoke(sender, Array.Empty<object>());
     }
 
-    public void OnPropertyChanging(object? sender, string propertyName)
+    public void OnPropertyChanging(object? sender, string? propertyName)
     {
-        if (sender == null)
+        if (sender == null || propertyName == null)
             return;
 
         if (_lastSender != sender)

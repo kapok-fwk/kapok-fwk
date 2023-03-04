@@ -27,7 +27,9 @@ public static class TypeExtensions
     };
 
     // at compile time
+#pragma warning disable CS0693
     public static bool IsNumericType<T>(this T input, bool includeNullable = true)
+#pragma warning restore CS0693
     {
         var type = typeof(T);
 
@@ -163,7 +165,6 @@ public static class TypeExtensions
     /// is supplied which is not publicly visible or which contains generic parameters, this method will fail with an 
     /// exception.
     /// </remarks>
-    /// <seealso cref="GetDefault&lt;T&gt;"/>
     public static object? GetTypeDefault(this Type? type)
     {
         // If no Type was supplied, if the Type was a reference type, or if the Type was a System.Void, return null
@@ -308,27 +309,37 @@ public static class TypeExtensions
         if (thisType == null) throw new ArgumentNullException(nameof(thisType));
         if (type == null) throw new ArgumentNullException(nameof(type));
 
+#pragma warning disable CS8600
         // Ignore any 'ref' types
         if (thisType.IsByRef)
             thisType = thisType.GetElementType();
         if (type.IsByRef)
             type = type.GetElementType();
+#pragma warning restore CS8600
 
         // ReSharper disable PossibleNullReferenceException
         // ReSharper disable AssignNullToNotNullAttribute
         // Handle array types
+#pragma warning disable CS8602
         if (thisType.IsArray && type.IsArray)
+#pragma warning disable CS8604
             return thisType.GetElementType().IsSimilarType(type.GetElementType());
+#pragma warning restore CS8604
+#pragma warning restore CS8602
         // ReSharper restore AssignNullToNotNullAttribute
 
         // If the types are identical, or they're both generic parameters 
         // or the special 'T' type, treat as a match
         if (thisType == type || (thisType.IsGenericParameter || thisType == typeof(T))
+#pragma warning disable CS8602
             && (type.IsGenericParameter || type == typeof(T)))
+#pragma warning restore CS8602
             return true;
 
         // Handle any generic arguments
+#pragma warning disable CS8602
         if (thisType.IsGenericType && type.IsGenericType)
+#pragma warning restore CS8602
         {
             Type[] thisArguments = thisType.GetGenericArguments();
             Type[] arguments = type.GetGenericArguments();

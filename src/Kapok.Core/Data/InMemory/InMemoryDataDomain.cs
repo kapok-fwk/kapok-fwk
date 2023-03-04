@@ -1,6 +1,4 @@
-﻿using Kapok.Core;
-
-namespace Kapok.Data.InMemory;
+﻿namespace Kapok.Data.InMemory;
 
 public class InMemoryDataDomain : DataDomain
 {

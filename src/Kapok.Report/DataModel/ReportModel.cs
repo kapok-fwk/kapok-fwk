@@ -25,7 +25,7 @@ public class ReportModel : EditableEntityBase, IEquatable<ReportModel>
 
     private byte[]? _rowVersion;
     private Guid _reportModelId;
-    private string _typeFullName;
+    private string _typeFullName = string.Empty;
     private Guid? _defaultLayoutId;
 
     [Timestamp]

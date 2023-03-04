@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using Kapok.Core;
+using Kapok.BusinessLayer;
 
 namespace Kapok.View;
 

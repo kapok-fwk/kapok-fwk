@@ -1,15 +1,26 @@
 ﻿using System.Reflection;
+using Kapok.BusinessLayer;
 
-namespace Kapok.Core;
+namespace Kapok.Data;
 
 public abstract class DataDomain : IDataDomain
 {
     private struct RegisteredEntity
     {
-        public Type EntityType { get; set; }
-        public Type DaoType { get; set; }
-        public bool IsReadOnly { get; set; }
-        public bool IsVirtual { get; set; }
+        public RegisteredEntity(Type entityType, Type daoType, bool isReadOnly, bool isVirtual)
+        {
+            EntityType = entityType;
+            DaoType = daoType;
+            IsReadOnly = isReadOnly;
+            IsVirtual = isVirtual;
+        }
+
+        // ReSharper disable once NotAccessedField.Local
+        public readonly Type EntityType;
+        public readonly Type DaoType;
+        public readonly bool IsReadOnly;
+        // ReSharper disable once NotAccessedField.Local
+        public readonly bool IsVirtual;
     }
 
     #region Static
@@ -44,13 +55,11 @@ public abstract class DataDomain : IDataDomain
         if (!isVirtual)
             DataEntities.Add(typeof(T));
 
-        Entities.Add(typeof(T), new RegisteredEntity
-        {
-            EntityType = typeof(T),
-            DaoType = DefaultDaoType.MakeGenericType(typeof(T)),
-            IsReadOnly = isReadOnly,
-            IsVirtual = isVirtual
-        });
+        Entities.Add(typeof(T), new RegisteredEntity(
+            entityType: typeof(T),
+            daoType: DefaultDaoType.MakeGenericType(typeof(T)),
+            isReadOnly: isReadOnly,
+            isVirtual: isVirtual));
     }
 
     public static void RegisterEntity<TEntity, TDao>(bool isVirtual = false)
@@ -71,13 +80,11 @@ public abstract class DataDomain : IDataDomain
             if (constructorInfo.GetParameters()
                 .Any(p => supportedParameterTypes.Contains(p.ParameterType) || p.HasDefaultValue))
             {
-                Entities.Add(typeof(TEntity), new RegisteredEntity
-                {
-                    EntityType = typeof(TEntity),
-                    DaoType = typeof(TDao),
-                    IsReadOnly = false,
-                    IsVirtual = isVirtual
-                });
+                Entities.Add(typeof(TEntity), new RegisteredEntity(
+                    entityType: typeof(TEntity),
+                    daoType: typeof(TDao),
+                    isReadOnly: false,
+                    isVirtual: isVirtual));
 
                 return;
             }
@@ -91,51 +98,53 @@ public abstract class DataDomain : IDataDomain
     {
         var entityType = typeof(T);
 
-        if (Entities.ContainsKey(entityType))
+        if (!Entities.ContainsKey(entityType))
+            throw new ArgumentException(
+                $"The passed generic type {typeof(T).FullName} is not registered as entity. The DAO object cannot be created.");
+
+        foreach (var constructorInfo in Entities[entityType].DaoType.GetConstructors())
         {
-            foreach (var constructorInfo in Entities[entityType].DaoType.GetConstructors())
+            var parameters = constructorInfo.GetParameters();
+            var parameterValues = new object?[parameters.Length];
+
+            int i = 0;
+            bool correct = true;
+            foreach (var parameterInfo in parameters)
             {
-                var parameters = constructorInfo.GetParameters();
-                var parameterValues = new object[parameters.Length];
-
-                int i = 0;
-                bool correct = true;
-                foreach (var parameterInfo in parameters)
+                if (parameterInfo.ParameterType == typeof(IDataDomainScope))
                 {
-                    if (parameterInfo.ParameterType == typeof(IDataDomainScope))
-                    {
-                        parameterValues[i] = dataDomainScope;
-                    }
-                    else if (parameterInfo.ParameterType == typeof(IRepository<T>))
-                    {
-                        parameterValues[i] = repository;
-                    }
-                    else if (parameterInfo.ParameterType == typeof(bool) &&
-                             parameterInfo.Name == "isReadOnly")
-                    {
-                        parameterValues[i] = Entities[entityType].IsReadOnly;
-                    }
-                    else if (parameterInfo.HasDefaultValue)
-                    {
-                        parameterValues[i] = parameterInfo.DefaultValue;
-                    }
-                    else
-                    {
-                        correct = false;
-                        break;
-                    }
-
-                    i++;
+                    parameterValues[i] = dataDomainScope;
+                }
+                else if (parameterInfo.ParameterType == typeof(IRepository<T>))
+                {
+                    parameterValues[i] = repository;
+                }
+                else if (parameterInfo.ParameterType == typeof(bool) &&
+                         parameterInfo.Name == "isReadOnly")
+                {
+                    parameterValues[i] = Entities[entityType].IsReadOnly;
+                }
+                else if (parameterInfo.HasDefaultValue)
+                {
+                    parameterValues[i] = parameterInfo.DefaultValue;
+                }
+                else
+                {
+                    correct = false;
+                    break;
                 }
 
-                if (correct)
-                {
-                    return (IDao<T>)constructorInfo.Invoke(parameterValues);
-                }
+                i++;
+            }
+
+            if (correct)
+            {
+                return (IDao<T>)constructorInfo.Invoke(parameterValues);
             }
         }
 
-        return null;
+        throw new NotSupportedException(
+            $"No constructor for DAO {Entities[entityType].DaoType.FullName} could be found for initialization.");
     }
 
     #endregion

@@ -46,7 +46,9 @@ public class DirectoryReportResourceProvider : IReportResourceProvider
         if (Contains(item))
             throw new ArgumentException($"A resource with the name {item.Name} exist already.", nameof(item));
 
+#pragma warning disable CS8604
         File.WriteAllBytes(GetResourceFullPath(item.Name), item.Data);
+#pragma warning restore CS8604
     }
 
     public void Clear()
@@ -70,7 +72,9 @@ public class DirectoryReportResourceProvider : IReportResourceProvider
             return false;
 
 #pragma warning disable 8602
+#pragma warning disable CS8604
         File.Delete(GetResourceFullPath(item.Name));
+#pragma warning restore CS8604
 #pragma warning restore 8602
         return true;
     }

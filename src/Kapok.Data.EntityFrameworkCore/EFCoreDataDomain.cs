@@ -1,5 +1,4 @@
-﻿using Kapok.Core;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Kapok.Data.EntityFrameworkCore;
 

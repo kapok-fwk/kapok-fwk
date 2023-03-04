@@ -1,4 +1,4 @@
-﻿using Kapok.Core;
+﻿using Kapok.Data;
 
 namespace Kapok.View;
 
@@ -11,7 +11,8 @@ public abstract class LinkedDetailPage<TBaseEntry, TLinkedEntry> : DetailPage<TL
     where TBaseEntry : class, new()
     where TLinkedEntry : class, new()
 {
-    // ReSharper disable once MemberCanBePrivate.Global
+    // ReSharper disable once UnusedMember.Global
+    // ReSharper disable once StaticMemberInGenericType
     public static string SourceDataSetName = "Source";
 
     protected LinkedDetailPage(IDataSetView<TBaseEntry> sourceDataSet,  IViewDomain? viewDomain = null, IDataDomainScope? dataDomainScope = null)

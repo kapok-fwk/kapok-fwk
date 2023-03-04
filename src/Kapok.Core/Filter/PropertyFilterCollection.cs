@@ -3,7 +3,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq.Expressions;
 
-namespace Kapok.Core;
+namespace Kapok.BusinessLayer;
 
 public class PropertyFilterCollection<T> : FilterBase<T>, IDisposable, IPropertyFilterCollection<T>
 {

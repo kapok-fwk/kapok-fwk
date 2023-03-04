@@ -1,7 +1,7 @@
 ﻿using System.Transactions;
-using Kapok.Data;
+using Kapok.BusinessLayer;
 
-namespace Kapok.Core;
+namespace Kapok.Data;
 
 public interface IDataDomainScope : IDisposable
 {

@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Kapok.Entity;
 
-namespace Kapok.Core;
+namespace Kapok.BusinessLayer;
 
 public class PropertyStaticFilter : PropertyFilter, IPropertyStaticFilter
 {
@@ -31,7 +31,7 @@ public class PropertyStaticFilter : PropertyFilter, IPropertyStaticFilter
         }
     }
 
-    private Expression BuildFilterExpression(object? value)
+    private Expression? BuildFilterExpression(object? value)
     {
         // don't use an actual filter on nested data filtering
         if (Attribute.IsDefined(PropertyInfo, typeof(NestedDataFilterAttribute)))

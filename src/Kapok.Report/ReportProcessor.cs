@@ -8,7 +8,7 @@ public abstract class ReportProcessor<TReportModel> : IMimeTypeReportProcessor
 {
     protected ReportProcessor()
     {
-        ReportLanguage = CultureInfo.CurrentCulture;
+        ReportLanguage = CultureInfo.CurrentUICulture;
     }
 
     [Required]
@@ -17,14 +17,12 @@ public abstract class ReportProcessor<TReportModel> : IMimeTypeReportProcessor
     /// <summary>
     /// Defines the language in which the report shall be exported.
     /// </summary>
-    [Required]
-    public CultureInfo? ReportLanguage { get; set; }
+    public CultureInfo ReportLanguage { get; set; }
 
     /// <summary>
     /// Contains the name of the report parameter with the value to it.
     /// </summary>
-    [Required]
-    public Dictionary<string, object>? ParameterValues { get; set; }
+    public Dictionary<string, object> ParameterValues { get; set; } = new();
 
     /// <summary>
     /// Validates the fields set in the report processor.
@@ -35,10 +33,6 @@ public abstract class ReportProcessor<TReportModel> : IMimeTypeReportProcessor
     {
         if (ReportModel == null)
             throw new NotSupportedException($"The report model was not given to the class. Property: {nameof(ReportModel)}");
-        if (ReportLanguage == null)
-            throw new NotSupportedException($"The reporting language was not given to the class. Property: {nameof(ReportLanguage)}");
-        if (ParameterValues == null)
-            throw new NotSupportedException($"The property {nameof(ParameterValues)} was not given.");
 
         // TODO: need validation if fields of the model with [Required] are not filled.
     }

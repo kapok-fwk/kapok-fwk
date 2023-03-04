@@ -1,6 +1,7 @@
-﻿using Kapok.Entity.Model;
+﻿using Kapok.Data;
+using Kapok.Entity.Model;
 
-namespace Kapok.Core;
+namespace Kapok.BusinessLayer;
 
 public interface IReadOnlyDao<T>
     where T : class

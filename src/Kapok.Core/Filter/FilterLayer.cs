@@ -1,4 +1,4 @@
-﻿namespace Kapok.Core;
+﻿namespace Kapok.BusinessLayer;
 
 // TODO: implement DisplayAttribute with translation
 public enum FilterLayer

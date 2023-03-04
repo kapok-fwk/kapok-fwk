@@ -15,19 +15,21 @@ public static class EnumExtension
             throw new ArgumentException("TEnum must be an enum.");
     }
 
-    public static string EnumValueToDisplayName(object enumValue, CultureInfo? cultureInfo = null)
+    public static string? EnumValueToDisplayName(object enumValue, CultureInfo? cultureInfo = null)
     {
         TestIsEnumType(enumValue.GetType());
 
+        string enumValueAsString = enumValue.ToString() ?? string.Empty;
+
         var enumNameMemberInfo = enumValue.GetType()
-            .GetMember(enumValue.ToString())
+            .GetMember(enumValueAsString)
             .FirstOrDefault();
 
         var displayAttribute = enumNameMemberInfo?.GetCustomAttribute<DisplayAttribute>();
 
         if (displayAttribute != null)
         {
-            if (displayAttribute.ResourceType != null)
+            if (displayAttribute.ResourceType != null && displayAttribute.Name != null)
             {
                 ResourceManager? resourceManager = (ResourceManager?) displayAttribute.ResourceType?
                     .GetProperty("ResourceManager", BindingFlags.Public | BindingFlags.Static)?.GetMethod?
@@ -35,28 +37,12 @@ public static class EnumExtension
 
                 if (resourceManager != null)
                 {
-                    var switchCulture = cultureInfo != null &&
-                                        !Thread.CurrentThread.CurrentUICulture.Equals(cultureInfo);
-                    CultureInfo? oldCultureInfo = null;
-
-                    if (switchCulture)
-                    {
-                        Thread.CurrentThread.CurrentUICulture = cultureInfo;
-                        oldCultureInfo = Thread.CurrentThread.CurrentUICulture;
-                    }
-
-                    var resourceString = resourceManager.GetString(displayAttribute.Name);
-
-                    if (switchCulture)
-                    {
-                        Thread.CurrentThread.CurrentUICulture = oldCultureInfo;
-                    }
-
+                    var resourceString = resourceManager.GetString(displayAttribute.Name, cultureInfo);
                     return resourceString ?? displayAttribute.Name;
                 }
             }
 
-            return displayAttribute.Name;
+            return displayAttribute.Name ?? enumValueAsString;
         }
 
         var displayNameAttribute = enumNameMemberInfo?.GetCustomAttribute<DisplayNameAttribute>();
@@ -65,16 +51,16 @@ public static class EnumExtension
             return displayNameAttribute.DisplayName;
         }
 
-        return enumValue.ToString();
+        return enumValueAsString;
     }
 
-    public static string ToDisplayName<TEnum>(this TEnum @enum, CultureInfo? cultureInfo = null)
+    public static string? ToDisplayName<TEnum>(this TEnum @enum, CultureInfo? cultureInfo = null)
         where TEnum : Enum
     {
         return EnumValueToDisplayName(@enum, cultureInfo);
     }
 
-    public static object ParseDisplayName(Type enumType, string s, CultureInfo? cultureInfo = null)
+    public static object? ParseDisplayName(Type enumType, string s, CultureInfo? cultureInfo = null)
     {
         if (TryParseDisplayName(enumType, s, out var result, cultureInfo))
             return result;
@@ -84,23 +70,28 @@ public static class EnumExtension
     public static TEnum ParseDisplayName<TEnum>(string s, CultureInfo? cultureInfo = null)
         where TEnum : struct, IConvertible, IComparable, IFormattable
     {
+#pragma warning disable CS8605
         return (TEnum) ParseDisplayName(typeof(TEnum), s, cultureInfo);
+#pragma warning restore CS8605
     }
 
-    public static bool TryParseDisplayName(Type enumType, string s, out object? result, CultureInfo? cultureInfo = null)
+    public static bool TryParseDisplayName(Type enumType, string? s, out object? result, CultureInfo? cultureInfo = null)
     {
         TestIsEnumType(enumType);
 
-        foreach (var enumName in enumType.GetEnumNames())
+        if (s != null)
         {
-            var enumValue = Enum.Parse(enumType, enumName);
-
-            var displayString = EnumValueToDisplayName(enumValue, cultureInfo);
-
-            if (displayString == s)
+            foreach (var enumName in enumType.GetEnumNames())
             {
-                result = enumValue;
-                return true;
+                var enumValue = Enum.Parse(enumType, enumName);
+
+                var displayString = EnumValueToDisplayName(enumValue, cultureInfo);
+
+                if (displayString == s)
+                {
+                    result = enumValue;
+                    return true;
+                }
             }
         }
 
@@ -108,13 +99,13 @@ public static class EnumExtension
         return false;
     }
 
-    public static bool TryParseDisplayName<TEnum>(string s, out TEnum? result, CultureInfo? cultureInfo = null)
+    public static bool TryParseDisplayName<TEnum>(string? s, out TEnum? result, CultureInfo? cultureInfo = null)
         where TEnum : Enum
     {
         var functionResult = TryParseDisplayName(typeof(TEnum), s, out object? dataResult, cultureInfo);
         if (functionResult)
         {
-            result = (TEnum)dataResult;
+            result = (TEnum?)dataResult;
             return true;
         }
 

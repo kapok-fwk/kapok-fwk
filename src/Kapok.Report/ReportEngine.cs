@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Kapok.Core;
+using Kapok.BusinessLayer;
+using Kapok.Data;
 using Kapok.Report.DataModel;
 using Kapok.View;
 
@@ -139,34 +140,34 @@ public sealed class ReportEngine
     private ReportLayout GetOrCreateReportLayout(ReportLayout? layout, ReportModel reportModel, Model.Report model,
         IDataDomainScope dataDomainScope)
     {
-        if (layout == null)
+        if (layout != null)
+            return layout;
+
+        if (reportModel.DefaultLayoutId != null)
         {
-            if (reportModel.DefaultLayoutId != null)
+            layout = dataDomainScope.GetDao<ReportLayout, IReportLayoutDao>()
+                .FindByKey(reportModel.DefaultLayoutId);
+            if (layout == null)
+                throw new NotSupportedException("Referenced default layout does not exist.");
+        }
+        else
+        {
+            layout = new ReportLayout
             {
-                layout = dataDomainScope.GetDao<ReportLayout, IReportLayoutDao>()
-                    .FindByKey(reportModel.DefaultLayoutId);
-                if (layout == null)
-                    throw new NotSupportedException("Referenced default layout does not exist.");
-            }
-            else
-            {
-                layout = new ReportLayout
-                {
-                    ReportLayoutId = Guid.NewGuid(),
-                    Name = model.Caption,
-                    ReportModelId = reportModel.ReportModelId,
-                    ReportModel = reportModel
-                };
-                dataDomainScope.GetDao<ReportLayout, IReportLayoutDao>()
-                    .Create(layout);
+                ReportLayoutId = Guid.NewGuid(),
+                Name = model.Caption,
+                ReportModelId = reportModel.ReportModelId,
+                ReportModel = reportModel
+            };
+            dataDomainScope.GetDao<ReportLayout, IReportLayoutDao>()
+                .Create(layout);
 
-                dataDomainScope.Save(); // note a bit dirty, but needs to be done to do not create circulating references during insert
+            dataDomainScope.Save(); // note a bit dirty, but needs to be done to do not create circulating references during insert
 
-                reportModel.DefaultLayoutId = layout.ReportLayoutId;
-                reportModel.DefaultLayout = layout;
-                dataDomainScope.GetDao<ReportModel, IReportModelDao>()
-                    .Update(reportModel);
-            }
+            reportModel.DefaultLayoutId = layout.ReportLayoutId;
+            reportModel.DefaultLayout = layout;
+            dataDomainScope.GetDao<ReportModel, IReportModelDao>()
+                .Update(reportModel);
         }
 
         return layout;
@@ -175,45 +176,45 @@ public sealed class ReportEngine
     private ReportDesign GetOrCreateReportDesign(ReportDesign? design, ReportLayout layout,
         ReportProcessor defaultReportProcessor, IDataDomainScope dataDomainScope)
     {
-        if (design == null)
+        if (design != null)
+            return design;
+
+        var reportDesignRepo = dataDomainScope.GetDao<ReportDesign, IReportDesignDao>();
+
+        if (layout.ActiveDesignVersion.HasValue)
         {
-            var reportDesignRepo = dataDomainScope.GetDao<ReportDesign, IReportDesignDao>();
+            design = reportDesignRepo.FindByKey(layout.ReportLayoutId, layout.ActiveDesignVersion.Value);
 
-            if (layout.ActiveDesignVersion.HasValue)
+            if (design == null)
+                // TODO: implement an exception 'ReferencedEntityNotFound'
+                throw new NotSupportedException($"The active design version number {layout.ActiveDesignVersion.Value} for layout {layout} could not be found.");
+        }
+        else if ((from d in reportDesignRepo.AsQueryable()
+                     where d.ReportLayoutId == layout.ReportLayoutId
+                     select d).Any())
+        {
+            throw new NotSupportedException($"No active design has been selected for layout {layout}.");
+        }
+        else
+        {
+            Debug.WriteLine($"{nameof(ReportEngine)}: No design exist for report layout {layout}, we will create one.");
+
+            design = new ReportDesign
             {
-                design = reportDesignRepo.FindByKey(layout.ReportLayoutId, layout.ActiveDesignVersion.Value);
+                ReportLayoutId = layout.ReportLayoutId,
+                ReportLayout = layout,
+                ReportProcessorId = defaultReportProcessor.ReportProcessorId,
+                ReportProcessor = defaultReportProcessor,
+                VersionNum = 1
+            };
+            reportDesignRepo.Create(design);
 
-                if (design == null)
-                    // TODO: implement an exception 'ReferencedEntityNotFound'
-                    throw new NotSupportedException($"The active design version number {layout.ActiveDesignVersion.Value} for layout {layout} could not be found.");
-            }
-            else if ((from d in reportDesignRepo.AsQueryable()
-                         where d.ReportLayoutId == layout.ReportLayoutId
-                         select d).Any())
-            {
-                throw new NotSupportedException($"No active design has been selected for layout {layout}.");
-            }
-            else
-            {
-                Debug.WriteLine($"{nameof(ReportEngine)}: No design exist for report layout {layout}, we will create one.");
+            dataDomainScope.Save(); // note a bit dirty, but needs to be done to do not create circulating references during insert
 
-                design = new ReportDesign
-                {
-                    ReportLayoutId = layout.ReportLayoutId,
-                    ReportLayout = layout,
-                    ReportProcessorId = defaultReportProcessor.ReportProcessorId,
-                    ReportProcessor = defaultReportProcessor,
-                    VersionNum = 1
-                };
-                reportDesignRepo.Create(design);
-
-                dataDomainScope.Save(); // note a bit dirty, but needs to be done to do not create circulating references during insert
-
-                layout.ActiveDesignVersion = design.VersionNum;
-                layout.ActiveDesign = design;
-                dataDomainScope.GetDao<ReportLayout, IReportLayoutDao>()
-                    .Update(layout);
-            }
+            layout.ActiveDesignVersion = design.VersionNum;
+            layout.ActiveDesign = design;
+            dataDomainScope.GetDao<ReportLayout, IReportLayoutDao>()
+                .Update(layout);
         }
 
         return design;
@@ -223,29 +224,29 @@ public sealed class ReportEngine
         ReportLayout layout,
         IDataDomainScope dataDomainScope)
     {
-        if (destination == null)
+        if (destination != null)
+            return destination;
+
+        var destinationRepo = dataDomainScope.GetDao<ReportDestination, IReportDestinationDao>();
+
+        if (layout.DefaultDestinationId.HasValue)
         {
-            var destinationRepo = dataDomainScope.GetDao<ReportDestination, IReportDestinationDao>();
+            destination =
+                await destinationRepo.GetByKeyAsync(layout.ReportLayoutId, layout.DefaultDestinationId.Value);
 
-            if (layout.DefaultDestinationId.HasValue)
-            {
-                destination =
-                    await destinationRepo.GetByKeyAsync(layout.ReportLayoutId, layout.DefaultDestinationId.Value);
-
-                if (destination == null)
-                    // TODO: implement an exception 'ReferencedEntityNotFound'
-                    throw new NotSupportedException();
-            }
-            else if ((from d in destinationRepo.AsQueryable()
-                         where d.ReportLayoutId == layout.ReportLayoutId
-                         select d).Any())
-            {
-                throw new NotSupportedException($"No default destination has been selected for layout {layout}.");
-            }
-            else
-            {
-                throw new NotSupportedException($"No destination has been configured for layout {layout}.");
-            }
+            if (destination == null)
+                // TODO: implement an exception 'ReferencedEntityNotFound'
+                throw new NotSupportedException();
+        }
+        else if ((from d in destinationRepo.AsQueryable()
+                     where d.ReportLayoutId == layout.ReportLayoutId
+                     select d).Any())
+        {
+            throw new NotSupportedException($"No default destination has been selected for layout {layout}.");
+        }
+        else
+        {
+            throw new NotSupportedException($"No destination has been configured for layout {layout}.");
         }
 
         return destination;
@@ -294,8 +295,11 @@ public sealed class ReportEngine
     public ReportLayout GetOrCreateReportLayout(Model.Report model, ReportLayout? layout)
     {
         CheckDataDomainSet();
+#pragma warning disable CS8602
         using var dataDomainScope = _dataDomain.CreateScope();
+#pragma warning restore CS8602
         var reportModel = GetOrCreateReportModel(model, dataDomainScope);
+        // ReSharper disable once UnusedVariable
         var registeredProcessor = GetRegisteredReportProcessor(model);
         var reportLayout = GetOrCreateReportLayout(layout, reportModel, model, dataDomainScope);
         dataDomainScope.Save();
@@ -311,7 +315,9 @@ public sealed class ReportEngine
     public string[] GetSupportedMimeTypes(Model.Report model, ReportLayout? layout = null, ReportDesign? design = null)
     {
         CheckDataDomainSet();
+#pragma warning disable CS8602
         using var dataDomainScope = _dataDomain.CreateScope();
+#pragma warning restore CS8602
         var (_, _, reportProcessor) =
             InitiateReportProcessor(model, dataDomainScope, layout, design).Result;
         dataDomainScope.Save();
@@ -320,7 +326,7 @@ public sealed class ReportEngine
 
     private object CreateReportProcessorInstance(Type reportProcessorType)
     {
-        var constructorArgs = new List<object>();
+        var constructorArgs = new List<object?>();
 
         ConstructorInfo? constructorToUse = null;
 
@@ -339,6 +345,7 @@ public sealed class ReportEngine
                 }
                 else if (parameterInfo.ParameterType == typeof(IDataDomain))
                 {
+                    CheckDataDomainSet();
                     constructorArgs.Add(_dataDomain);
                 }
                 else if (parameterInfo.HasDefaultValue)
@@ -365,15 +372,15 @@ public sealed class ReportEngine
         return constructorToUse.Invoke(constructorArgs.ToArray());
     }
 
-    private Task<Tuple<ReportLayout, ReportDesign, IMimeTypeReportProcessor>>
+    private Task<Tuple<ReportLayout, ReportDesign?, IMimeTypeReportProcessor>>
         InitiateReportProcessor(Model.Report model, IDataDomainScope dataDomainScope, ReportLayout? layout, ReportDesign? design)
     {
         var reportModel = GetOrCreateReportModel(model, dataDomainScope);
         var registeredProcessor = GetRegisteredReportProcessor(model);
         layout = GetOrCreateReportLayout(layout, reportModel, model, dataDomainScope);
             
-        var reportProcessorRepo = dataDomainScope.GetDao<ReportProcessor, IReportProcessorDao>();
-        ReportProcessor reportProcessor = reportProcessorRepo.GetOrCreateFromType(registeredProcessor.ReportProcessorType).Result;
+        var reportProcessorDao = dataDomainScope.GetDao<ReportProcessor, IReportProcessorDao>();
+        ReportProcessor? reportProcessor = reportProcessorDao.GetOrCreateFromType(registeredProcessor.ReportProcessorType).Result;
         Type reportProcessorType = registeredProcessor.ReportProcessorType;
         if (registeredProcessor.IsDesignable)
         {
@@ -382,11 +389,11 @@ public sealed class ReportEngine
             {
                 Debug.WriteLine($"{nameof(ReportEngine)}: Design report processor {reportProcessorType.FullName} is different as the registered report processor {registeredProcessor.ReportProcessorType.FullName}.");
 
-                reportProcessor = reportProcessorRepo.FindByKey(design.ReportProcessorId);
+                reportProcessor = reportProcessorDao.FindByKey(design.ReportProcessorId);
                 if (reportProcessor == null)
                     throw new NotSupportedException("Could not find report processor by id: " + design.ReportProcessorId);
 
-                reportProcessorType = reportProcessorRepo.GetType(reportProcessor);
+                reportProcessorType = reportProcessorDao.GetType(reportProcessor);
 
                 // check; this should never happen!
                 bool isDesignable = reportProcessorType.GetInterfaces().Contains(typeof(IDesignableReportProcessor));
@@ -412,12 +419,13 @@ public sealed class ReportEngine
         processor.ReportModel = model;
 
         if (registeredProcessor.IsDesignable &&
+            // ReSharper disable once SuspiciousTypeConversion.Global
             processor is IDesignableReportProcessor designableReportProcessor)
         {
-            designableReportProcessor.CurrentDesign = design.DesignData;
+            designableReportProcessor.CurrentDesign = design?.DesignData;
         }
 
-        return Task.FromResult(new Tuple<ReportLayout, ReportDesign, IMimeTypeReportProcessor>
+        return Task.FromResult(new Tuple<ReportLayout, ReportDesign?, IMimeTypeReportProcessor>
         (
             layout,
             design,
@@ -480,10 +488,17 @@ public sealed class ReportEngine
         ReportDestination destination, ReportLayout? layout = null, ReportDesign? design = null)
     {
         CheckDataDomainSet();
+#pragma warning disable CS8602
         using var dataDomainScope = _dataDomain.CreateScope();
+#pragma warning restore CS8602
         var (layoutCurrent, _, reportProcessor) =
             InitiateReportProcessor(model, dataDomainScope, layout, design).Result;
         destination = GetReportDestination(destination, layoutCurrent, dataDomainScope).Result;
+
+        if (destination.MimeType == null)
+        {
+            throw new NotSupportedException("The destination has no MimeType specified");
+        }
 
         reportProcessor.ParameterValues = parameterValues;
 
@@ -523,12 +538,15 @@ public sealed class ReportEngine
     public void OpenDesignDialog(Model.Report model, IViewDomain viewDomain, ReportLayout? layout = null, ReportDesign? design = null)
     {
         CheckDataDomainSet();
+#pragma warning disable CS8602
         using var dataDomainScope = _dataDomain.CreateScope();
+#pragma warning restore CS8602
         var task = InitiateReportProcessor(model, dataDomainScope, layout, design);
         var (layoutCurrent, designCurrent, reportProcessor) = task.Result;
         dataDomainScope.Save();
         reportProcessor.ReportLanguage = viewDomain.Culture;
 
+        // ReSharper disable once SuspiciousTypeConversion.Global
         if (!(reportProcessor is IDesignableReportProcessor designableReportProcessor))
         {
             throw new NotSupportedException(
@@ -542,7 +560,7 @@ public sealed class ReportEngine
 
             // updates the layout version when the changed report is the current report (TODO this behavior should maybe be changed based on application configuration)
             if (layoutCurrent.ActiveDesignVersion != null &&
-                layoutCurrent.ActiveDesignVersion.Value == designCurrent.VersionNum)
+                layoutCurrent.ActiveDesignVersion.Value == designCurrent?.VersionNum)
             {
                 layoutCurrent.ActiveDesignVersion = designNew.VersionNum;
                 dataDomainScope.GetDao<ReportLayout, IReportLayoutDao>()

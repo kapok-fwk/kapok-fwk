@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Kapok.Core;
+namespace Kapok.BusinessLayer;
 
 public abstract class FilterBase<T> : IFilter<T>
 {

@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using Kapok.Core;
+using Kapok.Data;
 using Kapok.Entity;
 using Res = Kapok.View.Resources.DataPage;
 
@@ -16,6 +16,8 @@ public abstract class DataPage<TEntry> : InteractivePage, IDataPage<TEntry>
     where TEntry : class, new()
 {
     // ReSharper disable once MemberCanBeProtected.Global
+    // ReSharper disable once ConvertToConstant.Global
+    // ReSharper disable once StaticMemberInGenericType
     public static string BaseDataSet = "Base";
 
     private bool _editable = true;
@@ -103,7 +105,7 @@ public abstract class DataPage<TEntry> : InteractivePage, IDataPage<TEntry>
                 editModeChanged = true;
             }
 
-            OnPropertyChanged(nameof(Editable));
+            OnPropertyChanged();
             OnPropertyChanged(nameof(IsEditable));
             if (editModeChanged)
                 OnPropertyChanged(nameof(EditMode));
@@ -121,7 +123,7 @@ public abstract class DataPage<TEntry> : InteractivePage, IDataPage<TEntry>
         {
             if (_editMode == value) return;
             _editMode = value;
-            OnPropertyChanged(nameof(EditMode));
+            OnPropertyChanged();
             if (Editable && DataSets.ContainsKey(BaseDataSet) && DataSets[BaseDataSet].ModifyAllowed)
                 OnPropertyChanged(nameof(IsEditable));
         }
@@ -202,7 +204,6 @@ public abstract class DataPage<TEntry> : InteractivePage, IDataPage<TEntry>
 
         _dataSets[name].Dispose();
         _dataSets.Remove(name);
-
     }
 
     private void BaseDataSet_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -216,7 +217,10 @@ public abstract class DataPage<TEntry> : InteractivePage, IDataPage<TEntry>
     protected override void OnLoaded()
     {
         // make sure that the data set is initialized, so that the 'ReferencingDataSet' in the base menu is set
+        // ReSharper disable once UnusedVariable
+#pragma warning disable IDE0059
         var x = DataSet;
+#pragma warning restore IDE0059
 
         // initiate EditMode toggle command
         if (IsEditable)
@@ -513,13 +517,17 @@ public abstract class DataPage<TEntry> : InteractivePage, IDataPage<TEntry>
 
     #region IDataPage
 
+#pragma warning disable CS8768
     IDataSetView? IDataPage.DataSet => DataSet;
+#pragma warning restore CS8768
 
     #endregion
 
     #region IDataPage<TEntry>
 
+#pragma warning disable CS8768
     IDataSetView<TEntry>? IDataPage<TEntry>.DataSet => DataSet;
+#pragma warning restore CS8768
 
     #endregion
 }

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 
-namespace Kapok.Core.FilterParsing;
+namespace Kapok.BusinessLayer.FilterParsing;
 
 internal class TextParser
 {

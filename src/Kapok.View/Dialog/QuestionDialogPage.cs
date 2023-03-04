@@ -50,10 +50,10 @@ public class QuestionDialogPage : DialogPage
     public class DialogButton : ICloneable
     {
         // ReSharper disable UnusedAutoPropertyAccessor.Global
-        public Caption Label { get; set; }
-        public Caption Description { get; set; }
+        public Caption? Label { get; set; }
+        public Caption? Description { get; set; }
 
-        public string Image { get; set; }
+        public string? Image { get; set; }
         // ReSharper restore UnusedAutoPropertyAccessor.Global
 
         public bool IsDefault { get; set; }

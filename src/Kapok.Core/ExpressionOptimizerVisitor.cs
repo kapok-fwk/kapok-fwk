@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Kapok.Core;
+namespace Kapok.BusinessLayer;
 
 /// <summary>
 /// The Linq-to-SQL implementation in EF Core has some limitations

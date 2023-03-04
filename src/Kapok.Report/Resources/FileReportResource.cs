@@ -13,9 +13,13 @@ public class FileReportResource : ReportResource
         FullFilePath = fullPath;
     }
 
-    public override byte[] Data
+    public override byte[]? Data
     {
         get => File.ReadAllBytes(FullFilePath);
-        set => File.WriteAllBytes(FullFilePath, value);
+        set
+        {
+            if (value != null)
+                File.WriteAllBytes(FullFilePath, value);
+        }
     }
 }

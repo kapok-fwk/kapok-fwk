@@ -3,9 +3,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
-using Kapok.Core.FilterParsing.SupportedOperands;
+using Kapok.BusinessLayer.FilterParsing.SupportedOperands;
 
-namespace Kapok.Core.FilterParsing;
+namespace Kapok.BusinessLayer.FilterParsing;
 
 public class FilterExpressionParser
 {
@@ -14,7 +14,7 @@ public class FilterExpressionParser
     private readonly IExpressionHelper _expressionHelper;
     private readonly IExpressionPromoter _expressionPromoter;
 
-    private ParameterExpression _it;
+    private ParameterExpression? _it;
     private ParameterExpression? _root;
     private readonly MemberExpression _propertyMemberExpression;
     private readonly PropertyInfo _propertyInfo;
@@ -42,11 +42,11 @@ public class FilterExpressionParser
     {
         Culture = cultureInfo ?? CultureInfo.InvariantCulture;
 
-        ParameterExpression[] parameters = new []{
+        ParameterExpression[] parameters = {
             Expression.Parameter(itType, string.Empty)
         };
 
-        _propertyInfo = itType.GetProperty(propertyName);
+        _propertyInfo = itType.GetProperty(propertyName) ?? throw new ArgumentException($"Could not find property {propertyName}", nameof(propertyName));
         if (_propertyInfo == null)
             throw new ArgumentException(string.Format(Res.ItPropertyNotFound, propertyName, itType.FullName), nameof(propertyName));
 
@@ -134,7 +134,9 @@ public class FilterExpressionParser
             _textParser.ValidateToken(TokenId.End, Res.SyntaxError);
         }
 
+#pragma warning disable CS8604
         return Expression.Lambda(expr, _root);
+#pragma warning restore CS8604
     }
 
     public static string? PropertyValueToFilterString(PropertyInfo propertyInfo, object? value, CultureInfo cultureInfo)
@@ -231,8 +233,11 @@ public class FilterExpressionParser
         return null;
     }
 
-    public static object? FilterStringToPropertyValue(PropertyInfo propertyInfo, string filterString, CultureInfo cultureInfo)
+    public static object? FilterStringToPropertyValue(PropertyInfo propertyInfo, string? filterString, CultureInfo cultureInfo)
     {
+        if (filterString == null)
+            return null;
+
         var propertyType = propertyInfo.PropertyType;
 
         if (propertyType.IsEnum)
@@ -472,19 +477,27 @@ public class FilterExpressionParser
                 if (left.Type != right.Type)
                 {
                     Expression e;
+#pragma warning disable CS8600
                     if ((e = _expressionPromoter.Promote(right, left.Type, true, false)) != null)
+#pragma warning restore CS8600
                     {
                         right = e;
                     }
+#pragma warning disable CS8600
                     else if ((e = _expressionPromoter.Promote(left, right.Type, true, false)) != null)
+#pragma warning restore CS8600
                     {
                         left = e;
                     }
+#pragma warning disable CS8600
                     else if (TypeHelper.IsEnumType(left.Type) && (constantExpr = right as ConstantExpression) != null)
+#pragma warning restore CS8600
                     {
                         right = ParseEnumToConstantExpression(op.Pos, left.Type, constantExpr);
                     }
+#pragma warning disable CS8600
                     else if (TypeHelper.IsEnumType(right.Type) && (constantExpr = left as ConstantExpression) != null)
+#pragma warning restore CS8600
                     {
                         left = ParseEnumToConstantExpression(op.Pos, right.Type, constantExpr);
                     }
@@ -494,7 +507,9 @@ public class FilterExpressionParser
                     }
                 }
             }
+#pragma warning disable CS8600
             else if ((constantExpr = right as ConstantExpression) != null && constantExpr.Value is string && (typeConverter = TypeDescriptor.GetConverter(left.Type)) != null)
+#pragma warning restore CS8600
             {
                 try
                 {
@@ -505,7 +520,9 @@ public class FilterExpressionParser
                     throw new ParseException(e.Message, op.Pos);
                 }
             }
+#pragma warning disable CS8600
             else if ((constantExpr = left as ConstantExpression) != null && constantExpr.Value is string && (typeConverter = TypeDescriptor.GetConverter(right.Type)) != null)
+#pragma warning restore CS8600
             {
                 try
                 {
@@ -548,7 +565,9 @@ public class FilterExpressionParser
                     {
                         var toStringMethod = right.Type.GetMethod(nameof(ToString), BindingFlags.Public | BindingFlags.Instance, null, new Type []{}, null);
 
+#pragma warning disable CS8604
                         right = Expression.Call(right, toStringMethod);
+#pragma warning restore CS8604
                     }
                     else
                     {
@@ -620,7 +639,9 @@ public class FilterExpressionParser
 
         try
         {
+#pragma warning disable CS8604
             return Enum.ToObject(TypeHelper.GetNonNullableType(leftType), constantExpr.Value);
+#pragma warning restore CS8604
         }
         catch
         {
@@ -801,7 +822,7 @@ public class FilterExpressionParser
         _textParser.ValidateToken(TokenId.IntegerLiteral);
 
         string text = _textParser.CurrentToken.Text;
-        string qualifier = null;
+        string? qualifier = null;
         char last = text[text.Length - 1];
         bool isHexadecimal = text.StartsWith(text[0] == '-' ? "-0x" : "0x", StringComparison.OrdinalIgnoreCase);
         char[] qualifierLetters = isHexadecimal
@@ -974,7 +995,7 @@ public class FilterExpressionParser
     {
         _textParser.ValidateToken(TokenId.Identifier);
 
-        if (_keywords.TryGetValue(_textParser.CurrentToken.Text, out object value))
+        if (_keywords.TryGetValue(_textParser.CurrentToken.Text, out object? value))
         {
             _textParser.NextToken();
 
@@ -1054,7 +1075,7 @@ public class FilterExpressionParser
 
     Exception ParseError(string format, params object[] args)
     {
-        return ParseError(_textParser?.CurrentToken.Pos ?? 0, format, args);
+        return ParseError(_textParser.CurrentToken.Pos, format, args);
     }
 
     Exception ParseError(int pos, string format, params object[] args)

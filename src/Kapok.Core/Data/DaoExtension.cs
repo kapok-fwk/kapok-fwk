@@ -1,57 +1,59 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Kapok.Core;
+namespace Kapok.BusinessLayer;
 
 public static class DaoExtension
 {
-    public static T GetByKey<T>(this IReadOnlyDao<T> @this, params object[] keyValues)
+    public static T GetByKey<T>(this IReadOnlyDao<T> @this, params object?[] keyValues)
         where T : class, new()
     {
         var entity = FindByKey(@this, keyValues);
-        if (entity == null)
+        if (entity != null)
+            return entity;
+
+        var primaryKeyValues = new Dictionary<PropertyInfo, object?>();
+
+        for (int i = 0; i < keyValues.Length; i++)
         {
-            var primaryKeyValues = new Dictionary<PropertyInfo, object>();
+#pragma warning disable CS8602
+            var propertyInfo = @this.Model.PrimaryKeyProperties[i];
+#pragma warning restore CS8602
+            var keyValue = keyValues[i];
 
-            for (int i = 0; i < keyValues.Length; i++)
-            {
-                var propertyInfo = @this.Model.PrimaryKeyProperties[i];
-                var keyValue = keyValues[i];
-
-                primaryKeyValues.Add(propertyInfo, keyValue);
-            }
-
-            throw new EntityNotFoundByKeyException(typeof(T),  primaryKeyValues);
+            primaryKeyValues.Add(propertyInfo, keyValue);
         }
 
-        return entity;
+        throw new EntityNotFoundByKeyException(typeof(T),  primaryKeyValues);
     }
 
-    public static T? FindByKey<T>(this IReadOnlyDao<T> @this, params object[] keyValues)
+    public static T? FindByKey<T>(this IReadOnlyDao<T> @this, params object?[] keyValues)
         where T : class, new()
     {
         return InternalFindByKey(@this, forUpdate: false, keyValues: keyValues);
     }
 
-    public static T? FindByKeyForUpdate<T>(this IDao<T> @this, params object[] keyValues)
+    public static T? FindByKeyForUpdate<T>(this IDao<T> @this, params object?[] keyValues)
         where T : class, new()
     {
         return InternalFindByKey(@this, forUpdate: true, keyValues: keyValues);
     }
 
-    private static T? InternalFindByKey<T>(IReadOnlyDao<T> @this, bool forUpdate, params object[] keyValues)
+    private static T? InternalFindByKey<T>(IReadOnlyDao<T> @this, bool forUpdate, params object?[] keyValues)
         where T : class, new()
     {
         if (@this == null)
             throw new ArgumentNullException(nameof(@this));
         if (@this.Model.PrimaryKeyProperties == null || @this.Model.PrimaryKeyProperties.Length == 0)
-            throw new EntityNoPrimaryKeyException(typeof(T), string.Format("You can not use method {0} with this entity.", nameof(FindByKey)));
+            throw new EntityNoPrimaryKeyException(typeof(T), string.Format("You can not use method {0} with this entity. It has no primary key", nameof(FindByKey)));
         if (keyValues == null)
             throw new ArgumentNullException(nameof(keyValues));
         if (keyValues.Length == 0)
             throw new ArgumentException("No primary key value was given", nameof(keyValues));
         if (@this.Model.PrimaryKeyProperties.Length != keyValues.Length)
             throw new NotSupportedException($"The type {typeof(T).FullName} has {@this.Model.PrimaryKeyProperties.Length} primary key properties, {keyValues.Length} where given");
+        if (@this.DataDomainScope == null)
+            throw new ArgumentException("The DAO has the DataDomainScope not initialized.", nameof(@this));
 
         var param = Expression.Parameter(typeof(T));
         Expression? whereExpression = null;
@@ -103,17 +105,19 @@ public static class DaoExtension
 #pragma warning restore CS8604
     }
 
-    public static async Task<T> GetByKeyAsync<T>(this IReadOnlyDao<T> @this, params object[] keyValues)
+    public static async Task<T> GetByKeyAsync<T>(this IReadOnlyDao<T> @this, params object?[] keyValues)
         where T : class, new()
     {
         var entity = await FindByKeyAsync(@this, keyValues);
         if (entity == null)
         {
-            var primaryKeyValues = new Dictionary<PropertyInfo, object>();
+            var primaryKeyValues = new Dictionary<PropertyInfo, object?>();
 
             for (int i = 0; i < keyValues.Length; i++)
             {
+#pragma warning disable CS8602
                 var propertyInfo = @this.Model.PrimaryKeyProperties[i];
+#pragma warning restore CS8602
                 var keyValue = keyValues[i];
 
                 primaryKeyValues.Add(propertyInfo, keyValue);
@@ -125,7 +129,7 @@ public static class DaoExtension
         return entity;
     }
 
-    public static Task<T?> FindByKeyAsync<T>(this IReadOnlyDao<T> @this, params object[] keyValues)
+    public static Task<T?> FindByKeyAsync<T>(this IReadOnlyDao<T> @this, params object?[] keyValues)
         where T : class, new()
     {
         if (@this == null)
@@ -138,6 +142,8 @@ public static class DaoExtension
             throw new ArgumentException("No primary key values where given", nameof(keyValues));
         if (@this.Model.PrimaryKeyProperties.Length != keyValues.Length)
             throw new NotSupportedException($"The type {typeof(T).FullName} has {@this.Model.PrimaryKeyProperties.Length} primary key properties, {keyValues.Length} where given");
+        if (@this.DataDomainScope == null)
+            throw new ArgumentException("The DAO has the DataDomainScope not initialized.", nameof(@this));
 
         var param = Expression.Parameter(typeof(T));
         Expression? whereExpression = null;

@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
-using Kapok.Core;
+using Kapok.BusinessLayer;
+using Kapok.Data;
 
 namespace Kapok.Entity.Model;
 
@@ -100,7 +101,7 @@ public sealed class PropertyModelBuilder<T>
         return this;
     }
 
-    public PropertyModelBuilder<T> AddDrillDown<TDestinationEntry>(Type pageType, Action<IFilterSet<TDestinationEntry>, T, IReadOnlyDictionary<string, object>> filter)
+    public PropertyModelBuilder<T> AddDrillDown<TDestinationEntry>(Type pageType, Action<IFilterSet<TDestinationEntry>, T, IReadOnlyDictionary<string, object?>> filter)
         where TDestinationEntry : class
     {
         if (_propertyModel.DrillDownDefinition != null)

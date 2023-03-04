@@ -1,10 +1,11 @@
-﻿using Kapok.DataModel;
+﻿using Kapok.BusinessLayer;
+using Kapok.Core.DataModel;
 
-namespace Kapok.Core;
+namespace Kapok.Core.BusinessLayer;
 
 public interface IModuleMigrationsHistoryDao : IDao<ModuleMigrationsHistory>
 {
-    ModuleMigrationsHistory New(string moduleName, Kapok.Module.Migration migration);
+    ModuleMigrationsHistory New(string moduleName, Module.Migration migration);
 
-    ModuleMigrationsHistory? Find(string moduleName, Kapok.Module.Migration migration);
+    ModuleMigrationsHistory? Find(string moduleName, Module.Migration migration);
 }

@@ -104,7 +104,7 @@ public class CsvDataPortTest
     [Fact]
     public void EntityToCsv()
     {
-        const string TargetFileName = "./CsvData_Accounts_new.csv";
+        const string targetFileName = "./CsvData_Accounts_new.csv";
 
         var entities = new List<SimpleLedgerAccountEntity>
         {
@@ -121,7 +121,7 @@ public class CsvDataPortTest
         StreamWriter? streamWriter = null;
         try
         {
-            streamWriter = new StreamWriter(File.OpenWrite(TargetFileName));
+            streamWriter = new StreamWriter(File.OpenWrite(targetFileName));
 
             var tableDataPort =
                 new TableDataPort<EntityEnumeratorDataPortSource<SimpleLedgerAccountEntity>, CsvDataPortTarget>(
@@ -165,7 +165,9 @@ public class CsvDataPortTest
                 {
                     SourceColumn =
                         sourceSchema.First(c => c.Name == nameof(SimpleLedgerAccountEntity.LedgerAccountNum)),
+#pragma warning disable CS8604
                     TargetColumn = tableDataPort.Target.Schema.First(c => c.Name == "Account No.")
+#pragma warning restore CS8604
 
                 },
                 new()
@@ -187,13 +189,13 @@ public class CsvDataPortTest
                 streamWriter.Dispose();
                 streamWriter = null;
                 
-                Assert.True(File.Exists(TargetFileName));
+                Assert.True(File.Exists(targetFileName));
             }
             finally
             {
                 // clean up the test
-                if (File.Exists(TargetFileName))
-                    File.Delete(TargetFileName);
+                if (File.Exists(targetFileName))
+                    File.Delete(targetFileName);
             }
         }
         finally

@@ -1,28 +1,40 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Resources;
 using Kapok.Core.Resources.Entity;
 
 namespace System.Reflection;
 
 public static class PropertyInfoExtensions
 {
+    /// <summary>
+    /// The internal property name in a resource to linking to the resource manager.
+    /// </summary>
+    private const string ResourceTypeResourceManagerPropertyName = "ResourceManager";
+
+    /// <summary>
+    /// Returns the resource manager of a resource type class object.
+    /// </summary>
+    /// <param name="resourceType"></param>
+    /// <returns></returns>
+    private static ResourceManager? GetResourceManager(Type? resourceType)
+    {
+        return (ResourceManager?)resourceType
+            ?.GetProperty(ResourceTypeResourceManagerPropertyName, BindingFlags.Public | BindingFlags.Static)
+            ?.GetMethod?.Invoke(null, null);
+    }
+
     public static string GetDisplayAttributeNameOrDefault(this PropertyInfo propertyInfo)
     {
         if (propertyInfo == null)
             throw new ArgumentNullException(nameof(propertyInfo));
         var displayAttribute = propertyInfo.GetCustomAttribute<DisplayAttribute>();
 
-        if (displayAttribute == null)
+        if (displayAttribute?.Name == null)
             return propertyInfo.Name;
 
-        var resourceManager = (Resources.ResourceManager?)displayAttribute.ResourceType?
-            .GetProperty("ResourceManager", BindingFlags.Public | BindingFlags.Static)?.GetMethod?
-            .Invoke(null, null);
-
-        if (displayAttribute.Name == null)
-            return propertyInfo.Name;
-
-        return resourceManager?.GetString(displayAttribute.Name) ??
+        return GetResourceManager(displayAttribute.ResourceType)?
+                   .GetString(displayAttribute.Name) ?? 
                displayAttribute.Name;
     }
 
@@ -35,39 +47,31 @@ public static class PropertyInfoExtensions
         if (displayAttribute == null)
             throw new NotSupportedException($"The property {propertyInfo.Name} does not implement attribute {nameof(DisplayAttribute)} which is required for the extension method {nameof(GetDisplayAttributeName)}.");
 
-        var resourceManager = (Resources.ResourceManager?)displayAttribute.ResourceType?
-            .GetProperty("ResourceManager", BindingFlags.Public | BindingFlags.Static)?.GetMethod?
-            .Invoke(null, null);
-
         if (displayAttribute.Name == null)
             return propertyInfo.Name;
 
-        return resourceManager?.GetString(displayAttribute.Name) ??
+        return GetResourceManager(displayAttribute.ResourceType)?
+                   .GetString(displayAttribute.Name) ??
                displayAttribute.Name;
     }
 
-    public static string GetDisplayAttributeNameOrDefault(this PropertyInfo propertyInfo, CultureInfo cultureInfo)
+    public static string GetDisplayAttributeNameOrDefault(this PropertyInfo propertyInfo, CultureInfo? cultureInfo)
     {
         if (propertyInfo == null)
             throw new ArgumentNullException(nameof(propertyInfo));
         var displayAttribute = propertyInfo.GetCustomAttribute<DisplayAttribute>();
 
-        if (displayAttribute == null)
+        if (displayAttribute?.Name == null)
             return propertyInfo.Name;
 
-        var resourceManager = (Resources.ResourceManager?)displayAttribute.ResourceType?
-            .GetProperty("ResourceManager", BindingFlags.Public | BindingFlags.Static)?.GetMethod?
-            .Invoke(null, null);
-
-        if (displayAttribute.Name == null)
-            return propertyInfo.Name;
+        var resourceManager = GetResourceManager(displayAttribute.ResourceType);
 
         return resourceManager?.GetString(displayAttribute.Name, cultureInfo) ??
                resourceManager?.GetString(displayAttribute.Name) ??
                displayAttribute.Name;
     }
 
-    public static string GetDisplayAttributeName(this PropertyInfo propertyInfo, CultureInfo cultureInfo)
+    public static string GetDisplayAttributeName(this PropertyInfo propertyInfo, CultureInfo? cultureInfo)
     {
         if (propertyInfo == null)
             throw new ArgumentNullException(nameof(propertyInfo));
@@ -76,12 +80,10 @@ public static class PropertyInfoExtensions
         if (displayAttribute == null)
             throw new NotSupportedException($"The property {propertyInfo.Name} does not implement attribute {nameof(DisplayAttribute)} which is required for the extension method {nameof(GetDisplayAttributeName)}.");
 
-        var resourceManager = (Resources.ResourceManager?)displayAttribute.ResourceType?
-            .GetProperty("ResourceManager", BindingFlags.Public | BindingFlags.Static)?.GetMethod?
-            .Invoke(null, null);
-
         if (displayAttribute.Name == null)
             return propertyInfo.Name;
+
+        var resourceManager = GetResourceManager(displayAttribute.ResourceType);
 
         return resourceManager?.GetString(displayAttribute.Name, cultureInfo) ??
                resourceManager?.GetString(displayAttribute.Name) ??
@@ -94,21 +96,15 @@ public static class PropertyInfoExtensions
             throw new ArgumentNullException(nameof(propertyInfo));
         var displayAttribute = propertyInfo.GetCustomAttribute<DisplayAttribute>();
 
-        if (displayAttribute == null)
+        if (displayAttribute?.Description == null)
             return null;
 
-        var resourceManager = (Resources.ResourceManager?)displayAttribute.ResourceType?
-            .GetProperty("ResourceManager", BindingFlags.Public | BindingFlags.Static)?.GetMethod?
-            .Invoke(null, null);
-
-        if (displayAttribute.Description == null)
-            return null;
-
-        return resourceManager?.GetString(displayAttribute.Description) ??
+        return GetResourceManager(displayAttribute.ResourceType)?
+                   .GetString(displayAttribute.Description) ??
                displayAttribute.Description;
     }
 
-    public static string GetDisplayAttributeDescription(this PropertyInfo propertyInfo)
+    public static string? GetDisplayAttributeDescription(this PropertyInfo propertyInfo)
     {
         if (propertyInfo == null)
             throw new ArgumentNullException(nameof(propertyInfo));
@@ -117,39 +113,31 @@ public static class PropertyInfoExtensions
         if (displayAttribute == null)
             throw new NotSupportedException($"The property {propertyInfo.Name} does not implement attribute {nameof(DisplayAttribute)} which is required for the extension method {nameof(GetDisplayAttributeName)}.");
 
-        var resourceManager = (Resources.ResourceManager?)displayAttribute.ResourceType?
-            .GetProperty("ResourceManager", BindingFlags.Public | BindingFlags.Static)?.GetMethod?
-            .Invoke(null, null);
-
         if (displayAttribute.Description == null)
-            return string.Empty;
+            return null;
 
-        return resourceManager?.GetString(displayAttribute.Description) ??
+        return GetResourceManager(displayAttribute.ResourceType)?
+                   .GetString(displayAttribute.Description) ??
                displayAttribute.Description;
     }
 
-    public static string? GetDisplayAttributeDescriptionOrDefault(this PropertyInfo propertyInfo, CultureInfo cultureInfo)
+    public static string? GetDisplayAttributeDescriptionOrDefault(this PropertyInfo propertyInfo, CultureInfo? cultureInfo)
     {
         if (propertyInfo == null)
             throw new ArgumentNullException(nameof(propertyInfo));
         var displayAttribute = propertyInfo.GetCustomAttribute<DisplayAttribute>();
 
-        if (displayAttribute == null)
+        if (displayAttribute?.Description == null)
             return null;
 
-        var resourceManager = (Resources.ResourceManager?)displayAttribute.ResourceType?
-            .GetProperty("ResourceManager", BindingFlags.Public | BindingFlags.Static)?.GetMethod?
-            .Invoke(null, null);
-
-        if (displayAttribute.Description == null)
-            return null;
+        var resourceManager = GetResourceManager(displayAttribute.ResourceType);
 
         return resourceManager?.GetString(displayAttribute.Description, cultureInfo) ??
                resourceManager?.GetString(displayAttribute.Description) ??
                displayAttribute.Description;
     }
 
-    public static string GetDisplayAttributeDescription(this PropertyInfo propertyInfo, CultureInfo cultureInfo)
+    public static string? GetDisplayAttributeDescription(this PropertyInfo propertyInfo, CultureInfo? cultureInfo)
     {
         if (propertyInfo == null)
             throw new ArgumentNullException(nameof(propertyInfo));
@@ -158,12 +146,10 @@ public static class PropertyInfoExtensions
         if (displayAttribute == null)
             throw new NotSupportedException($"The property {propertyInfo.Name} does not implement attribute {nameof(DisplayAttribute)} which is required for the extension method {nameof(GetDisplayAttributeName)}.");
 
-        var resourceManager = (Resources.ResourceManager?)displayAttribute.ResourceType?
-            .GetProperty("ResourceManager", BindingFlags.Public | BindingFlags.Static)?.GetMethod?
-            .Invoke(null, null);
-
         if (displayAttribute.Description == null)
-            return string.Empty;
+            return null;
+
+        var resourceManager = GetResourceManager(displayAttribute.ResourceType);
 
         return resourceManager?.GetString(displayAttribute.Description, cultureInfo) ??
                resourceManager?.GetString(displayAttribute.Description) ??

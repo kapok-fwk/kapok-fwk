@@ -2,78 +2,77 @@ using System.Globalization;
 using System.IO;
 using Xunit;
 
-namespace Kapok.Report.Razor.UnitTest
+namespace Kapok.Report.Razor.UnitTest;
+
+public class HtmlReportProcessorTest
 {
-    public class HtmlReportProcessorTest
+    public class SampleHtmlModel : Model.HtmlReport
     {
-        public class SampleHtmlModel : Model.HtmlReport
+        public SampleHtmlModel()
         {
-            public SampleHtmlModel()
-            {
-                Name = "SampleHtmlModel";
-                Template = "<h1>Hello @Model.PropertyName!</h1>";
-            }
-
-            public Caption PropertyName => new Caption
-            {
-                {string.Empty, "--World--"}, // invariant culture string (= default string)
-                {"en-US", "World"},
-                {"de-DE", "Welt"},
-            };
+            Name = "SampleHtmlModel";
+            Template = "<h1>Hello @Model.PropertyName!</h1>";
         }
 
-        [Fact]
-        public void TestInvariantCulture()
+        public Caption PropertyName => new Caption
         {
-            var processor = new HtmlReportProcessor();
-            processor.ReportModel = new SampleHtmlModel();
-            processor.ReportLanguage = CultureInfo.InvariantCulture;
+            {string.Empty, "--World--"}, // invariant culture string (= default string)
+            {"en-US", "World"},
+            {"de-DE", "Welt"},
+        };
+    }
 
-            using var stream = new MemoryStream();
+    [Fact]
+    public void TestInvariantCulture()
+    {
+        var processor = new HtmlReportProcessor();
+        processor.ReportModel = new SampleHtmlModel();
+        processor.ReportLanguage = CultureInfo.InvariantCulture;
 
-            processor.ProcessToStream(HtmlReportProcessor.HtmlMimeType, stream);
+        using var stream = new MemoryStream();
 
-            stream.Seek(0, SeekOrigin.Begin);
-            using var reader = new StreamReader(stream);
-            var htmlContent = reader.ReadToEnd();
+        processor.ProcessToStream(HtmlReportProcessor.HtmlMimeType, stream);
 
-            Assert.Equal("<h1>Hello --World--!</h1>", htmlContent);
-        }
+        stream.Seek(0, SeekOrigin.Begin);
+        using var reader = new StreamReader(stream);
+        var htmlContent = reader.ReadToEnd();
+
+        Assert.Equal("<h1>Hello --World--!</h1>", htmlContent);
+    }
         
-        [Fact]
-        public void TestEnglishLanguage()
-        {
-            var processor = new HtmlReportProcessor();
-            processor.ReportModel = new SampleHtmlModel();
-            processor.ReportLanguage = CultureInfo.GetCultureInfo("en-US");
+    [Fact]
+    public void TestEnglishLanguage()
+    {
+        var processor = new HtmlReportProcessor();
+        processor.ReportModel = new SampleHtmlModel();
+        processor.ReportLanguage = CultureInfo.GetCultureInfo("en-US");
             
-            using var stream = new MemoryStream();
+        using var stream = new MemoryStream();
             
-            processor.ProcessToStream(HtmlReportProcessor.HtmlMimeType, stream);
+        processor.ProcessToStream(HtmlReportProcessor.HtmlMimeType, stream);
 
-            stream.Seek(0, SeekOrigin.Begin);
-            using var reader = new StreamReader(stream);
-            var htmlContent = reader.ReadToEnd();
+        stream.Seek(0, SeekOrigin.Begin);
+        using var reader = new StreamReader(stream);
+        var htmlContent = reader.ReadToEnd();
 
-            Assert.Equal("<h1>Hello World!</h1>", htmlContent);
-        }
+        Assert.Equal("<h1>Hello World!</h1>", htmlContent);
+    }
         
-        [Fact]
-        public void TestGermanLanguage()
-        {
-            var processor = new HtmlReportProcessor();
-            processor.ReportModel = new SampleHtmlModel();
-            processor.ReportLanguage = CultureInfo.GetCultureInfo("de-DE");
+    [Fact]
+    public void TestGermanLanguage()
+    {
+        var processor = new HtmlReportProcessor();
+        processor.ReportModel = new SampleHtmlModel();
+        processor.ReportLanguage = CultureInfo.GetCultureInfo("de-DE");
             
-            using var stream = new MemoryStream();
+        using var stream = new MemoryStream();
             
-            processor.ProcessToStream(HtmlReportProcessor.HtmlMimeType, stream);
+        processor.ProcessToStream(HtmlReportProcessor.HtmlMimeType, stream);
 
-            stream.Seek(0, SeekOrigin.Begin);
-            using var reader = new StreamReader(stream);
-            var htmlContent = reader.ReadToEnd();
+        stream.Seek(0, SeekOrigin.Begin);
+        using var reader = new StreamReader(stream);
+        var htmlContent = reader.ReadToEnd();
 
-            Assert.Equal("<h1>Hello Welt!</h1>", htmlContent);
-        }
+        Assert.Equal("<h1>Hello Welt!</h1>", htmlContent);
     }
 }

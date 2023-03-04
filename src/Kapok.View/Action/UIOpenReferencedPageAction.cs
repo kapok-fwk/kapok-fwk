@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using Kapok.Core;
+using Kapok.BusinessLayer;
 
 namespace Kapok.View;
 
@@ -17,13 +17,13 @@ public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction
     private readonly IDataPage? _page;
     protected readonly Dictionary<Type, object>? PageConstructorParamValues;
     private readonly IDataSetView<TEntry>? _baseDataSetView;
-    private readonly Action<IFilterSet, TEntry, IReadOnlyDictionary<string, object>>? _filter;
+    private readonly Action<IFilterSet, TEntry, IReadOnlyDictionary<string, object?>>? _filter;
 
     private readonly string? _listViewName;
 
     public UIOpenReferencedPageAction(string name, IDataPage page,
         IDataSetView<TEntry>? baseDataSetView = null,
-        Action<IFilterSet, TEntry, IReadOnlyDictionary<string, object>>? filter = null,
+        Action<IFilterSet, TEntry, IReadOnlyDictionary<string, object?>>? filter = null,
         Func<TEntry, bool>? canExecute = null, string? listViewName = null)
         : base(name, DummyExecute, canExecute)
     {
@@ -40,7 +40,7 @@ public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction
 
     public UIOpenReferencedPageAction(string name, Type pageType, IViewDomain viewDomain,
         IDataSetView<TEntry>? baseDataSetView = null,
-        Action<IFilterSet, TEntry, IReadOnlyDictionary<string, object>>? filter = null,
+        Action<IFilterSet, TEntry, IReadOnlyDictionary<string, object?>>? filter = null,
         Func<TEntry, bool>? canExecute = null, string? listViewName = null)
         : base(name, DummyExecute, canExecute)
     {
@@ -124,7 +124,8 @@ public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction
             var filterSet = ConstructFilterSet();
 
             var firstEntry = selectedEntry;
-            _filter.Invoke(filterSet, firstEntry, _baseDataSetView?.Filter.GetNestedDataFilter(page.ViewDomain) ?? new Dictionary<string, object>());
+            var nestedDataFilter = _baseDataSetView?.Filter.GetNestedDataFilter(page.ViewDomain);
+            _filter.Invoke(filterSet, firstEntry, nestedDataFilter ?? new Dictionary<string, object?>());
 
             page.DataSet.Filter.Add(filterSet);
         }

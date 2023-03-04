@@ -16,19 +16,19 @@ public class Claim : EntityBase
         set => SetProperty(ref _type, value);
     }
 
-    private string _name;
+    private string? _name;
 
     [Display(Name = "Name", ResourceType = typeof(Res))]
-    public string Name
+    public string? Name
     {
         get => _name;
         set => SetProperty(ref _name, value);
     }
 
-    private string _description;
+    private string? _description;
 
     [Display(Name = "Description", ResourceType = typeof(Res))]
-    public string Description
+    public string? Description
     {
         get => _description;
         set => SetProperty(ref _description, value);

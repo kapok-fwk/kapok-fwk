@@ -21,7 +21,7 @@ public class ReportProcessor : EditableEntityBase, IEquatable<ReportProcessor>
 
     private byte[]? _rowVersion;
     private Guid _reportProcessorId;
-    private string _typeFullName;
+    private string _typeFullName = string.Empty;
 
     [Timestamp]
     [Browsable(false)]

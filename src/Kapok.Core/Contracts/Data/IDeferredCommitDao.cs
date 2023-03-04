@@ -1,6 +1,6 @@
 ﻿using Kapok.Entity.Model;
 
-namespace Kapok.Core;
+namespace Kapok.BusinessLayer;
 
 /// <summary>
 /// A dao which commits/saves the changes only on request.

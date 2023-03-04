@@ -1,7 +1,8 @@
-﻿using Kapok.Entity;
+﻿using Kapok.Data;
+using Kapok.Entity;
 using Kapok.Entity.Model;
 
-namespace Kapok.Core;
+namespace Kapok.BusinessLayer;
 
 public class LinqQueryDao<T> : IDao<T>
     where T : class, new()
@@ -22,19 +23,19 @@ public class LinqQueryDao<T> : IDao<T>
         return Query ?? new T[]{ }.AsQueryable();
     }
 
-    public IReadOnlyList<IReadOnlyList<string>> Indexes => null;
+    public IReadOnlyList<IReadOnlyList<string>>? Indexes => null;
 
     #region IBusinessLayerService
 
-    void IBusinessLayerService.OnPropertyChanging(object entry, string propertyName)
+    void IBusinessLayerService.OnPropertyChanging(object entry, string? propertyName)
     {
     }
 
-    void IBusinessLayerService.OnPropertyChanged(object entry, string propertyName)
+    void IBusinessLayerService.OnPropertyChanged(object entry, string? propertyName)
     {
     }
 
-    bool IBusinessLayerService.ValidateProperty(object entry, string propertyName, object value, out ICollection<string> validationErrors)
+    bool IBusinessLayerService.ValidateProperty(object entry, string propertyName, object? value, out ICollection<string>? validationErrors)
     {
         validationErrors = null;
         return true;
@@ -45,7 +46,7 @@ public class LinqQueryDao<T> : IDao<T>
     #region IReadOnlyDao<T>
 
     IFilterSet<T> IReadOnlyDao<T>.Filter => Filter;
-    IQueryable<TNested> IReadOnlyDao<T>.GetNestedAsQueryable<TNested>(T entity, string referenceName) => throw new NotSupportedException($"{nameof(LinqQueryDao<T>)} does not support working with nested entities.");
+    IQueryable<TNested> IReadOnlyDao<T>.GetNestedAsQueryable<TNested>(T entity, string? referenceName) => throw new NotSupportedException($"{nameof(LinqQueryDao<T>)} does not support working with nested entities.");
 
     #endregion
 
@@ -62,15 +63,15 @@ public class LinqQueryDao<T> : IDao<T>
     {
     }
 
-    void IDao<T>.OnPropertyChanging(T entry, string propertyName)
+    void IDao<T>.OnPropertyChanging(T entry, string? propertyName)
     {
     }
 
-    void IDao<T>.OnPropertyChanged(T entry, string propertyName)
+    void IDao<T>.OnPropertyChanged(T entry, string? propertyName)
     {
     }
 
-    bool IDao<T>.ValidateProperty(T entry, string propertyName, object value, out ICollection<string> validationErrors)
+    bool IDao<T>.ValidateProperty(T entry, string propertyName, object? value, out ICollection<string>? validationErrors)
     {
         validationErrors = null;
         return true;
@@ -85,7 +86,7 @@ public class LinqQueryDao<T> : IDao<T>
 
     #region IReadOnlyDao<T>
 
-    ICollection<string> IReadOnlyDao<T>.IncludeNestedData => null;
+    ICollection<string>? IReadOnlyDao<T>.IncludeNestedData => null;
 
     IDataDomainScope? IReadOnlyDao<T>.DataDomainScope => null;
 

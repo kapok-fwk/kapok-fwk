@@ -1,4 +1,4 @@
-﻿using Kapok.Entity;
+﻿using Kapok.Entity.Model;
 
 namespace Kapok.View;
 

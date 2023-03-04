@@ -9,22 +9,22 @@ public static class LinqExtension
 
     public static T GetNext<T>(this IQueryable<T> queryable, T current)
     {
-        return queryable.SkipWhile(i => !i.Equals(current)).Skip(1).First();
+        return queryable.SkipWhile(i => !(i == null ? Equals(i, current) : i.Equals(current))).Skip(1).First();
     }
 
     public static T GetPrevious<T>(this IQueryable<T> queryable, T current)
     {
-        return queryable.TakeWhile(x => !x.Equals(current)).Last();
+        return queryable.TakeWhile(x => !(x == null ? Equals(x, current) : x.Equals(current))).Last();
     }
 
-    public static T GetNextOrDefault<T>(this IQueryable<T> queryable, T current)
+    public static T? GetNextOrDefault<T>(this IQueryable<T> queryable, T current)
     {
-        return queryable.SkipWhile(i => !i.Equals(current)).Skip(1).FirstOrDefault();
+        return queryable.SkipWhile(i => !(i == null ? Equals(i, current) : i.Equals(current))).Skip(1).FirstOrDefault();
     }
 
-    public static T GetPreviousOrDefault<T>(this IQueryable<T> queryable, T current)
+    public static T? GetPreviousOrDefault<T>(this IQueryable<T> queryable, T current)
     {
-        return queryable.TakeWhile(x => !x.Equals(current)).LastOrDefault();
+        return queryable.TakeWhile(x => !(x == null ? Equals(x, current) : x.Equals(current))).LastOrDefault();
     }
 
     public static IQueryable<T> Clone<T>(this IQueryable<T> queryable)
@@ -59,7 +59,9 @@ public static class LinqExtension
                 : orderedQueryable.ThenBy(orderExpression);
         }
 
+#pragma warning disable CS8603
         return orderedQueryable;
+#pragma warning restore CS8603
     }
 
     public static IOrderedQueryable<T> OrderByDescending<T>(this IQueryable<T> queryable, IReadOnlyList<PropertyInfo> propertyInfos)
@@ -88,7 +90,9 @@ public static class LinqExtension
                 : orderedQueryable.ThenByDescending(orderExpression);
         }
 
+#pragma warning disable CS8603
         return orderedQueryable;
+#pragma warning restore CS8603
     }
 
     #endregion
@@ -97,22 +101,22 @@ public static class LinqExtension
 
     public static T GetNext<T>(this IEnumerable<T> queryable, T current)
     {
-        return queryable.SkipWhile(i => !i.Equals(current)).Skip(1).First();
+        return queryable.SkipWhile(i => !(i == null ? Equals(i, current) : i.Equals(current))).Skip(1).First();
     }
 
     public static T GetPrevious<T>(this IEnumerable<T> queryable, T current)
     {
-        return queryable.TakeWhile(x => !x.Equals(current)).Last();
+        return queryable.TakeWhile(x => !(x == null ? Equals(x, current) : x.Equals(current))).Last();
     }
 
-    public static T GetNextOrDefault<T>(this IEnumerable<T> queryable, T current)
+    public static T? GetNextOrDefault<T>(this IEnumerable<T> queryable, T current)
     {
-        return queryable.SkipWhile(i => !i.Equals(current)).Skip(1).FirstOrDefault();
+        return queryable.SkipWhile(i => !(i == null ? Equals(i, current) : i.Equals(current))).Skip(1).FirstOrDefault();
     }
 
-    public static T GetPreviousOrDefault<T>(this IEnumerable<T> queryable, T current)
+    public static T? GetPreviousOrDefault<T>(this IEnumerable<T> queryable, T current)
     {
-        return queryable.TakeWhile(x => !x.Equals(current)).LastOrDefault();
+        return queryable.TakeWhile(x => !(x == null ? Equals(x, current) : x.Equals(current))).LastOrDefault();
     }
         
     public static IEnumerable<T> Clone<T>(this IEnumerable<T> enumerable)

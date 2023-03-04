@@ -1,4 +1,6 @@
-﻿namespace Kapok.Core;
+﻿using Kapok.Data;
+
+namespace Kapok.BusinessLayer;
 
 /// <summary>
 /// An business layer object that handles data

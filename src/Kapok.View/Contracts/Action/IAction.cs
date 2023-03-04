@@ -13,7 +13,7 @@ public interface IAction
     /// </summary>
     bool IsVisible { get; set; }
 
-    event EventHandler CanExecuteChanged;
+    event EventHandler? CanExecuteChanged;
 
     bool CanExecute();
 
@@ -33,7 +33,7 @@ public interface IAction<in T>
     /// </summary>
     bool IsVisible { get; set; }
 
-    event EventHandler CanExecuteChanged;
+    event EventHandler? CanExecuteChanged;
 
     bool CanExecute(T? arg);
 

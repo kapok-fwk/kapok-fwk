@@ -13,6 +13,7 @@ public static class ExcelHelper
     {
         // Source: https://stackoverflow.com/questions/20648149/what-are-numberformat-options-in-excel-vba
 
+        // ReSharper disable UnusedMember.Local
         public static string General => "General";
         public static string Number => "0";
 
@@ -29,6 +30,7 @@ public static class ExcelHelper
         public static string Text => "@";
         public static string Special => ";;";
         //public static string Custom => "#,##0_);[Red](#,##0)";
+        // ReSharper restore UnusedMember.Local
     }
 
     /// <summary>
@@ -57,7 +59,9 @@ public static class ExcelHelper
                 object? value = null;
 
                 if (columnProperty.CanRead)
+#pragma warning disable CS8602
                     value = columnProperty.GetMethod.Invoke(row, Array.Empty<object>());
+#pragma warning restore CS8602
 
                 value ??= DBNull.Value;
 

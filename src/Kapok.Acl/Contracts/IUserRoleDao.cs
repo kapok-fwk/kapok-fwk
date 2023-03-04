@@ -1,5 +1,5 @@
-﻿using Kapok.Core;
-using Kapok.Acl.DataModel;
+﻿using Kapok.Acl.DataModel;
+using Kapok.BusinessLayer;
 
 namespace Kapok.Acl;
 

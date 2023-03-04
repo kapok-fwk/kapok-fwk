@@ -1,4 +1,4 @@
-﻿namespace Kapok.Core;
+﻿namespace Kapok.BusinessLayer;
 
 /// <summary>
 /// A exception which is called when 'ReportError(..)' in business layer is called and 'ThrowOnError' is set to true.

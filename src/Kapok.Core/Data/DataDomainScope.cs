@@ -1,8 +1,8 @@
 ﻿using System.Transactions;
-using Kapok.Data;
+using Kapok.BusinessLayer;
 using Res = Kapok.Core.Resources.Data.DataDomainScope;
 
-namespace Kapok.Core;
+namespace Kapok.Data;
 
 public abstract class DataDomainScope : IDataDomainScope
 {
@@ -171,7 +171,7 @@ public abstract class DataDomainScope : IDataDomainScope
     private IDao<T> InitializeDao<T>(IRepository<T> repository)
         where T : class, new()
     {
-        return Kapok.Core.DataDomain.ConstructNewDao(this, repository);
+        return Kapok.Data.DataDomain.ConstructNewDao(this, repository);
     }
 
     private void AddDaoInternal<T>(IDao<T> dao)

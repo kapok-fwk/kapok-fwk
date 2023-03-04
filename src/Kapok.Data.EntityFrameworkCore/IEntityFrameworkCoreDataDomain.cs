@@ -1,10 +1,8 @@
-﻿using Kapok.Core;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace Kapok.Data.EntityFrameworkCore
+namespace Kapok.Data.EntityFrameworkCore;
+
+public interface IEntityFrameworkCoreDataDomain : IDataDomain
 {
-    public interface IEntityFrameworkCoreDataDomain : IDataDomain
-    {
-        DbContext ConstructNewDbContext();
-    }
+    DbContext ConstructNewDbContext();
 }

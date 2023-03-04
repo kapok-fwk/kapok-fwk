@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Kapok.Core;
+namespace Kapok.Data;
 
 public static class DataDomainScopeUsageManager
 {

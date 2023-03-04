@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Kapok.DataModel;
+namespace Kapok.Core.DataModel;
 
 [Table("MigrationsHistory", Schema = "System")]
 public class ModuleMigrationsHistory : EntityBase
@@ -15,13 +15,13 @@ public class ModuleMigrationsHistory : EntityBase
         });
     }
 
-    private string _moduleName;
-    private string _migrationId;
-    private string _productVersion;
+    private string? _moduleName;
+    private string? _migrationId;
+    private string? _productVersion;
 
     [Required]
     [StringLength(150)]
-    public string ModuleName
+    public string? ModuleName
     {
         get => _moduleName;
         set => SetProperty(ref _moduleName, value);
@@ -29,7 +29,7 @@ public class ModuleMigrationsHistory : EntityBase
 
     [Required]
     [StringLength(150)]
-    public string MigrationId
+    public string? MigrationId
     {
         get => _migrationId;
         set => SetProperty(ref _migrationId, value);
@@ -37,7 +37,7 @@ public class ModuleMigrationsHistory : EntityBase
 
     [Required]
     [StringLength(32)]
-    public string ProductVersion
+    public string? ProductVersion
     {
         get => _productVersion;
         set => SetProperty(ref _productVersion, value);

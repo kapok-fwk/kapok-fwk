@@ -107,6 +107,7 @@ public partial class DocumentPageCollectionPage : InteractivePage
 
     #endregion
 
+    // ReSharper disable once ReturnTypeCanBeNotNullable
     private IPage? FindDocumentPageBySource(object source)
     {
         return _documentPageSource.FirstOrDefault(p => p.Value == source).Key;
@@ -163,12 +164,12 @@ public partial class DocumentPageCollectionPage : InteractivePage
     protected virtual void OnSelectedDocumentPageChanged(IPage? oldPage, IPage? page)
     {
         // switch detail pages
-        if (oldPage != null && oldPage is InteractivePage oldInteractivePage)
+        if (oldPage is InteractivePage oldInteractivePage)
         {
             DetailPages.RemoveRange(oldInteractivePage.DetailPages);
         }
 
-        if (page != null && page is InteractivePage interactivePage)
+        if (page is InteractivePage interactivePage)
         {
             DetailPages.AddRange(interactivePage.DetailPages);
         }

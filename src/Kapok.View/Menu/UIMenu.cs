@@ -71,10 +71,12 @@ public class UIMenu
             var property =
                 menuItemType.GetProperty(nameof(UIMenuItemDataSetSelectionAction<object>.ReferencingDataSet));
             Debug.Assert(property != null);
+#pragma warning disable CS8602
             if (property.GetMethod.Invoke(menuItem, Array.Empty<object>()) == null)
             {
                 property.SetMethod.Invoke(menuItem, new object[] {DefaultReferencingDataSet});
             }
+#pragma warning restore CS8602
         }
 
         UIMenuItem? vmTab;
@@ -151,8 +153,8 @@ public class UIMenu
         foreach (var prop in props)
         {
             var menuItemAttribute = prop.GetCustomAttribute<MenuItemAttribute>();
-            if (!(string.IsNullOrEmpty(menuItemAttribute.MenuName) && menuName == BaseMenuName ||
-                  menuItemAttribute.MenuName == menuName))
+            if (!(string.IsNullOrEmpty(menuItemAttribute?.MenuName) && menuName == BaseMenuName ||
+                  menuItemAttribute?.MenuName == menuName))
             {
                 continue;
             }
@@ -173,7 +175,9 @@ public class UIMenu
             }
 
             UIMenuItem menuItem;
+#pragma warning disable CS8602
             object? action = prop.GetGetMethod(false).Invoke(_basePage, new object[] {});
+#pragma warning restore CS8602
             if (action == null) // skip action which is not defined
                 continue;
 
@@ -202,7 +206,9 @@ public class UIMenu
                     typeof(IAction<>).MakeGenericType(typeof(IList<>).MakeGenericType(entityType)),
                     typeof(string)
                 });
+#pragma warning disable CS8602
                 menuItem = (UIMenuItem)constr.Invoke(new []
+#pragma warning restore CS8602
                 {
                     action,
                     null
@@ -242,14 +248,17 @@ public class UIMenu
                         groupSortOrder = Array.FindIndex(GroupSortOrder, i => i == groupName);
                 }
 
-                if (displayAttribute.GetOrder() != null)
+                var displayAttributeOrder = displayAttribute.GetOrder();
+                if (displayAttributeOrder != null)
                 {
-                    menuItem.Order = displayAttribute.GetOrder().Value;
+                    menuItem.Order = displayAttributeOrder.Value;
                 }
             }
 
             AddMenuItem(menuItem, viewDomain,
+#pragma warning disable CS8602
                 menuItemAttribute.TabName, menuItemAttribute.Order,
+#pragma warning restore CS8602
                 groupName, groupSortOrder
             );
         }
@@ -308,6 +317,7 @@ public class UIMenu
                 return null;
 
             string keyTip = label[0].ToString();
+            // ReSharper disable once AccessToModifiedClosure
             while (keyTip.Length < label.Length && list.Any(e => (e.Label.LanguageOrDefault(viewDomain.Culture)?.StartsWith(keyTip) ?? false) && e != menuItem))
             {
                 keyTip += label[keyTip.Length].ToString(); // add one char to the KeyTip

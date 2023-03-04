@@ -1,4 +1,5 @@
-﻿using Kapok.Core;
+﻿using Kapok.Data;
+using Kapok.Module;
 using Kapok.Report.DataModel;
 
 namespace Kapok.Report;

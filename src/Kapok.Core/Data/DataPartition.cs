@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Kapok.Core;
+namespace Kapok.Data;
 
 public class DataPartition
 {

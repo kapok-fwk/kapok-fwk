@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Kapok.Core.FilterParsing;
+namespace Kapok.BusinessLayer.FilterParsing;
 
 internal class ExpressionPromoter : IExpressionPromoter
 {
@@ -25,7 +25,7 @@ internal class ExpressionPromoter : IExpressionPromoter
             }
             else
             {
-                if (ConstantExpressionHelper.TryGetText(ce, out string text))
+                if (ConstantExpressionHelper.TryGetText(ce, out string? text))
                 {
                     Type target = TypeHelper.GetNonNullableType(type);
                     object? value = null;
@@ -41,7 +41,7 @@ internal class ExpressionPromoter : IExpressionPromoter
                             // Make sure an enum value stays an enum value
                             if (target.IsEnum)
                             {
-                                value = Enum.ToObject(target, value);
+                                value = Enum.ToObject(target, value ?? string.Empty);
                             }
                             break;
 

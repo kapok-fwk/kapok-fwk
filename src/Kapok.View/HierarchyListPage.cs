@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Kapok.Core;
+using Kapok.Data;
 using Kapok.Entity;
 using Res = Kapok.View.Resources.HierarchyListPage;
 

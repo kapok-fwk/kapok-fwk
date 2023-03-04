@@ -1,8 +1,9 @@
 ﻿using System.Globalization;
 using System.Linq.Expressions;
-using Kapok.Core.FilterParsing;
+using Kapok.BusinessLayer.FilterParsing;
+using Kapok.Data;
 
-namespace Kapok.Core;
+namespace Kapok.BusinessLayer;
 
 public static class FilterSetExtension
 {

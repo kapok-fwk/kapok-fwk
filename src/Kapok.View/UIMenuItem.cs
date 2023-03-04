@@ -54,12 +54,14 @@ public class UIMenuItem : BindableObjectBase
 
     private void SubMenuItem_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
+        if (sender == null) return;
+
         var subMenuItem = (UIMenuItem)sender;
 
-        if (e.PropertyName == nameof(UIMenuItem.IsVisible) &&
+        if (e.PropertyName == nameof(IsVisible) &&
             !subMenuItem.IsVisible)
         {
-            // check if all sub menu items are invisble
+            // check if all sub menu items are invisible
             var newIsVisibleDefault = SubMenuItems.Any(mi => mi.IsVisible);
 
             if (_isVisibleDefault != newIsVisibleDefault)
@@ -102,13 +104,17 @@ public class UIMenuItem : BindableObjectBase
     public Caption Label
     {
         get => _label;
+#pragma warning disable CS8601
         set => SetProperty(ref _label, value);
+#pragma warning restore CS8601
     }
 
     public Caption Description
     {
         get => _description;
+#pragma warning disable CS8601
         set => SetProperty(ref _description, value);
+#pragma warning restore CS8601
     }
 
     public int Order

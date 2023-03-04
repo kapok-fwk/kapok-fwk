@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq.Expressions;
 using System.Reflection;
-using Kapok.Core.FilterParsing;
+using Kapok.BusinessLayer.FilterParsing;
 using Kapok.Entity;
 
-namespace Kapok.Core;
+namespace Kapok.BusinessLayer;
 
 public class PropertyFilterStringFilter : PropertyFilter, IPropertyFilterStringFilter
 {
@@ -103,7 +103,7 @@ public class PropertyFilterStringFilter<T> : PropertyFilter<T>, IPropertyFilterS
     {
         if (propertyName == nameof(FilterString))
         {
-            BuildFilterExpression((string)value, out ParseException? parseException);
+            BuildFilterExpression((string?)value, out ParseException? parseException);
             if (parseException != null)
             {
                 validationErrors.Add(new BusinessLayerMessage(parseException.Message, MessageSeverity.Error));
@@ -111,7 +111,7 @@ public class PropertyFilterStringFilter<T> : PropertyFilter<T>, IPropertyFilterS
         }
     }
 
-    private void BuildFilterExpression(string expression, out ParseException? parseException)
+    private void BuildFilterExpression(string? expression, out ParseException? parseException)
     {
         // don't use an actual filter on nested data filtering
         if (Attribute.IsDefined(PropertyInfo, typeof(NestedDataFilterAttribute)))
@@ -142,7 +142,7 @@ public class PropertyFilterStringFilter<T> : PropertyFilter<T>, IPropertyFilterS
         );
 
         parser.TryParse(out var filterExpression, out parseException);
-        FilterExpression = (Expression<Func<T, bool>>)filterExpression;
+        FilterExpression = (Expression<Func<T, bool>>?)filterExpression;
     }
 
     public override void Clear()

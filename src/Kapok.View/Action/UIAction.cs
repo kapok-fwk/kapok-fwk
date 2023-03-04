@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using Kapok.Core;
+using Kapok.BusinessLayer;
 using Kapok.Entity;
 using NLog;
 
@@ -14,7 +14,7 @@ public class UIAction : BindableObjectBase, IAction
     private readonly Func<bool>? _canExecuteFunc;
     private bool? _imageIsBig;
 
-    protected static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    protected static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
 
     public UIAction(string name, Action execute, Func<bool>? canExecute = null)
     {
@@ -44,7 +44,7 @@ public class UIAction : BindableObjectBase, IAction
         set => SetProperty(ref _isVisible, value);
     }
 
-    public event EventHandler CanExecuteChanged;
+    public event EventHandler? CanExecuteChanged;
 
     public void RaiseCanExecuteChanged()
     {
@@ -83,7 +83,13 @@ public class UIAction : BindableObjectBase, IAction
         {
             Debugger.Break();
             Logger.Error(e, "Execute action {actionName} failed", Name);
-            ViewDomain.Default.ShowErrorMessage(e.Message); // TODO: find a better way to report this here!
+            if (ViewDomain.Default == null)
+            {
+#pragma warning disable CA2200
+                throw;
+#pragma warning restore CA2200
+            }
+            ViewDomain.Default.ShowErrorMessage(e.Message);
         }
     }
 
@@ -103,7 +109,7 @@ public class UIAction<T> : BindableObjectBase, IAction<T>
     private bool? _imageIsBig;
 
     // ReSharper disable once StaticMemberInGenericType
-    protected static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    protected static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
 
     public UIAction(string name, Action<T?> execute, Func<T?, bool>? canExecute = null)
     {
@@ -133,7 +139,7 @@ public class UIAction<T> : BindableObjectBase, IAction<T>
         set => SetProperty(ref _isVisible, value);
     }
 
-    public event EventHandler CanExecuteChanged;
+    public event EventHandler? CanExecuteChanged;
 
     public void RaiseCanExecuteChanged()
     {
@@ -172,6 +178,10 @@ public class UIAction<T> : BindableObjectBase, IAction<T>
         {
             Debugger.Break();
             Logger.Error(e, "Execute action {actionName} failed", Name);
+            if (ViewDomain.Default == null)
+            {
+                throw;
+            }
             ViewDomain.Default.ShowErrorMessage(e.Message); // TODO: find a better way to report this here!
         }
     }

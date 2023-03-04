@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Kapok.Core;
+namespace Kapok.BusinessLayer;
 
 public abstract class PropertyFilter : ValidatableBindableObjectBase, IPropertyFilter
 {

@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-namespace Kapok.Core.FilterParsing;
+namespace Kapok.BusinessLayer.FilterParsing;
 
 internal class ExpressionHelper : IExpressionHelper
 {
@@ -180,16 +180,16 @@ internal class ExpressionHelper : IExpressionHelper
 
         if (rightType == typeof(string) && right.NodeType == ExpressionType.Constant)
         {
-            right = OptimizeStringForEqualityIfPossible((string)((ConstantExpression)right).Value, leftType) ?? right;
+            right = OptimizeStringForEqualityIfPossible((string?)((ConstantExpression)right).Value, leftType) ?? right;
         }
 
         if (leftType == typeof(string) && left.NodeType == ExpressionType.Constant)
         {
-            left = OptimizeStringForEqualityIfPossible((string)((ConstantExpression)left).Value, rightType) ?? left;
+            left = OptimizeStringForEqualityIfPossible((string?)((ConstantExpression)left).Value, rightType) ?? left;
         }
     }
 
-    public Expression OptimizeStringForEqualityIfPossible(string text, Type type)
+    public Expression? OptimizeStringForEqualityIfPossible(string? text, Type type)
     {
         if (type == typeof(DateTime) && DateTime.TryParse(text, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dateTime))
         {
@@ -220,6 +220,9 @@ internal class ExpressionHelper : IExpressionHelper
         {
             methodInfo = right.Type.GetMethod(methodName, new[] { left.Type, right.Type });
         }
+
+        if (methodInfo == null)
+            throw new Exception("Could not find static method either from left nor from right");
 
         return methodInfo;
     }

@@ -1,4 +1,4 @@
-﻿namespace Kapok.Core.FilterParsing;
+﻿namespace Kapok.BusinessLayer.FilterParsing;
 
 internal static class Res
 {

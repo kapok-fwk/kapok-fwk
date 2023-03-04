@@ -3,7 +3,8 @@ using System.Collections.Specialized;
 
 namespace Kapok.View;
 
-public interface IPropertyViewCollection : ICollection<PropertyView>, IList<PropertyView>, IList, INotifyCollectionChanged
+// ReSharper disable once PossibleInterfaceMemberAmbiguity
+public interface IPropertyViewCollection : IList<PropertyView>, IList, INotifyCollectionChanged
 {
     IReadOnlyDictionary<string, IPropertyLookupView> LookupViews { get; }
 

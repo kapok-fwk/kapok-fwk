@@ -24,7 +24,7 @@ public abstract class UserIdentity : IIdentity
 
     string IIdentity.Name => DisplayName;
 
-    string IIdentity.AuthenticationType => LoginProviderName;
+    string? IIdentity.AuthenticationType => LoginProviderName;
 
     #endregion
 }

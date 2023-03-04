@@ -1,10 +1,10 @@
 ﻿using System.Reflection;
 
-namespace Kapok.Core;
+namespace Kapok.BusinessLayer;
 
 public class EntityNotFoundByKeyException : BusinessLayerException
 {
-    public EntityNotFoundByKeyException(Type entityType, IDictionary<PropertyInfo, object> keyValues)
+    public EntityNotFoundByKeyException(Type entityType, IDictionary<PropertyInfo, object?> keyValues)
     {
         EntityType = entityType;
         KeyValues = keyValues;
@@ -12,7 +12,7 @@ public class EntityNotFoundByKeyException : BusinessLayerException
 
     public Type EntityType { get; }
 
-    public IDictionary<PropertyInfo, object> KeyValues { get; }
+    public IDictionary<PropertyInfo, object?> KeyValues { get; }
 
     public override string Message => string.Format(
         "Could not find {0} by key: {1}", // TODO: translation missing

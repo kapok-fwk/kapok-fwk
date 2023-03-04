@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace Kapok.Core;
+namespace Kapok.BusinessLayer;
 
 /// <summary>
 /// An interface which needs to be used for classes which provide a defined functionality. Normally

@@ -17,6 +17,9 @@ public abstract class EntityDataPortTargetBase<TEntity> : IDataPortTableTarget
         {
             if (rowValues.ContainsKey(column))
             {
+                if (column.PropertyInfo.SetMethod == null)
+                    throw new NotSupportedException($"You cannot write to property {column.PropertyInfo.Name} because it has no setter method");
+
                 column.PropertyInfo.SetMethod.Invoke(newEntity, new[]
                 {
                     rowValues[column]
