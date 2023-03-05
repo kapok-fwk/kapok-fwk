@@ -2,7 +2,13 @@
 using Kapok.Data;
 using Kapok.Report.DataModel;
 
-namespace Kapok.Report;
+namespace Kapok.Report.BusinessLayer;
+
+public interface IReportProcessorDao : IDao<ReportProcessor>
+{
+    Task<ReportProcessor> GetOrCreateFromType(Type reportProcessorType);
+    Type GetType(ReportProcessor entity);
+}
 
 public class ReportProcessorDao : Dao<ReportProcessor>, IReportProcessorDao
 {

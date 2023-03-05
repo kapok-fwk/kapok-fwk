@@ -2,7 +2,11 @@
 using Kapok.Data;
 using Kapok.Report.DataModel;
 
-namespace Kapok.Report;
+namespace Kapok.Report.BusinessLayer;
+
+public interface IReportDesignDao : IDao<ReportDesign>
+{
+}
 
 public class ReportDesignDao : Dao<ReportDesign>, IReportDesignDao
 {

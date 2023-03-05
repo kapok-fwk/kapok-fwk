@@ -82,7 +82,7 @@ public class ReportParameterCollection : ICollection<ReportParameter>, IReadOnly
         if (item == null)
             return false;
 
-        return _reportParameters.Remove(item.Name);
+        return Remove(item.Name);
     }
 
     #endregion

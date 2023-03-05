@@ -2,7 +2,13 @@
 using Kapok.Data;
 using Kapok.Report.DataModel;
 
-namespace Kapok.Report;
+namespace Kapok.Report.BusinessLayer;
+
+public interface IReportModelDao : IDao<ReportModel>
+{
+    ReportModel GetOrCreateFromType(Type reportModelType);
+    Type GetType(ReportModel entity);
+}
 
 public class ReportModelDao : Dao<ReportModel>, IReportModelDao
 {

@@ -9,9 +9,12 @@ public class ExcelReportPackageProcessor : ReportProcessor<ExcelReportPackage>
         ReportEngine.RegisterProcessor(typeof(ExcelReportPackageProcessor), typeof(ExcelReportPackage));
     }
 
+    /// <summary>
+    /// This method can be called to make sure that the static constructor is called.
+    /// </summary>
+    // ReSharper disable once UnusedMember.Global
     public static void Register()
     {
-        // this function can be called to make sure that the static constructor is called.
     }
 
     #endregion

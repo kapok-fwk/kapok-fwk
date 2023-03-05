@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Kapok.BusinessLayer;
 using Kapok.Data;
+using Kapok.Report.BusinessLayer;
 using Kapok.Report.DataModel;
 using Kapok.View;
 

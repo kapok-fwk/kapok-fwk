@@ -3,6 +3,7 @@ using System.Xml.Serialization;
 
 namespace Kapok.Report.Model;
 
+[Obsolete]
 public class DynamicReport : DynamicObject
 {
     public string? Name { get; set; }

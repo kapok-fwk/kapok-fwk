@@ -1,5 +1,6 @@
 ﻿using Kapok.Data;
 using Kapok.Module;
+using Kapok.Report.BusinessLayer;
 using Kapok.Report.DataModel;
 
 namespace Kapok.Report;

@@ -4,16 +4,18 @@ using System.Globalization;
 using System.Reflection;
 using OfficeOpenXml;
 using OfficeOpenXml.Table;
+using static System.String;
 
 namespace Kapok.Report;
 
 public static class ExcelHelper 
 {
-    private static class ExcelCellDataFormat
+    public static class ExcelCellDataFormat
     {
         // Source: https://stackoverflow.com/questions/20648149/what-are-numberformat-options-in-excel-vba
 
         // ReSharper disable UnusedMember.Local
+        // ReSharper disable UnusedMember.Global
         public static string General => "General";
         public static string Number => "0";
 
@@ -30,6 +32,7 @@ public static class ExcelHelper
         public static string Text => "@";
         public static string Special => ";;";
         //public static string Custom => "#,##0_);[Red](#,##0)";
+        // ReSharper restore UnusedMember.Global
         // ReSharper restore UnusedMember.Local
     }
 
@@ -91,9 +94,10 @@ public static class ExcelHelper
                     {
                         return "0";
                     }
-                    else if (precisionSpecifier > 0)
+
+                    if (precisionSpecifier > 0)
                     {
-                        return string.Join("", Enumerable.Repeat("0", precisionSpecifier));
+                        return Join("", Enumerable.Repeat("0", precisionSpecifier));
                     }
                 }
             }
@@ -112,9 +116,10 @@ public static class ExcelHelper
                     {
                         return "0";
                     }
-                    else if (precisionSpecifier > 0)
+
+                    if (precisionSpecifier > 0)
                     {
-                        return "0." + String.Join("", Enumerable.Repeat("#", precisionSpecifier));
+                        return "0." + Join("", Enumerable.Repeat("#", precisionSpecifier));
                     }
                 }
             }
@@ -133,9 +138,10 @@ public static class ExcelHelper
                     {
                         return "#,##0";
                     }
-                    else if (precisionSpecifier > 0)
+
+                    if (precisionSpecifier > 0)
                     {
-                        return "#,##0." + String.Join("", Enumerable.Repeat("#", precisionSpecifier));
+                        return "#,##0." + Join("", Enumerable.Repeat("#", precisionSpecifier));
                     }
                 }
             }
@@ -154,9 +160,10 @@ public static class ExcelHelper
                     {
                         return "0.00%";
                     }
-                    else if (precisionSpecifier > 0)
+
+                    if (precisionSpecifier > 0)
                     {
-                        return "0." + String.Join("", Enumerable.Repeat("#", precisionSpecifier)) + "%";
+                        return "0." + Join("", Enumerable.Repeat("#", precisionSpecifier)) + "%";
                     }
                 }
             }

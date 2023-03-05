@@ -42,6 +42,8 @@ public abstract class ReportProcessor<TReportModel> : IMimeTypeReportProcessor
     /// </summary>
     public virtual void ValidateReportModel()
     {
+        if (ReportModel == null)
+            throw new NotSupportedException("The report model is not set");
         if (ReportModel?.Name == null)
             throw new NotSupportedException($"The report model has no name. Property: {nameof(Model.Report.Name)}");
     }
