@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.5.1 (2023-03-05)
+
+## Kapok.Report
+
+- refactoring namespaces in Kapok.Report
+- add DataTableReportProcessor back again
+
 ## 0.1.5 (2023-03-05)
 
 ### General
