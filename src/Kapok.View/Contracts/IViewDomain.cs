@@ -101,7 +101,7 @@ public interface IViewDomain
     /// <param name="eventArgs">
     /// The event with the business layer message.
     /// </param>
-    void BusinessLayerMessageEventToSingleUIMessage(object businessLayerObject, ReportBusinessLayerMessageEventArgs eventArgs);
+    void BusinessLayerMessageEventToSingleUIMessage(object? businessLayerObject, ReportBusinessLayerMessageEventArgs eventArgs);
 
     #region Menu functions
 
