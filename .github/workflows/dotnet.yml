@@ -25,3 +25,28 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+    - name: Add Kapok package source
+      run: dotnet nuget add source --username leo-schick --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name kapok-fwk "https://nuget.pkg.github.com/kapok-fwk/index.json"
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build solution and generate NuGet package
+      run: |
+        dotnet build --no-restore -c Release
+        dotnet pack -c Release -o out
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: Nuget Packages
+        path: ./out/*.nupkg
+    - name: Push generated package to GitHub registry
+      run: dotnet nuget push ./out/*.nupkg --skip-duplicate --source kapok-fwk --api-key ${{ secrets.GITHUB_TOKEN }}
