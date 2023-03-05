@@ -1,5 +1,45 @@
 # Changelog
 
+## 0.1.5 (2023-03-05)
+
+### General
+
+- refactor code; process suggestions from ReSharper
+- add build artifacts (#7)
+- add source link
+
+### Kapok.Acl
+
+- refactoring namespace naming
+
+### Kapok.Core
+
+- refactoring namespace naming
+
+### Kapok.Data.EntityFrameworkCore
+
+- see General
+
+### Kapok.DataPort
+
+- dependency update + see General
+
+### Kapok.Report
+
+- drop obsolete methods and classes
+
+### Kapok.Report.Razor
+
+- dependency update
+
+### Kapok.Report.SqlServer
+
+- dependency update
+
+### Kapok.View
+
+- dependency update + see General
+
 ## 0.1.4 (2023-02-21)
 
 ### Kapok.Core
