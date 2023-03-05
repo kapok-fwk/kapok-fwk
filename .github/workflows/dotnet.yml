@@ -44,4 +44,4 @@ jobs:
         dotnet build --no-restore -c Release
         dotnet pack -c Release -o out
     - name: Push generated package to GitHub registry
-      run: dotnet nuget push --source ./out/*.nupkg --skip-duplicate
+      run: dotnet nuget push ./out/*.nupkg --skip-duplicate --source kapok-fwk
