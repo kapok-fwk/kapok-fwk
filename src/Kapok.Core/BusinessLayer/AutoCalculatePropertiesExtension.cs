@@ -246,15 +246,11 @@ public static class AutoCalculatePropertiesExtension
                 anonymousType
             });
 
-#pragma warning disable CS8600
-            var newQuery = (IQueryable)method.Invoke(null, new object[] { query, selectQueryExpression });
-#pragma warning restore CS8600
-
+            IQueryable newQuery = query;
             QueryTranslatorProvider<T>? provider = null;
-
             if (query is QueryTranslator<T> queryTranslator)
             {
-                // When DeferredDao<T>.QueryTranslator<T> is used we remove the logic
+                // When QueryTranslator<T> is used we remove the logic
                 // and implement it manually at this place. This is done because
                 // we want to use the Entity Framework feature to calculate the auto-calculate columns.
 
@@ -262,41 +258,46 @@ public static class AutoCalculatePropertiesExtension
                 newQuery = queryTranslator.NotForUpdate<T>(provider.Source);
             }
 
+#pragma warning disable CS8600
+            newQuery = (IQueryable)method.Invoke(null, new object[] { newQuery, selectQueryExpression });
+#pragma warning restore CS8600
+
             // With this loop we
             //   1. copy the auto-calculate columns into its main entity
             //   2. add the tracking in case it is a QueryTranslator<T> entity.
-            //
-            // NOTE: probably this whole logic could be put in an own enumerable-like IQueryProvider so we don't have to
-            //       iterate over it here when e.g. it is never requested in the aftermath.
-            var newResultList = new List<T>();
-#pragma warning disable CS8602
-            foreach (object o in newQuery)
-#pragma warning restore CS8602
+            IEnumerable<T> InternalIterateMapAutoCalculatePropertiesToEntity()
             {
-                var field = anonymousType.GetField("__entry");
+#pragma warning disable CS8602
+                foreach (object o in newQuery)
+#pragma warning restore CS8602
+                {
+                    var field = anonymousType.GetField("__entry");
 #pragma warning disable CS8602
 #pragma warning disable CS8600
-                T trackedEntry = (T)field.GetValue(o);
+                    T trackedEntry = (T)field.GetValue(o);
 #pragma warning restore CS8600
 #pragma warning restore CS8602
 
-                foreach (var propertyInfo in autoCalculateCache.Select(p => p.Item1))
-                {
-                    var calculatedField = anonymousType.GetField(propertyInfo.Name);
+                    foreach (var propertyInfo in autoCalculateCache.Select(p => p.Item1))
+                    {
+                        var calculatedField = anonymousType.GetField(propertyInfo.Name);
 
 #pragma warning disable CS8602
-                    propertyInfo.SetMethod.Invoke(trackedEntry, new[] {calculatedField.GetValue(o)});
+                        propertyInfo.SetMethod.Invoke(trackedEntry, new[] { calculatedField.GetValue(o) });
 #pragma warning restore CS8602
-                }
+                    }
 
+                    object trackedEntryAsObject = trackedEntry;
+#pragma warning disable CS8601
+                    provider?.TrackCreateIfNotAlreadyTracked(ref trackedEntryAsObject);
+#pragma warning restore CS8601
 #pragma warning disable CS8604
-                newResultList.Add(trackedEntry);
+                    yield return trackedEntry;
 #pragma warning restore CS8604
-                object trackedEntryAsObject = trackedEntry;
-                provider?.TrackCreateIfNotAlreadyTracked(ref trackedEntryAsObject);
+                }
             }
 
-            return newResultList.AsQueryable();
+            return InternalIterateMapAutoCalculatePropertiesToEntity().AsQueryable();
         }
     }
 }
