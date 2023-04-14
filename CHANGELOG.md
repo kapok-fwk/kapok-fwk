@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.5.2 (2023-04-15)
+
+## Kapok.Core
+
+- :rocket: implement additional constructors for BusinessLayerException / BusinessLayerErrorException
+- :rocket: *change* root namespace of Kapok.Core to Kapok
+- :rocket: *change* fix null hint in IViewDomain.BusinessLayerMessageEventToSingleUIMessage
+- :bug: fix a bug with AutoCalculate when base query is based on QueryTranslator<T>
+
 ## 0.1.5.1 (2023-03-05)
 
 ## Kapok.Report
