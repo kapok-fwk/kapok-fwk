@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Kapok.Core.Resources.BusinessLayer {
+namespace Kapok.Resources.BusinessLayer {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Kapok.Core.Resources.BusinessLayer {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Kapok.Core.Resources.BusinessLayer.MessageSeverity", typeof(MessageSeverity).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Kapok.Resources.BusinessLayer.MessageSeverity", typeof(MessageSeverity).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

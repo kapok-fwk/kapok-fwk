@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Kapok.Core.Resources.Entity {
+namespace Kapok.Resources.Entity {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Kapok.Core.Resources.Entity {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Kapok.Core.Resources.Entity.EntityExtension", typeof(EntityExtension).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Kapok.Resources.Entity.EntityExtension", typeof(EntityExtension).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

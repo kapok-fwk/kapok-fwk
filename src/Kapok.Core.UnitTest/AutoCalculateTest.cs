@@ -1,4 +1,5 @@
-﻿using Kapok.BusinessLayer;
+﻿using System.Reflection;
+using Kapok.BusinessLayer;
 using Kapok.Core.UnitTest.DataModel;
 using Kapok.Data;
 using Xunit;
@@ -13,7 +14,7 @@ public class AutoCalculateTest
     ///     Field '__entry' defined on type 'AnonymousType' is not a field on the target object which
     ///     is of type 'Namespace.YourEntityType'.
     /// ```
-    /// happened when using AutoCalculate on a query based on QueryTranslator<T>.
+    /// happened when using AutoCalculate on a query based on QueryTranslator&lt;T&gt;.
     /// This unit test is made to catch this exception and fix it finally.
     /// </summary>
     [Fact]
@@ -57,9 +58,12 @@ public class AutoCalculateTest
 
         var changeTracker = new ChangeTracker();
 
-        var qt = new QueryTranslator<ToDoList>(queryable, changeTracker, new[]
+        // ReSharper disable once RedundantExplicitArrayCreation
+        var qt = new QueryTranslator<ToDoList>(queryable, changeTracker, new PropertyInfo[]
         {
+#pragma warning disable CS8601
             typeof(ToDoList).GetProperty(nameof(ToDoList.Id))
+#pragma warning restore CS8601
         });
 
         var autoCalculateQuery = 

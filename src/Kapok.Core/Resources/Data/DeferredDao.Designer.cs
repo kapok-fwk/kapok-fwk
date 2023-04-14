@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Kapok.Core.Resources.Data {
+namespace Kapok.Resources.Data {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Kapok.Core.Resources.Data {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Kapok.Core.Resources.Data.DeferredDao", typeof(DeferredDao).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Kapok.Resources.Data.DeferredDao", typeof(DeferredDao).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

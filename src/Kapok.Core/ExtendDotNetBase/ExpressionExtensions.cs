@@ -1,4 +1,5 @@
-﻿namespace System.Linq.Expressions;
+﻿// ReSharper disable once CheckNamespace
+namespace System.Linq.Expressions;
 
 public static class ExpressionExtensions
 {

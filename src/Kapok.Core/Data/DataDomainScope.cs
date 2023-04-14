@@ -1,6 +1,6 @@
 ﻿using System.Transactions;
 using Kapok.BusinessLayer;
-using Res = Kapok.Core.Resources.Data.DataDomainScope;
+using Res = Kapok.Resources.Data.DataDomainScope;
 
 namespace Kapok.Data;
 

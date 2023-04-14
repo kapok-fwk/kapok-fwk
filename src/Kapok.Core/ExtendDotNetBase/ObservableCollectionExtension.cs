@@ -1,4 +1,5 @@
-﻿namespace System.Collections.ObjectModel;
+﻿// ReSharper disable once CheckNamespace
+namespace System.Collections.ObjectModel;
 
 public static class ObservableCollectionExtension
 {

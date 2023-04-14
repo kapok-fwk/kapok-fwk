@@ -4,7 +4,7 @@ using System.Reflection;
 using Kapok.Data;
 using Kapok.Entity;
 using Kapok.Entity.Model;
-using Res = Kapok.Core.Resources.Data.DaoBase;
+using Res = Kapok.Resources.Data.DaoBase;
 
 namespace Kapok.BusinessLayer;
 

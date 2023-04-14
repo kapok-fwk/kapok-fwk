@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Globalization;
-using Res = Kapok.Core.Resources.ExtendDotNetBase.StringExtension;
+using Res = Kapok.Resources.ExtendDotNetBase.StringExtension;
 
+// ReSharper disable once CheckNamespace
 namespace System;
 
 public static class StringExtension

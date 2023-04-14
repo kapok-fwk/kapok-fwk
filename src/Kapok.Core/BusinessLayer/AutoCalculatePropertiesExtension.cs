@@ -287,13 +287,15 @@ public static class AutoCalculatePropertiesExtension
 #pragma warning restore CS8602
                     }
 
+#pragma warning disable CS8600
                     object trackedEntryAsObject = trackedEntry;
+#pragma warning restore CS8600
 #pragma warning disable CS8601
                     provider?.TrackCreateIfNotAlreadyTracked(ref trackedEntryAsObject);
 #pragma warning restore CS8601
-#pragma warning disable CS8604
+#pragma warning disable CS8603
                     yield return trackedEntry;
-#pragma warning restore CS8604
+#pragma warning restore CS8603
                 }
             }
 

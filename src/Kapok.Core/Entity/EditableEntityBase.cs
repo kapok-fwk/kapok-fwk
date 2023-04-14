@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Kapok.BusinessLayer;
 using Newtonsoft.Json;
-using DaoBaseRes = Kapok.Core.Resources.Data.DaoBase;
+using DaoBaseRes = Kapok.Resources.Data.DaoBase;
 
 namespace Kapok.Entity;
 

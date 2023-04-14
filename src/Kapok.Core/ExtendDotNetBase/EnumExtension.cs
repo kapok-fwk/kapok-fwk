@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Resources;
 
+// ReSharper disable once CheckNamespace
 namespace System;
 
 public static class EnumExtension

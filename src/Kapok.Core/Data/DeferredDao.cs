@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Kapok.Data;
 using Kapok.Entity;
-using Res = Kapok.Core.Resources.Data.DeferredDao;
+using Res = Kapok.Resources.Data.DeferredDao;
 
 namespace Kapok.BusinessLayer;
 

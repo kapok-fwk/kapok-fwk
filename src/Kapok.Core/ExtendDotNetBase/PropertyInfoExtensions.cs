@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Resources;
-using Kapok.Core.Resources.Entity;
+using Kapok.Resources.Entity;
 
+// ReSharper disable once CheckNamespace
 namespace System.Reflection;
 
 public static class PropertyInfoExtensions

@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Res = Kapok.Core.Resources.BusinessLayer.MessageSeverity;
+using Res = Kapok.Resources.BusinessLayer.MessageSeverity;
 // ReSharper disable UnusedMember.Global
 
 namespace Kapok.BusinessLayer;
