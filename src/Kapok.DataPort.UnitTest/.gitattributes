@@ -1,0 +1,2 @@
+# Required to make sure that unit test files use the right line ending.
+text eol=lf
