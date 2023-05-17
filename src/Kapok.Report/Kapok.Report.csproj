@@ -5,13 +5,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
-	<PackageId>Kapok.Report</PackageId>
-	<Version>0.1.5.1</Version>
-	<Authors>Kapok Framework Community</Authors>
-	<RepositoryUrl>https://github.com/kapok-fwk/kapok-fwk</RepositoryUrl>
-	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	<SignAssembly>True</SignAssembly>
-	<AssemblyOriginatorKeyFile>..\kapok-fwk.snk</AssemblyOriginatorKeyFile>
+    <PackageId>Kapok.Report</PackageId>
+    <Version>0.1.5.6</Version>
+    <Authors>Kapok Framework Community</Authors>
+    <RepositoryUrl>https://github.com/kapok-fwk/kapok-fwk</RepositoryUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\kapok-fwk.snk</AssemblyOriginatorKeyFile>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
