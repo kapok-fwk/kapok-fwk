@@ -1,8 +1,14 @@
 # Changelog
 
+## 0.1.5.3 (2023-05-17)
+
+### Kapok.DataPort
+
+- :bug: fix add CSV quotation support for `CsvDataPortTarget` (#10)
+
 ## 0.1.5.2 (2023-04-15)
 
-## Kapok.Core
+### Kapok.Core
 
 - :rocket: implement additional constructors for BusinessLayerException / BusinessLayerErrorException
 - :rocket: *change* root namespace of Kapok.Core to Kapok
@@ -11,7 +17,7 @@
 
 ## 0.1.5.1 (2023-03-05)
 
-## Kapok.Report
+### Kapok.Report
 
 - refactoring namespaces in Kapok.Report
 - add DataTableReportProcessor back again
