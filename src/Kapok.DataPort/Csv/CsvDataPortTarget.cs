@@ -2,16 +2,15 @@
 
 public class CsvDataPortTarget : IDataPortTableTarget
 {
+    private CsvHelper.LineSeparator _columnSeparator = CsvHelper.LineSeparator.Comma;
+    private bool _headerIsWritten;
+    private char _quoteChar;
+
     public virtual string Name => "CSV Data Port";
 
     public IReadOnlyList<DataPortColumn>? Schema { get; set; }
 
     public virtual bool WriteWithHeader { get; set; }
-
-    /// <summary>
-    /// Defines the column separator.
-    /// </summary>
-    private CsvHelper.LineSeparator _columnSeparator = CsvHelper.LineSeparator.Comma;
 
     /// <summary>
     /// By default <c>null</c> is parsed into an empty string.
@@ -20,6 +19,9 @@ public class CsvDataPortTarget : IDataPortTableTarget
     /// </summary>
     public string? NullValueString { get; set; }
 
+    /// <summary>
+    /// Defines the column separator.
+    /// </summary>
     public virtual CsvHelper.LineSeparator ColumnSeparator
     {
         get => _columnSeparator;
@@ -49,16 +51,21 @@ public class CsvDataPortTarget : IDataPortTableTarget
 
     public StreamWriter? StreamWriter { get; set; }
 
-    private bool _headerIsWritten;
+    /// <summary>
+    /// Defines the quotation char. If not set, no quotation takes place.
+    /// </summary>
+    public char? QuoteChar { get; set; } = '"';
+
+    /// <summary>
+    /// If set all cells will be quoted.
+    /// </summary>
+    public bool QuoteAll { get; set; } = false;
 
     public virtual void WriteHeader()
     {
-        if (StreamWriter == null) throw new InvalidOperationException($"You have to set memeber {nameof(StreamWriter)} before calling this function");
         if (Schema == null) throw new InvalidOperationException($"You have to set memeber {nameof(Schema)} before calling this function");
 
-        StreamWriter.WriteLine(
-            string.Join(ColumnSeparatorAsChar, Schema.Select(column => column.Name))
-        );
+        WriteLineAsync(Schema.Select(column => column.Name ?? string.Empty)).Wait();
     }
 
     public virtual string WriteCell(DataPortColumn column, object? value)
@@ -85,7 +92,6 @@ public class CsvDataPortTarget : IDataPortTableTarget
 
     public virtual void Write(Dictionary<DataPortColumn, object?> rowValues)
     {
-        if (StreamWriter == null) throw new InvalidOperationException($"You have to set memeber {nameof(StreamWriter)} before calling this function");
         if (Schema == null) throw new InvalidOperationException($"You have to set memeber {nameof(Schema)} before calling this function");
 
         if (WriteWithHeader && !_headerIsWritten)
@@ -106,8 +112,33 @@ public class CsvDataPortTarget : IDataPortTableTarget
             row[i] = WriteCell(Schema[i], value);
         }
 
-        StreamWriter.WriteLine(
-            string.Join(ColumnSeparatorAsChar, row)
+        WriteLineAsync(row).Wait();
+    }
+
+    protected async Task WriteLineAsync(IEnumerable<string> rowCells)
+    {
+        if (StreamWriter == null) throw new InvalidOperationException($"You have to set memeber {nameof(StreamWriter)} before calling this function");
+
+        IEnumerable<string> cells;
+
+        if (QuoteAll)
+        {
+            if (!QuoteChar.HasValue)
+                throw new NotSupportedException($"You have to provide {nameof(QuoteChar)} when {nameof(QuoteAll)} is true");
+
+            cells = rowCells.Select(c => $"{QuoteChar}{c}{QuoteChar}");
+        }
+        else if (QuoteChar.HasValue)
+        {
+            cells = rowCells.Select(c => c.Contains(ColumnSeparatorAsChar) ? $"{QuoteChar}{c}{QuoteChar}" : c);
+        }
+        else
+        {
+            cells = rowCells;
+        }
+
+        await StreamWriter.WriteLineAsync(
+            string.Join(ColumnSeparatorAsChar, cells)
         );
     }
 }

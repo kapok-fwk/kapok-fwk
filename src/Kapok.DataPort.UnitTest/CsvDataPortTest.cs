@@ -13,6 +13,8 @@ public class SimpleLedgerAccountEntity
 
 public class CsvDataPortTest
 {
+    public const string SampleFilePath_CsvData_Accounts = "./CsvData_Accounts.csv";
+
     [Fact]
     public void CsvToEntity()
     {
@@ -23,7 +25,7 @@ public class CsvDataPortTest
             {
                 HasHeader = true,
                 ColumnSeparator = CsvHelper.LineSeparator.Comma,
-                StreamReader = new StreamReader(File.OpenRead("./CsvData_Accounts.csv"))
+                StreamReader = new StreamReader(File.OpenRead(SampleFilePath_CsvData_Accounts))
             },
             target: new EntityCollectionDataPortTarget<SimpleLedgerAccountEntity>
             {
@@ -122,6 +124,7 @@ public class CsvDataPortTest
         try
         {
             streamWriter = new StreamWriter(File.OpenWrite(targetFileName));
+            streamWriter.NewLine = "\n";
 
             var tableDataPort =
                 new TableDataPort<EntityEnumeratorDataPortSource<SimpleLedgerAccountEntity>, CsvDataPortTarget>(
@@ -190,6 +193,12 @@ public class CsvDataPortTest
                 streamWriter = null;
                 
                 Assert.True(File.Exists(targetFileName));
+
+                string csvContent = File.ReadAllText(targetFileName);
+                string originalFile = File.ReadAllText(SampleFilePath_CsvData_Accounts);
+                // Just in case the CSV file 
+                originalFile = originalFile.Replace("\r\n", "\n");
+                Assert.Equal(originalFile, csvContent);
             }
             finally
             {
