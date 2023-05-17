@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using Kapok.Report.Model;
+using System.Data;
 
 namespace Kapok.Report;
 
@@ -28,4 +29,9 @@ public interface IDbReportDataSet : IReportDataSet
     void ExecuteQuery(IDbConnection connection,
         IReadOnlyDictionary<string, object?>? parameters = default,
         IReportResourceProvider? resourceProvider = default);
+
+    void ExecuteQuery(IDbConnection connection,
+        ReportParameterCollection parameters,
+        IReportResourceProvider? resourceProvider = default) =>
+        ExecuteQuery(connection, parameters.ToDictionary(), resourceProvider);
 }
