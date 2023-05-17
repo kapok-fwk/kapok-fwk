@@ -61,11 +61,11 @@ public class CsvDataPortTarget : IDataPortTableTarget
     /// </summary>
     public bool QuoteAll { get; set; } = false;
 
-    public virtual void WriteHeader()
+    public virtual async void WriteHeader()
     {
         if (Schema == null) throw new InvalidOperationException($"You have to set memeber {nameof(Schema)} before calling this function");
 
-        WriteLineAsync(Schema.Select(column => column.Name ?? string.Empty)).Wait();
+        await WriteLineAsync(Schema.Select(column => column.Name ?? string.Empty));
     }
 
     public virtual string WriteCell(DataPortColumn column, object? value)
@@ -90,7 +90,7 @@ public class CsvDataPortTarget : IDataPortTableTarget
         return value.ToString() ?? string.Empty;
     }
 
-    public virtual void Write(Dictionary<DataPortColumn, object?> rowValues)
+    public virtual async void Write(Dictionary<DataPortColumn, object?> rowValues)
     {
         if (Schema == null) throw new InvalidOperationException($"You have to set memeber {nameof(Schema)} before calling this function");
 
@@ -112,7 +112,7 @@ public class CsvDataPortTarget : IDataPortTableTarget
             row[i] = WriteCell(Schema[i], value);
         }
 
-        WriteLineAsync(row).Wait();
+        await WriteLineAsync(row);
     }
 
     protected async Task WriteLineAsync(IEnumerable<string> rowCells)
