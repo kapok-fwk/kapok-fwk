@@ -4,7 +4,6 @@ public class CsvDataPortTarget : IDataPortTableTarget
 {
     private CsvHelper.LineSeparator _columnSeparator = CsvHelper.LineSeparator.Comma;
     private bool _headerIsWritten;
-    private char _quoteChar;
 
     public virtual string Name => "CSV Data Port";
 
