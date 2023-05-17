@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.5.5 (2023-05-17)
+
+### Kapok.DataPort
+
+- fix duplicated stream write, remove internal async. logic in CsvDataPortTarget
+
 ## 0.1.5.4 (2023-05-17)
 
 ### Kapok.DataPort
