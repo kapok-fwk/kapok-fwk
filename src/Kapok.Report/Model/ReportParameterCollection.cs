@@ -1,8 +1,9 @@
 ﻿using System.Collections;
+using System.Collections.ObjectModel;
 
 namespace Kapok.Report.Model;
 
-public class ReportParameterCollection : ICollection<ReportParameter>, IReadOnlyDictionary<string, object?>
+public class ReportParameterCollection : ICollection<ReportParameter>
 {
     private readonly Dictionary<string, ReportParameter> _reportParameters = new();
         
@@ -96,30 +97,24 @@ public class ReportParameterCollection : ICollection<ReportParameter>, IReadOnly
 
     #endregion
 
-    #region IEnumerable<KeyValuePair<string, object>>
-
-    IEnumerator<KeyValuePair<string, object?>> IEnumerable<KeyValuePair<string, object?>>.GetEnumerator()
+    /// <summary>
+    /// Returns the parameters as readonly dictionary.
+    /// </summary>
+    /// <returns>
+    /// The returned dictionary is readonly. The key is the parameter name and the dictionary value
+    /// is the parameter value.
+    /// </returns>
+    public IReadOnlyDictionary<string, object?> ToDictionary()
     {
-        return _reportParameters.AsEnumerable().Select(p => new KeyValuePair<string, object?>(p.Key, p.Value)).GetEnumerator();
+#pragma warning disable CS8620
+        return new ReadOnlyDictionary<string, object?>(
+            (from p in _reportParameters
+             select new
+             {
+                 p.Key,
+                 p.Value.Value
+             }).ToDictionary(p => p.Key, p => p.Value)
+            );
+#pragma warning restore CS8620
     }
-
-    bool IReadOnlyDictionary<string, object?>.ContainsKey(string key)
-    {
-        return Contains(key);
-    }
-
-    bool IReadOnlyDictionary<string, object?>.TryGetValue(string key, out object? value)
-    {
-        var retVar = TryGetValue(key, out var reportParameter);
-        value = reportParameter;
-        return retVar;
-    }
-
-    object IReadOnlyDictionary<string, object?>.this[string key] => this[key];
-
-    IEnumerable<string> IReadOnlyDictionary<string, object?>.Keys => _reportParameters.Keys;
-
-    IEnumerable<object?> IReadOnlyDictionary<string, object?>.Values => _reportParameters.Values;
-
-    #endregion
 }
