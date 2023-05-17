@@ -6,7 +6,7 @@
 	<Nullable>enable</Nullable>
 
 	<PackageId>Kapok.DataPort</PackageId>
-	<Version>0.1.5.3</Version>
+	<Version>0.1.5.4</Version>
 	<Authors>Kapok Framework Community</Authors>
 	<RepositoryUrl>https://github.com/kapok-fwk/kapok-fwk</RepositoryUrl>
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
