@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.5.7 (2023-06-08)
+
+### Kapok.Core
+
+- :bug: fix index was not unique when using AddUniqueIndex (#11)
+
 ## 0.1.5.6 (2023-05-17)
 
 ### Kapok.Report
