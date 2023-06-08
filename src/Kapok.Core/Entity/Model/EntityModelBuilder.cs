@@ -199,7 +199,7 @@ public sealed class EntityModelBuilder<T>
 
         var propertyInfoList = GetPropertyInfosFromNames(typeof(T), propertyNames);
 
-        Model.Indexes.Add(new IndexModel(propertyInfoList));
+        Model.Indexes.Add(new IndexModel(propertyInfoList) { IsUnique = true } );
 
         return this;
     }
