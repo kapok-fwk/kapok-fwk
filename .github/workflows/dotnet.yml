@@ -27,6 +27,7 @@ jobs:
       run: dotnet test --no-build --verbosity normal
 
   publish:
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     steps:
