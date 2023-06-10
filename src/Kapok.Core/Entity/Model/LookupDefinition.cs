@@ -15,7 +15,7 @@ public interface ILookupDefinition
     /// The second <b><c>IDataDomainScope</c></b> parameter holds a data domain scope created for this call which
     /// can be used to access entity lists of the data domain. 
     /// </summary>
-    Func<object?, IDataDomainScope, IEnumerable<object>> EntriesFunc { get; set; }
+    Func<object?, IDataDomainScope, IQueryable<object>> EntriesFunc { get; set; }
 
     /// <summary>
     /// The field selector returning the property value to be written to the property.
@@ -47,7 +47,7 @@ public interface ILookupDefinition<TBaseEntry, TLookupEntry, TFieldType> : ILook
     /// The second <b><c>IDataDomainScope</c></b> parameter holds a data domain scope created for this call which
     /// can be used to access entity lists of the data domain. 
     /// </summary>
-    new Func<TBaseEntry?, IDataDomainScope, IEnumerable<TLookupEntry>> EntriesFunc { get; set; }
+    new Func<TBaseEntry?, IDataDomainScope, IQueryable<TLookupEntry>> EntriesFunc { get; set; }
     
     /// <summary>
     /// The field selector returning the property value to be written to the property.
@@ -89,13 +89,13 @@ public class LookupDefinition<TBaseEntry, TLookupEntry, TFieldType> : ILookupDef
 
     public bool EntriesFuncDependentOnEntry { get; }
 
-    public Func<TBaseEntry?, IDataDomainScope, IEnumerable<TLookupEntry>> EntriesFunc { get; set; }
+    public Func<TBaseEntry?, IDataDomainScope, IQueryable<TLookupEntry>> EntriesFunc { get; set; }
 
     public Expression<Func<TLookupEntry, TFieldType>>? FieldSelectorFunc { get; set; }
 
     #region ILookupDefinition
         
-    Func<object?, IDataDomainScope, IEnumerable<object>> ILookupDefinition.EntriesFunc
+    Func<object?, IDataDomainScope, IQueryable<object>> ILookupDefinition.EntriesFunc
     {
         get
         {
