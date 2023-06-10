@@ -15,7 +15,7 @@ public interface ILookupDefinition
     /// The second <b><c>IDataDomainScope</c></b> parameter holds a data domain scope created for this call which
     /// can be used to access entity lists of the data domain. 
     /// </summary>
-    Func<object?, IDataDomainScope, IQueryable<object>> EntriesFunc { get; set; }
+    Func<object?, IDataDomainScope, IEnumerable<object>> EntriesFunc { get; set; }
 
     /// <summary>
     /// The field selector returning the property value to be written to the property.
@@ -47,7 +47,7 @@ public interface ILookupDefinition<TBaseEntry, TLookupEntry, TFieldType> : ILook
     /// The second <b><c>IDataDomainScope</c></b> parameter holds a data domain scope created for this call which
     /// can be used to access entity lists of the data domain. 
     /// </summary>
-    new Func<TBaseEntry?, IDataDomainScope, IQueryable<TLookupEntry>> EntriesFunc { get; set; }
+    new Func<TBaseEntry?, IDataDomainScope, IEnumerable<TLookupEntry>> EntriesFunc { get; set; }
     
     /// <summary>
     /// The field selector returning the property value to be written to the property.
@@ -61,26 +61,26 @@ public class LookupDefinition<TBaseEntry, TLookupEntry, TFieldType> : ILookupDef
     where TBaseEntry : class
     where TLookupEntry : class
 {
-    public LookupDefinition(Func<IDataDomainScope, IQueryable<TLookupEntry>> lookupEntriesFunc)
+    public LookupDefinition(Func<IDataDomainScope, IEnumerable<TLookupEntry>> lookupEntriesFunc)
     {
         EntriesFunc = (_, repository) => lookupEntriesFunc.Invoke(repository);
         EntriesFuncDependentOnEntry = false;
     }
 
-    public LookupDefinition(Func<TBaseEntry?, IDataDomainScope, IQueryable<TLookupEntry>> lookupEntriesFunc)
+    public LookupDefinition(Func<TBaseEntry?, IDataDomainScope, IEnumerable<TLookupEntry>> lookupEntriesFunc)
     {
         EntriesFunc = lookupEntriesFunc;
         EntriesFuncDependentOnEntry = true;
     }
 
-    public LookupDefinition(Func<IDataDomainScope, IQueryable<TLookupEntry>> lookupEntriesFunc, Expression<Func<TLookupEntry, TFieldType>> fieldSelector)
+    public LookupDefinition(Func<IDataDomainScope, IEnumerable<TLookupEntry>> lookupEntriesFunc, Expression<Func<TLookupEntry, TFieldType>> fieldSelector)
     {
         EntriesFunc = (_, repository) => lookupEntriesFunc.Invoke(repository);
         EntriesFuncDependentOnEntry = false;
         FieldSelectorFunc = fieldSelector;
     }
 
-    public LookupDefinition(Func<TBaseEntry?, IDataDomainScope, IQueryable<TLookupEntry>> lookupEntriesFunc, Expression<Func<TLookupEntry, TFieldType>> fieldSelector)
+    public LookupDefinition(Func<TBaseEntry?, IDataDomainScope, IEnumerable<TLookupEntry>> lookupEntriesFunc, Expression<Func<TLookupEntry, TFieldType>> fieldSelector)
     {
         EntriesFunc = lookupEntriesFunc;
         EntriesFuncDependentOnEntry = true;
@@ -89,13 +89,13 @@ public class LookupDefinition<TBaseEntry, TLookupEntry, TFieldType> : ILookupDef
 
     public bool EntriesFuncDependentOnEntry { get; }
 
-    public Func<TBaseEntry?, IDataDomainScope, IQueryable<TLookupEntry>> EntriesFunc { get; set; }
+    public Func<TBaseEntry?, IDataDomainScope, IEnumerable<TLookupEntry>> EntriesFunc { get; set; }
 
     public Expression<Func<TLookupEntry, TFieldType>>? FieldSelectorFunc { get; set; }
 
     #region ILookupDefinition
         
-    Func<object?, IDataDomainScope, IQueryable<object>> ILookupDefinition.EntriesFunc
+    Func<object?, IDataDomainScope, IEnumerable<object>> ILookupDefinition.EntriesFunc
     {
         get
         {
