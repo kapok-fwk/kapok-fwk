@@ -3,20 +3,58 @@ using Kapok.Data;
 
 namespace Kapok.Entity.Model;
 
+/// <summary>
+/// Represents a definition what possible items to show for a property.
+/// </summary>
 public interface ILookupDefinition
 {
-    Func<object, IDataDomainScope, IQueryable<object>> EntriesFunc { get; set; }
+    /// <summary>
+    /// A function returning the list of possible items in the combobox dropdown.
+    ///
+    /// The first <b><c>object?</c></b> parameter of the function represents the current item if set. This is only passed when <see cref="EntriesFuncDependentOnEntry"/> is <c>true</c>.
+    /// The second <b><c>IDataDomainScope</c></b> parameter holds a data domain scope created for this call which
+    /// can be used to access entity lists of the data domain. 
+    /// </summary>
+    Func<object?, IDataDomainScope, IQueryable<object>> EntriesFunc { get; set; }
+
+    /// <summary>
+    /// The field selector returning the property value to be written to the property.
+    ///
+    /// The first <b><c>object</c></b> parameter represents the entity retrieved while iterating through <see cref="EntriesFunc"/>.
+    /// </summary>
     Expression<Func<object, object>>? FieldSelectorFunc { get; set; }
+    
+    /// <summary>
+    /// If the lookup is dynamic and depends on properties of the current item.
+    /// </summary>
     bool EntriesFuncDependentOnEntry { get; }
 }
 
+/// <summary>
+/// Represents a definition what possible items to show for a property.
+/// </summary>
+/// <typeparam name="TBaseEntry">entity type for which the property lookup is performed</typeparam>
+/// <typeparam name="TLookupEntry">lookup type</typeparam>
+/// <typeparam name="TFieldType">type of the returned value. Should match the type of the property the lookup is performed for</typeparam>
 public interface ILookupDefinition<TBaseEntry, TLookupEntry, TFieldType> : ILookupDefinition
     where TBaseEntry : class
     where TLookupEntry : class
 {
-    new Func<TBaseEntry, IDataDomainScope, IQueryable<TLookupEntry>> EntriesFunc { get; set; }
+    /// <summary>
+    /// A function returning the list of possible items in the combobox dropdown.
+    ///
+    /// The first <b><c>TBaseEntry</c></b> parameter of the function represents the current item if set. This is only passed when <see cref="ILookupDefinition.EntriesFuncDependentOnEntry"/> is <c>true</c>.
+    /// The second <b><c>IDataDomainScope</c></b> parameter holds a data domain scope created for this call which
+    /// can be used to access entity lists of the data domain. 
+    /// </summary>
+    new Func<TBaseEntry?, IDataDomainScope, IQueryable<TLookupEntry>> EntriesFunc { get; set; }
+    
+    /// <summary>
+    /// The field selector returning the property value to be written to the property.
+    ///
+    /// The first <b><c>TLookupEntry</c></b> parameter represents the entity retrieved while iterating through <see cref="EntriesFunc"/>.
+    /// </summary>
     new Expression<Func<TLookupEntry, TFieldType>>? FieldSelectorFunc { get; set; }
-    new bool EntriesFuncDependentOnEntry { get; }
 }
 
 public class LookupDefinition<TBaseEntry, TLookupEntry, TFieldType> : ILookupDefinition<TBaseEntry, TLookupEntry, TFieldType>
@@ -29,7 +67,7 @@ public class LookupDefinition<TBaseEntry, TLookupEntry, TFieldType> : ILookupDef
         EntriesFuncDependentOnEntry = false;
     }
 
-    public LookupDefinition(Func<TBaseEntry, IDataDomainScope, IQueryable<TLookupEntry>> lookupEntriesFunc)
+    public LookupDefinition(Func<TBaseEntry?, IDataDomainScope, IQueryable<TLookupEntry>> lookupEntriesFunc)
     {
         EntriesFunc = lookupEntriesFunc;
         EntriesFuncDependentOnEntry = true;
@@ -42,7 +80,7 @@ public class LookupDefinition<TBaseEntry, TLookupEntry, TFieldType> : ILookupDef
         FieldSelectorFunc = fieldSelector;
     }
 
-    public LookupDefinition(Func<TBaseEntry, IDataDomainScope, IQueryable<TLookupEntry>> lookupEntriesFunc, Expression<Func<TLookupEntry, TFieldType>> fieldSelector)
+    public LookupDefinition(Func<TBaseEntry?, IDataDomainScope, IQueryable<TLookupEntry>> lookupEntriesFunc, Expression<Func<TLookupEntry, TFieldType>> fieldSelector)
     {
         EntriesFunc = lookupEntriesFunc;
         EntriesFuncDependentOnEntry = true;
@@ -51,17 +89,17 @@ public class LookupDefinition<TBaseEntry, TLookupEntry, TFieldType> : ILookupDef
 
     public bool EntriesFuncDependentOnEntry { get; }
 
-    public Func<TBaseEntry, IDataDomainScope, IQueryable<TLookupEntry>> EntriesFunc { get; set; }
+    public Func<TBaseEntry?, IDataDomainScope, IQueryable<TLookupEntry>> EntriesFunc { get; set; }
 
     public Expression<Func<TLookupEntry, TFieldType>>? FieldSelectorFunc { get; set; }
 
     #region ILookupDefinition
         
-    Func<object, IDataDomainScope, IQueryable<object>> ILookupDefinition.EntriesFunc
+    Func<object?, IDataDomainScope, IQueryable<object>> ILookupDefinition.EntriesFunc
     {
         get
         {
-            return (entry, dataDomainScope) => EntriesFunc.Invoke((TBaseEntry)entry, dataDomainScope);
+            return (entry, dataDomainScope) => EntriesFunc.Invoke((TBaseEntry?)entry, dataDomainScope);
         }
         set
         {

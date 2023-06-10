@@ -207,7 +207,18 @@ public abstract class ViewDomain : IViewDomain
     public abstract IQueryableView<TEntity> CreateQueryableView<TEntity>(IQueryable<TEntity> queryable)
         where TEntity : class;
 
-    public abstract IPropertyLookupView CreatePropertyLookupView(ILookupDefinition lookupDefinition, IDataDomain dataDomain, IDataSetView? dataSet);
+    public abstract IPropertyLookupView CreatePropertyLookupView(ILookupDefinition lookupDefinition, IDataDomain dataDomain, Func<object?>? currentSelector = null);
+
+    IPropertyLookupView IViewDomain.CreatePropertyLookupView(ILookupDefinition lookupDefinition, IDataDomain dataDomain,
+        IDataSetView? dataSet)
+    {
+        if (dataSet == null)
+        {
+            return CreatePropertyLookupView(lookupDefinition, dataDomain, null);
+        }
+
+        return CreatePropertyLookupView(lookupDefinition, dataDomain, () => dataSet.Current);
+    }
 
     public IDataPage ConstructEntityDefaultPage(Type entityType, IDataDomainScope? dataDomainScope = null)
     {
@@ -273,10 +284,7 @@ public abstract class ViewDomain : IViewDomain
     {
         var tuple = (destinationType, menuName ?? UIMenu.BaseMenuName);
 
-        List<(string?, UIMenuItem)> l1;
-        if (DynamicMenuItems.ContainsKey(tuple))
-            l1 = DynamicMenuItems[tuple];
-        else
+        if (!DynamicMenuItems.TryGetValue(tuple, out List<(string?, UIMenuItem)>? l1))
         {
             l1 = new List<(string?, UIMenuItem)>();
             DynamicMenuItems.Add(tuple, l1);

@@ -16,21 +16,30 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>
     private readonly IEntityModel _entityModel;
     private readonly IDataDomain _dataDomain;
     private readonly IDataSetView<TEntity>? _dataSet;
+    private readonly Func<TEntity?>? _currentSelector;
         
-    private readonly ObservableCollection<PropertyView> _observableCollection;
+    private readonly ObservableCollection<PropertyView> _observableCollection = new();
 
     private readonly Dictionary<string, IPropertyLookupView> _lookupViews = new();
     private readonly Dictionary<string, IDataSetSelectionAction<TEntity>> _drillDown = new();
 
+    public PropertyViewCollection(IViewDomain viewDomain, IDataDomain dataDomain,
+        IEntityModel entityModel, Func<TEntity?>? currentSelector = null)
+    {
+        _viewDomain = viewDomain ?? throw new ArgumentNullException(nameof(viewDomain));
+        _dataDomain = dataDomain ?? throw new ArgumentNullException(nameof(dataDomain));
+        _entityModel = entityModel ?? throw new ArgumentNullException(nameof(entityModel));
+        _currentSelector = currentSelector;
+    }
+    
     public PropertyViewCollection(IViewDomain viewDomain, IDataDomain dataDomain,
         IEntityModel entityModel, IDataSetView<TEntity>? baseDataSet = null)
     {
         _viewDomain = viewDomain ?? throw new ArgumentNullException(nameof(viewDomain));
         _dataDomain = dataDomain ?? throw new ArgumentNullException(nameof(dataDomain));
         _entityModel = entityModel ?? throw new ArgumentNullException(nameof(entityModel));
+        _currentSelector = () => baseDataSet?.Current;
         _dataSet = baseDataSet;
-
-        _observableCollection = new ObservableCollection<PropertyView>();
     }
 
     public void RefreshPropertyLookups(bool refreshOnlyDependentOnEntry)
@@ -70,7 +79,7 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>
             // NOTE: here we make sure that when a property is used twice we just load it once... TODO maybe something to improve/change? e.g. with a dedicated 'Name' property in the PropertyView class
             if (!_lookupViews.ContainsKey(item.PropertyInfo.Name))
             {
-                var lookupView = _viewDomain.CreatePropertyLookupView(item.LookupDefinition, _dataDomain, _dataSet);
+                var lookupView = _viewDomain.CreatePropertyLookupView(item.LookupDefinition, _dataDomain, _currentSelector);
                 if (lookupView != null)
                     _lookupViews.Add(item.PropertyInfo.Name, lookupView);
             }

@@ -23,7 +23,7 @@ public class UnitTestViewDomain : ViewDomain
     }
 
     public override IPropertyLookupView CreatePropertyLookupView(ILookupDefinition lookupDefinition, IDataDomain dataDomain,
-        IDataSetView? dataSet)
+        Func<object?>? currentSelector = null)
     {
         throw new NotImplementedException();
     }

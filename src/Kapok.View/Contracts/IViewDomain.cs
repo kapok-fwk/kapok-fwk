@@ -31,6 +31,8 @@ public interface IViewDomain
     IQueryableView<TEntity> CreateQueryableView<TEntity>(IQueryable<TEntity> queryable)
         where TEntity : class;
 
+    IPropertyLookupView? CreatePropertyLookupView(ILookupDefinition lookupDefinition, IDataDomain dataDomain, Func<object?>? currentSelector = null);
+    [Obsolete("Please use CreatePropertyLookupView(ILookupDefinition, IDataDomain, Func<object?>?) instead")]
     IPropertyLookupView? CreatePropertyLookupView(ILookupDefinition lookupDefinition, IDataDomain dataDomain, IDataSetView? dataSet = null);
     IDataSetView<TEntry> CreateDataSetView<TEntry>(IDataDomainScope dataDomainScope, IDao<TEntry>? dao = null)
         where TEntry : class, new();
