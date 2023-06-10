@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.5.8 (2023-06-10)
+
+### Kapok.Core
+
+- simplify `ILookupDefinition`: return value of `EntriesFunc` changed from `IQueryable<T>` to `IEnumerable<T>` (#14)
+
+### Kapok.View
+
+- add constructor to `ProperyViewCollection` which uses `currentSelector` (usable in card pages) (#13)
+
 ## 0.1.5.7 (2023-06-08)
 
 ### Kapok.Core
