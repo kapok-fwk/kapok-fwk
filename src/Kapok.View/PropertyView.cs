@@ -6,7 +6,7 @@ using Kapok.Entity.Model;
 namespace Kapok.View;
 
 /// <summary>
-/// Defines a property view.
+/// A view definition for a property.
 /// </summary>
 public class PropertyView
 {

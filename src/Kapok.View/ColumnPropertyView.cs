@@ -5,6 +5,10 @@ using Kapok.Entity;
 
 namespace Kapok.View;
 
+/// <summary>
+/// The view definition for a column in a table.
+/// </summary>
+// ReSharper disable once ClassNeverInstantiated.Global
 public class ColumnPropertyView : PropertyView
 {
     public ColumnPropertyView(PropertyInfo propertyInfo) : base(propertyInfo)
@@ -48,6 +52,7 @@ public class ColumnPropertyView : PropertyView
     /// <summary>
     /// Indicates that this column field is hidden from the user view.
     /// </summary>
+    // ReSharper disable once UnusedAutoPropertyAccessor.Global
     public bool IsHidden { get; set; }
 
     /// <summary>
@@ -56,4 +61,9 @@ public class ColumnPropertyView : PropertyView
     /// This requires that the entity implements IHierarchyEntry`1.
     /// </summary>
     public bool ShowHierarchicalTree { get; set; }
+
+    /// <summary>
+    /// If the text shall be wrapped to a second line if longer than <see cref="Width"/>.
+    /// </summary>
+    public bool TextWrap { get; set; } = false;
 }
