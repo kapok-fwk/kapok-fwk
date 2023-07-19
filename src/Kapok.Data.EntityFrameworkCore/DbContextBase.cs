@@ -323,7 +323,7 @@ public class DbContextBase : DbContext
                             }
 
                             entityTypeBuilder.Property(property.Name)
-                                .HasDefaultValueSql("GetUtcDate()");
+                                .HasDefaultValueSql(SqlFunctionCurrentDateTimeUtc(Database?.ProviderName));
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -331,6 +331,30 @@ public class DbContextBase : DbContext
                 }
             }
         }
+    }
+
+    private static string SqlFunctionCurrentDateTimeUtc(string? providerName)
+    {
+        if (providerName == null)
+            throw new ArgumentNullException(nameof(providerName));
+
+        if (providerName == "Microsoft.EntityFrameworkCore.Sqlite")
+        {
+            return "DATETIME('now')";
+        }
+
+        if (providerName == "Npgsql.EntityFrameworkCore.PostgreSQL")
+        {
+            return "timezone('utc', now())";
+        }
+
+        if (providerName == "Microsoft.EntityFrameworkCore.SqlServer")
+        {
+            return "GetUtcDate()";
+        }
+
+        throw new NotSupportedException(
+            $"Function {nameof(SqlFunctionCurrentDateTimeUtc)} is not supported for provider '{providerName}'");
     }
 
     public override int SaveChanges()
