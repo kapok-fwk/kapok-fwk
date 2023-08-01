@@ -9,7 +9,7 @@ namespace Kapok.View;
 // ReSharper disable once InconsistentNaming
 public class UIMenu
 {
-    public static string BaseMenuName = "Base";
+    public static readonly string BaseMenuName = "Base";
 
     private readonly IPage _basePage;
     private ObservableCollection<UIMenuItem>? _menuItems;
@@ -35,18 +35,17 @@ public class UIMenu
     {
         get
         {
-            if (_menuItems == null)
+            if (_menuItems != null)
+                return _menuItems;
+            _menuItems = new ObservableCollection<UIMenuItem>();
+            try
             {
-                _menuItems = new ObservableCollection<UIMenuItem>();
-                try
-                {
-                    BuildMenuFromType();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    throw;
-                }
+                BuildMenuFromType();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
             }
 
             return _menuItems;
@@ -137,7 +136,7 @@ public class UIMenu
         return defaultTabMenuItem;
     }
 
-    private void BuildMenuFromType()
+    protected virtual void BuildMenuFromType()
     {
         string menuName = Name;
         Type type = _basePage.GetType();

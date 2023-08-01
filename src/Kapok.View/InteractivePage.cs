@@ -35,6 +35,20 @@ public abstract class InteractivePage : Page, IInteractivePage
             DefaultReferencingDataSet = referencingDataSet
         });
     }
+    
+    protected void AddMenu(UIMenu menu)
+    {
+        if (menu == null)
+            throw new ArgumentNullException(nameof(menu));
+
+        if (string.IsNullOrEmpty(menu.Name))
+            throw new ArgumentException($"{nameof(menu)}.Name can not be empty or null.", nameof(menu));
+        
+        if (_menu.ContainsKey(menu.Name))
+            throw new ArgumentException($"There exist already a menu with the name '{menu.Name}'.", nameof(menu));
+
+        _menu.Add(menu.Name, menu);
+    }
 
     // ReSharper disable MemberCanBeProtected.Global
     public IReadOnlyDictionary<string, UIMenu> Menu => _menu;
