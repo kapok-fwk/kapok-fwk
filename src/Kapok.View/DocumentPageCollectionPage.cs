@@ -12,15 +12,22 @@ public partial class DocumentPageCollectionPage : InteractivePage
 {
     private IPage? _selectedDocumentPage;
     private readonly Dictionary<IPage, List<UIMenuItemTab>> _contextualMenuItems = new();
-    private Dictionary<IPage, object> _documentPageSource = new();
+    private readonly Dictionary<IPage, object> _documentPageSource = new();
 
     protected DocumentPageCollectionPage(IViewDomain? viewDomain = null) : base(viewDomain)
     {
+        ViewDomain.UnregisterPageContainer(this);
         ViewDomain.RegisterPageContainer(this, DocumentPages);
         DocumentPages.CollectionChanged += Pages_CollectionChanged;
 
         // Actions
         CloseCurrentDocumentPageAction = new UIAction("CloseCurrentDocumentPage", CloseCurrentDocumentPage, CanCloseCurrentDocumentPage);
+    }
+
+    public override void Close()
+    {
+        DocumentPages.CollectionChanged -= Pages_CollectionChanged;
+        base.Close();
     }
 
     #region Internal logic
