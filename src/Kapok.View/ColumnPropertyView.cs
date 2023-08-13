@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using Kapok.Entity;
 
@@ -13,10 +15,21 @@ public class ColumnPropertyView : PropertyView
 {
     public ColumnPropertyView(PropertyInfo propertyInfo) : base(propertyInfo)
     {
-        if (propertyInfo.SetMethod == null || (propertyInfo.GetCustomAttribute<ReadOnlyAttribute>()?.IsReadOnly ?? false))
+    }
+
+    public ColumnPropertyView(string propertyName) : base(propertyName)
+    {
+    }
+
+    protected override void DiscoverDisplayPropertiesFromPropertyAttributes(CultureInfo? cultureInfo = null)
+    {
+        Debug.Assert(PropertyInfo != null);
+        base.DiscoverDisplayPropertiesFromPropertyAttributes(cultureInfo);
+        
+        if (PropertyInfo.SetMethod == null || (PropertyInfo.GetCustomAttribute<ReadOnlyAttribute>()?.IsReadOnly ?? false))
             IsReadOnly = true;
 
-        var autoCalculateAttribute = propertyInfo.GetCustomAttribute<AutoCalculateAttribute>();
+        var autoCalculateAttribute = PropertyInfo.GetCustomAttribute<AutoCalculateAttribute>();
         if (autoCalculateAttribute != null)
             IsReadOnly = true;
     }

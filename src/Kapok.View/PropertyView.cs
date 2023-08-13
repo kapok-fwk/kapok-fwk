@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using Kapok.Entity.Model;
@@ -6,16 +7,51 @@ using Kapok.Entity.Model;
 namespace Kapok.View;
 
 /// <summary>
-/// A view definition for a property.
+/// A view definition how the value of a specific property shall be displayed in the UI.
 /// </summary>
 public class PropertyView
 {
+    private string? _propertyName;
+    private PropertyInfo? _propertyInfo;
+
+    /// <summary>
+    /// Constructs the <see cref="PropertyView"/> class based on a PropertyInfo.
+    /// </summary>
+    /// <param name="propertyInfo">
+    /// The base property info for the PropertyView.
+    /// </param>
+    /// <param name="cultureInfo">
+    /// The culture info used for the display attributes if set. If not set, <c>CultureInfo.CurrentUICulture</c> is used.
+    /// </param>
     public PropertyView(PropertyInfo propertyInfo, CultureInfo? cultureInfo = null)
     {
-        PropertyInfo = propertyInfo;
+        _propertyInfo = propertyInfo;
 
-        if (cultureInfo == null)
-            cultureInfo = CultureInfo.CurrentUICulture;
+        DiscoverDisplayPropertiesFromPropertyAttributes(cultureInfo);
+    }
+
+    /// <summary>
+    /// Constructs the <see cref="PropertyView"/> with just the property name.
+    ///
+    /// This is useful in case the type is not known at construction time. It must
+    /// be set afterwards via property <see cref="DeclaringType"/> before it is
+    /// used in the view.
+    /// </summary>
+    /// <param name="propertyName"></param>
+    public PropertyView(string propertyName)
+    {
+        _propertyName = propertyName;
+    }
+
+    /// <summary>
+    /// Auto discover the display properties for the property view
+    /// from attributes of the property info. 
+    /// </summary>
+    protected virtual void DiscoverDisplayPropertiesFromPropertyAttributes(CultureInfo? cultureInfo = null)
+    {
+        Debug.Assert(PropertyInfo != null);
+
+        cultureInfo ??= CultureInfo.CurrentUICulture;
 
         // initialize properties from display attributes:
 
@@ -91,7 +127,46 @@ public class PropertyView
         }
     }
 
-    public PropertyInfo PropertyInfo { get; set; }
+    /// <summary>
+    /// The declaring type of the property view.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Is thrown when setting the declaring type and a property with name <see cref="Name"/> is not found in the type definition.  
+    /// </exception>
+    public Type? DeclaringType
+    {
+        get => _propertyInfo?.DeclaringType;
+        set
+        {
+            if (value == null)
+            {
+                if (_propertyInfo != null)
+                    _propertyName = _propertyInfo.Name;
+                _propertyInfo = null;
+                return;
+            }
+
+            var newPropertyInfo = value.GetProperty(Name);
+            if (newPropertyInfo == null)
+                throw new InvalidOperationException($"Could not find property {Name} in declaring type {DeclaringType}.");
+
+            _propertyInfo = newPropertyInfo;
+            DiscoverDisplayPropertiesFromPropertyAttributes();
+        }
+    }
+
+    /// <summary>
+    /// The name of the property.
+    /// </summary>
+#pragma warning disable CS8603
+    public string Name => _propertyInfo?.Name ?? _propertyName;
+#pragma warning restore CS8603
+
+    public PropertyInfo? PropertyInfo
+    {
+        get => _propertyInfo;
+        set => _propertyInfo = value;
+    }
 
     public bool IsReadOnly { get; set; }
 

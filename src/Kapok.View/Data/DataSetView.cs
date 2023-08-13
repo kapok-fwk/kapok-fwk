@@ -131,6 +131,9 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
 
     protected virtual void OnAddColumn(ColumnPropertyView column)
     {
+        column.DeclaringType ??= typeof(TEntry);
+        Debug.Assert(column.PropertyInfo != null);
+        
         if (column.PropertyInfo.GetCustomAttribute<AutoCalculateAttribute>() != null)
         {
             if (!AutoCalculateProperties.Contains(column.PropertyInfo.Name))
@@ -142,6 +145,9 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
 
     protected virtual void OnRemoveColumn(ColumnPropertyView column)
     {
+        column.DeclaringType ??= typeof(TEntry);
+        Debug.Assert(column.PropertyInfo != null);
+
         if (column.PropertyInfo.GetCustomAttribute<AutoCalculateAttribute>() != null)
         {
             if (AutoCalculateProperties.Contains(column.PropertyInfo.Name) &&
