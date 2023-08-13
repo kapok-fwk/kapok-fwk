@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.7 (2023-08-13)
+
+### Kapok.View
+
+- :rocket: add actions to page contracts
+- :rocket: support PropertyView/ColumnPropertyView just based on property name with later binding to PropertyInfo
+
 ## 0.1.6
 
 ### Kapok.View (2023-08-13)
