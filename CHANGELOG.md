@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.6
+
+### Kapok.View (2023-08-13)
+
+- :tada: add TextWrap property to ColumnPropertyView class
+- :rocket: make it possible to add own UIMenu instances to InteractivePage
+- :bug: fix crash with DocumentPageCollectionPage + fix memory leak bug
+
+### Kapok.Data.EntityFrameworkCore (2023-07-24)
+
+- add support for auto-generated current date/time sql function for sql provider SQLite and PostgreSQL
+
 ## 0.1.5.8 (2023-06-10)
 
 ### Kapok.Core
