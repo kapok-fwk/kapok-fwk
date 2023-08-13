@@ -49,7 +49,7 @@ public partial class DocumentPageCollectionPage
             var existingDocumentPage = _page.FindDocumentPageBySource(_baseAction);
             if (existingDocumentPage != null)
             {
-                _page.SelectedDocumentPage = existingDocumentPage;
+                _page.CurrentDocumentPage = existingDocumentPage;
                 return;
             }
 
@@ -57,7 +57,7 @@ public partial class DocumentPageCollectionPage
             Debug.Assert(newPage != null);
 
             _page.AddDocumentPageWithSource(newPage, _baseAction);
-            _page.SelectedDocumentPage = newPage;
+            _page.CurrentDocumentPage = newPage;
         }
 
         IPage IOpenPageAction.GetOrConstructPage()

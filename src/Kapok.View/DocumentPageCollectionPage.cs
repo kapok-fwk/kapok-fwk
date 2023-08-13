@@ -8,9 +8,10 @@ namespace Kapok.View;
 /// <summary>
 /// A page which shows a collection of document pages (similar to Visual Studio).
 /// </summary>
+// ReSharper disable once ClassNeverInstantiated.Global
 public partial class DocumentPageCollectionPage : InteractivePage
 {
-    private IPage? _selectedDocumentPage;
+    private IPage? _currentDocumentPage;
     private readonly Dictionary<IPage, List<UIMenuItemTab>> _contextualMenuItems = new();
     private readonly Dictionary<IPage, object> _documentPageSource = new();
 
@@ -22,6 +23,13 @@ public partial class DocumentPageCollectionPage : InteractivePage
 
         // Actions
         CloseCurrentDocumentPageAction = new UIAction("CloseCurrentDocumentPage", CloseCurrentDocumentPage, CanCloseCurrentDocumentPage);
+        CurrentDocumentSaveDataAction = new UIAction("SaveData", CurrentDocumentSaveData, CanCurrentDocumentSaveData);
+        CurrentDocumentRefreshAction = new UIAction("Refresh", CurrentDocumentRefresh, CanCurrentDocumentRefresh);
+        CurrentDocumentCreateNewEntryAction = new UIAction("CreateNewEntry", CurrentDocumentCreateNewEntry, CanCurrentDocumentCreateNewEntry);
+        CurrentDocumentDeleteEntryAction = new UIAction("DeleteEntry", CurrentDocumentDeleteEntry, CanCurrentDocumentDeleteEntry);
+        CurrentDocumentEditEntryAction = new UIAction("EditEntry", CurrentDocumentEditEntry, CanCurrentDocumentEditEntry);
+        CurrentDocumentToggleFilterVisibleAction = new UIAction("ToggleFilterVisible", CurrentDocumentToggleFilterVisible, CanCurrentDocumentToggleFilterVisible);
+        CurrentDocumentExportAsExcelSheetAction = new UIAction("ExportAsExcelSheet", CurrentDocumentExportAsExcelSheet, CanCurrentDocumentExportAsExcelSheet);
     }
 
     public override void Close()
@@ -103,13 +111,13 @@ public partial class DocumentPageCollectionPage : InteractivePage
 
     private bool CanCloseCurrentDocumentPage()
     {
-        return SelectedDocumentPage != null;
+        return CurrentDocumentPage != null;
     }
 
     private void CloseCurrentDocumentPage()
     {
-        if (SelectedDocumentPage != null)
-            DocumentPages.Remove(SelectedDocumentPage);
+        if (CurrentDocumentPage != null)
+            DocumentPages.Remove(CurrentDocumentPage);
     }
 
     #endregion
@@ -133,13 +141,13 @@ public partial class DocumentPageCollectionPage : InteractivePage
     /// <summary>
     /// The current selected document page.
     /// </summary>
-    public IPage? SelectedDocumentPage
+    public IPage? CurrentDocumentPage
     {
-        get => _selectedDocumentPage;
+        get => _currentDocumentPage;
         set
         {
-            var oldPage = _selectedDocumentPage;
-            if (SetProperty(ref _selectedDocumentPage, value))
+            var oldPage = _currentDocumentPage;
+            if (SetProperty(ref _currentDocumentPage, value))
             {
                 OnSelectedDocumentPageChanged(oldPage, value);
             }
@@ -255,10 +263,148 @@ public partial class DocumentPageCollectionPage : InteractivePage
         // TODO: The WPF Avalon Dock is not stable here; as workaround we will add this code to make sure that when the last page is removed the 'SelectedDocumentPage' is set to null {to release as well the reference so that the GC can clean up the memory for the last document)
         if (DocumentPages.Count == 0)
         {
-            SelectedDocumentPage = null;
+            CurrentDocumentPage = null;
         }
 
         if (_documentPageSource.ContainsKey(page))
             _documentPageSource.Remove(page);
     }
+
+    #region Routed events to SelectedDocumentPage
+
+    public IAction CurrentDocumentSaveDataAction { get; }
+    public IAction CurrentDocumentRefreshAction { get; }
+    public IAction CurrentDocumentCreateNewEntryAction { get; }
+    public IAction CurrentDocumentDeleteEntryAction { get; }
+    public IAction CurrentDocumentEditEntryAction { get; }
+    public IAction CurrentDocumentToggleFilterVisibleAction { get; }
+    public IAction CurrentDocumentExportAsExcelSheetAction { get; }
+    
+    private bool CanCurrentDocumentSaveData()
+    {
+        if (CurrentDocumentPage is IDataPage dataPage)
+        {
+            return dataPage.SaveDataAction.CanExecute();
+        }
+
+        return false;
+    }
+
+    private void CurrentDocumentSaveData()
+    {
+        if (CurrentDocumentPage is IDataPage dataPage)
+        {
+            dataPage.SaveDataAction.Execute();
+        }
+    }
+
+    private bool CanCurrentDocumentRefresh()
+    {
+        if (CurrentDocumentPage is IDataPage dataPage)
+        {
+            return dataPage.RefreshAction.CanExecute();
+        }
+
+        return false;
+    }
+
+    private void CurrentDocumentRefresh()
+    {
+        if (CurrentDocumentPage is IDataPage dataPage)
+        {
+            dataPage.RefreshAction.Execute();
+        }
+    }
+
+    private bool CanCurrentDocumentCreateNewEntry()
+    {
+        if (CurrentDocumentPage is IDataPage dataPage)
+        {
+            return dataPage.CreateNewEntryAction.CanExecute();
+        }
+
+        return false;
+    }
+
+    private void CurrentDocumentCreateNewEntry()
+    {
+        if (CurrentDocumentPage is IDataPage dataPage)
+        {
+            dataPage.CreateNewEntryAction.Execute();
+        }
+    }
+
+    private bool CanCurrentDocumentDeleteEntry()
+    {
+        if (CurrentDocumentPage is IDataPage dataPage)
+        {
+            return dataPage.DeleteEntryAction.CanExecute();
+        }
+
+        return false;
+    }
+
+    private void CurrentDocumentDeleteEntry()
+    {
+        if (CurrentDocumentPage is IDataPage dataPage)
+        {
+            dataPage.DeleteEntryAction.Execute();
+        }
+    }
+
+    private bool CanCurrentDocumentEditEntry()
+    {
+        if (CurrentDocumentPage is IListPage listPage)
+        {
+            return listPage.EditEntryAction.CanExecute();
+        }
+
+        return false;
+    }
+
+    private void CurrentDocumentEditEntry()
+    {
+        if (CurrentDocumentPage is IListPage listPage)
+        {
+            listPage.EditEntryAction.Execute();
+        }
+    }
+
+    private bool CanCurrentDocumentToggleFilterVisible()
+    {
+        if (CurrentDocumentPage is IListPage listPage)
+        {
+            return listPage.ToggleFilterVisibleAction.CanExecute();
+        }
+
+        return false;
+    }
+
+    private void CurrentDocumentToggleFilterVisible()
+    {
+        if (CurrentDocumentPage is IListPage listPage)
+        {
+            listPage.ToggleFilterVisibleAction.Execute();
+        }
+    }
+
+    private bool CanCurrentDocumentExportAsExcelSheet()
+    {
+        if (CurrentDocumentPage is IListPage listPage)
+        {
+            return listPage.ExportAsExcelSheetAction.CanExecute();
+        }
+
+        return false;
+    }
+
+    private void CurrentDocumentExportAsExcelSheet()
+    {
+        if (CurrentDocumentPage is IListPage listPage)
+        {
+            listPage.ExportAsExcelSheetAction.Execute();
+        }
+    }
+
+    #endregion
 }
