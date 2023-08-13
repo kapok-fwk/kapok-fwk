@@ -521,6 +521,18 @@ public abstract class DataPage<TEntry> : InteractivePage, IDataPage<TEntry>
     IDataSetView? IDataPage.DataSet => DataSet;
 #pragma warning restore CS8768
 
+    IAction IDataPage.DeleteEntryAction => new UIAction(DeleteEntryAction.Name, IDataPage_DeleteEntry, IDataPage_CanDeleteEntry);
+
+    private bool IDataPage_CanDeleteEntry()
+    {
+        return DeleteEntryAction.CanExecute(DataSet?.SelectedEntries);
+    }
+
+    private void IDataPage_DeleteEntry()
+    {
+        DeleteEntryAction.Execute(DataSet?.SelectedEntries);
+    }
+    
     #endregion
 
     #region IDataPage<TEntry>

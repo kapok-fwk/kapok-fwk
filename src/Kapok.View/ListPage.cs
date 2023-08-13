@@ -579,5 +579,23 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
 
     IEnumerable<IDataSetListView> IListPage.ListViews => ListViews;
 
+    IAction IListPage.EditEntryAction => new UIAction(EditEntryAction.Name, IListPage_EditEntry, IListPage_CanEditEntry);
+
+    private bool IListPage_CanEditEntry()
+    {
+        if (DataSet == null || DataSet.Current == null)
+            return false;
+
+        return EditEntryAction.CanExecute(new List<TEntry?> { DataSet.Current });
+    }
+    
+    private void IListPage_EditEntry()
+    {
+        if (DataSet == null || DataSet.Current == null)
+            return;
+
+        EditEntryAction.Execute(new List<TEntry?> { DataSet.Current });
+    }
+    
     #endregion
 }

@@ -22,10 +22,20 @@ public interface IDataPage : IInteractivePage
     /// has an validation error.
     /// </summary>
     bool HasValidationErrors { get; }
+    
+    // actions
+    IAction SaveDataAction { get; }
+    IAction RefreshAction { get; }
+    IAction CreateNewEntryAction { get; }
+    IAction DeleteEntryAction { get; }
+    IToggleAction ToggleEditModeAction { get; }
 }
     
 public interface IDataPage<TEntry> : IDataPage
     where TEntry : class, new()
 {
     new IDataSetView<TEntry> DataSet { get; }
+    
+    // actions
+    new IDataSetSelectionAction<TEntry> DeleteEntryAction { get; }
 }
