@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.8 (2023-08-13)
+
+### Kapok.View
+
+- :rocket: refactor DocumentPageCollectionPage, add routing for default page events
+
 ## 0.1.7 (2023-08-13)
 
 ### Kapok.View
