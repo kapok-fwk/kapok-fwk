@@ -36,8 +36,6 @@ public class JsonTest : DeferredDaoTestBase
             using var scope = DataDomain.CreateScope();
             var courseDao = scope.GetDao<Course, DeferredDao<Course>>();
 
-            var list = courseDao.AsQueryable().ToList();
-
             var course = courseDao.GetByKey(1);
             Assert.Equal(1, course.CourseId);
             Assert.Equal("Leaning about JSON and its benefits compared to other formats", course.Title);
