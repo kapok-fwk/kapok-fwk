@@ -6,7 +6,7 @@ using Res = Kapok.Acl.Resources.UserRole;
 
 namespace Kapok.Acl.DataModel;
 
-[Table("UserRole", Schema = "System")]
+[Table(nameof(UserRole), Schema = "System")]
 public class UserRole : EditableEntityBase, IEquatable<UserRole>
 {
     static UserRole()
@@ -35,7 +35,7 @@ public class UserRole : EditableEntityBase, IEquatable<UserRole>
 
     [Key]
     [Browsable(false)]
-    [Display(Name = "UserId", ResourceType = typeof(Res))]
+    [Display(Name = nameof(UserId), ResourceType = typeof(Res))]
     public Guid UserId
     {
         get => _userId;
@@ -46,7 +46,7 @@ public class UserRole : EditableEntityBase, IEquatable<UserRole>
 
     [Key]
     [Browsable(false)]
-    [Display(Name = "RoleId", ResourceType = typeof(Res))]
+    [Display(Name = nameof(RoleId), ResourceType = typeof(Res))]
     public Guid RoleId
     {
         get => _roleId;

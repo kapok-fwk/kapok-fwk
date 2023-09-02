@@ -12,7 +12,7 @@ namespace Kapok.Acl.DataModel;
 //       See also:
 //         https://docs.microsoft.com/en-us/aspnet/core/security/authentication/customize_identity_model?view=aspnetcore-2.1
 //
-[Table("User", Schema = "System")]
+[Table(nameof(User), Schema = "System")]
 public class User : EditableEntityBase, IEquatable<User>
 {
     static User()
@@ -41,7 +41,7 @@ public class User : EditableEntityBase, IEquatable<User>
 
     [Key]
     [Browsable(false)]
-    [Display(Name = "Id", ResourceType = typeof(Res))]
+    [Display(Name = nameof(Id), ResourceType = typeof(Res))]
     public Guid Id
     {
         get => _id;
@@ -49,7 +49,7 @@ public class User : EditableEntityBase, IEquatable<User>
     }
 
     [StringLength(80)]
-    [Display(Name = "UserName", ResourceType = typeof(Res))]
+    [Display(Name = nameof(UserName), ResourceType = typeof(Res))]
     [LookupColumn]
     public string UserName
     {

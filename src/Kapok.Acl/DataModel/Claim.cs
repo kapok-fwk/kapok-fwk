@@ -9,7 +9,7 @@ public class Claim : EntityBase
 {
     private ClaimType _type;
 
-    [Display(Name = "Type", ResourceType = typeof(Res))]
+    [Display(Name = nameof(Type), ResourceType = typeof(Res))]
     public ClaimType Type
     {
         get => _type;
@@ -18,7 +18,7 @@ public class Claim : EntityBase
 
     private string? _name;
 
-    [Display(Name = "Name", ResourceType = typeof(Res))]
+    [Display(Name = nameof(Name), ResourceType = typeof(Res))]
     public string? Name
     {
         get => _name;
@@ -27,7 +27,7 @@ public class Claim : EntityBase
 
     private string? _description;
 
-    [Display(Name = "Description", ResourceType = typeof(Res))]
+    [Display(Name = nameof(Description), ResourceType = typeof(Res))]
     public string? Description
     {
         get => _description;

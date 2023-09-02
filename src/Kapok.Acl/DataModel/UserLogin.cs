@@ -6,7 +6,7 @@ using Res = Kapok.Acl.Resources.UserLogin;
 
 namespace Kapok.Acl.DataModel;
 
-[Table("UserLogin", Schema = "System")]
+[Table(nameof(UserLogin), Schema = "System")]
 public class UserLogin : EditableEntityBase, IEquatable<UserLogin>
 {
     static UserLogin()
@@ -39,7 +39,7 @@ public class UserLogin : EditableEntityBase, IEquatable<UserLogin>
     /// </summary>
     [Key]
     [Browsable(false)]
-    [Display(Name = "UserId", ResourceType = typeof(Res))]
+    [Display(Name = nameof(UserId), ResourceType = typeof(Res))]
     public Guid UserId
     {
         get => _userId;
@@ -53,7 +53,7 @@ public class UserLogin : EditableEntityBase, IEquatable<UserLogin>
     /// </summary>
     [Key]
     [StringLength(50)]
-    [Display(Name = "LoginProvider", ResourceType = typeof(Res))]
+    [Display(Name = nameof(LoginProvider), ResourceType = typeof(Res))]
     [LookupColumn]
     public string LoginProvider
     {
@@ -66,7 +66,7 @@ public class UserLogin : EditableEntityBase, IEquatable<UserLogin>
     /// </summary>
     // Note: a windows SID has a max length of 184 chars (source: https://stackoverflow.com/questions/1140528/what-is-the-maximum-length-of-a-sid-in-sddl-format)
     [StringLength(255)]
-    [Display(Name = "ProviderKey", ResourceType = typeof(Res))]
+    [Display(Name = nameof(ProviderKey), ResourceType = typeof(Res))]
     public string ProviderKey
     {
         get => _providerKey;

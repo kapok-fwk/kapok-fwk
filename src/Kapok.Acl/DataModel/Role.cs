@@ -6,7 +6,7 @@ using Res = Kapok.Acl.Resources.Role;
 
 namespace Kapok.Acl.DataModel;
 
-[Table("Role", Schema = "System")]
+[Table(nameof(Role), Schema = "System")]
 public class Role : EditableEntityBase, IEquatable<Role>
 {
     static Role()
@@ -33,7 +33,7 @@ public class Role : EditableEntityBase, IEquatable<Role>
     }
 
     [Browsable(false)]
-    [Display(Name = "Id", ResourceType = typeof(Res))]
+    [Display(Name = nameof(Id), ResourceType = typeof(Res))]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id
     {
@@ -43,7 +43,7 @@ public class Role : EditableEntityBase, IEquatable<Role>
 
     [Required(AllowEmptyStrings = false)]
     [StringLength(80)]
-    [Display(Name = "Name", ResourceType = typeof(Res))]
+    [Display(Name = nameof(Name), ResourceType = typeof(Res))]
     [LookupColumn]
     public string Name
     {

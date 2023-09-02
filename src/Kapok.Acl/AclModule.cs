@@ -16,6 +16,7 @@ public sealed class AclModule : ModuleBase
         base.Initiate();
 
         // register DataModel
+        DataDomain.RegisterEntity<LoginProvider, LoginProviderDao>();
         DataDomain.RegisterEntity<RoleClaim, RoleClaimDao>();
         DataDomain.RegisterEntity<Role, RoleDao>();
         DataDomain.RegisterEntity<UserLogin, UserLoginDao>();

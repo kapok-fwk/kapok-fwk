@@ -6,7 +6,7 @@ using Res = Kapok.Acl.Resources.RoleClaim;
 
 namespace Kapok.Acl.DataModel;
 
-[Table("RoleClaim", Schema = "System")]
+[Table(nameof(RoleClaim), Schema = "System")]
 public class RoleClaim : EditableEntityBase, IEquatable<RoleClaim>
 {
     static RoleClaim()
@@ -34,7 +34,7 @@ public class RoleClaim : EditableEntityBase, IEquatable<RoleClaim>
 
     [Key]
     [Browsable(false)]
-    [Display(Name = "RoleId", ResourceType = typeof(Res))]
+    [Display(Name = nameof(RoleId), ResourceType = typeof(Res))]
     public Guid RoleId
     {
         get => _roleId;
@@ -45,7 +45,7 @@ public class RoleClaim : EditableEntityBase, IEquatable<RoleClaim>
 
     [Key]
     [StringLength(10)]
-    [Display(Name = "ClaimType", ResourceType = typeof(Res))]
+    [Display(Name = nameof(ClaimType), ResourceType = typeof(Res))]
     [LookupColumn]
     public string ClaimType
     {
@@ -55,7 +55,7 @@ public class RoleClaim : EditableEntityBase, IEquatable<RoleClaim>
 
     [Key]
     [StringLength(255)]
-    [Display(Name = "ClaimValue", ResourceType = typeof(Res))]
+    [Display(Name = nameof(ClaimValue), ResourceType = typeof(Res))]
     [LookupColumn]
     public string? ClaimValue
     {
