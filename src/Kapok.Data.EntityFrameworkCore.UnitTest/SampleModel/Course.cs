@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Nodes;
 using Kapok.Entity;
 
 namespace Kapok.Data.EntityFrameworkCore.UnitTest.SampleModel;
@@ -19,6 +20,7 @@ public class Course : EditableEntityBase
     private int _courseId;
     private string _title = string.Empty;
     private int _credits;
+    private JsonObject? _metadata;
 
     [Timestamp]
     [Browsable(false)]
@@ -47,6 +49,12 @@ public class Course : EditableEntityBase
     {
         get => _credits;
         set => SetValidateProperty(ref _credits, value);
+    }
+
+    public JsonObject? Metadata
+    {
+        get => _metadata;
+        set => SetValidateProperty(ref _metadata, value);
     }
 
     public ICollection<Enrollment>? Enrollments { get; set; }

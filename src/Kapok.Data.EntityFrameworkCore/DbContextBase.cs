@@ -10,6 +10,7 @@ using DeleteBehavior = Kapok.Entity.Model.DeleteBehavior;
 using ModelBuilder = Microsoft.EntityFrameworkCore.ModelBuilder;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Nodes;
 
 namespace Kapok.Data.EntityFrameworkCore;
 
@@ -51,6 +52,10 @@ public class DbContextBase : DbContext
             .EnableSensitiveDataLogging();
     }
 #endif
+    
+    public const string SqliteProvider = "Microsoft.EntityFrameworkCore.Sqlite";
+    public const string PostgreSqlProvider = "Npgsql.EntityFrameworkCore.PostgreSQL";
+    public const string SqlServerProvider = "Microsoft.EntityFrameworkCore.SqlServer";
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -263,8 +268,12 @@ public class DbContextBase : DbContext
                 if (Attribute.IsDefined(property, typeof(NotMappedAttribute)))
                     continue;
 
-                if (property.PropertyType == typeof(JObject) ||
+                if (property.PropertyType == typeof(JsonObject) ||
+                    property.PropertyType == typeof(JsonArray) ||
+#if USE_JSON_LIBRARY_NEWTONSOFT
+                    property.PropertyType == typeof(JObject) ||
                     property.PropertyType == typeof(JArray) ||
+#endif
                     property.PropertyType == typeof(Caption))
                 {
                     entityTypeBuilder.Property(property.Name)
@@ -338,17 +347,17 @@ public class DbContextBase : DbContext
         if (providerName == null)
             throw new ArgumentNullException(nameof(providerName));
 
-        if (providerName == "Microsoft.EntityFrameworkCore.Sqlite")
+        if (providerName == SqliteProvider)
         {
             return "DATETIME('now')";
         }
 
-        if (providerName == "Npgsql.EntityFrameworkCore.PostgreSQL")
+        if (providerName == PostgreSqlProvider)
         {
             return "timezone('utc', now())";
         }
 
-        if (providerName == "Microsoft.EntityFrameworkCore.SqlServer")
+        if (providerName == SqlServerProvider)
         {
             return "GetUtcDate()";
         }

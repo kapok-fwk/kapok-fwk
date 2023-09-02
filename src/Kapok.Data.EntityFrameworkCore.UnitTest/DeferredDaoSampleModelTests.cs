@@ -1,70 +1,16 @@
-using System.Data;
 using System.Diagnostics;
 using Kapok.BusinessLayer;
 using Kapok.Data.EntityFrameworkCore.UnitTest.SampleModel;
 using Kapok.Module;
 using Microsoft.EntityFrameworkCore;
-using Xunit;
 
 namespace Kapok.Data.EntityFrameworkCore.UnitTest;
 
-public class DeferredDaoSampleModelTests : IDisposable
+public class DeferredDaoSampleModelTests : DeferredDaoTestBase
 {
-    private readonly IDataDomain _dataDomain;
-
-    // A connection which is kept alive as long as the unit test runs.
-    // We use by default a SQLite shared memory database. To ensure
-    // that the data is not removed we need to keep a connection alive while
-    // the database is used. See also:
-    // https://docs.microsoft.com/en-us/dotnet/standard/data/sqlite/in-memory-databases
-    private readonly IDbConnection _cacheDbConnection;
-    private readonly EFCoreDataDomainScope _cacheScope;
-
-    public DeferredDaoSampleModelTests(IDataDomain? dataDomain = null)
+    protected override void InitiateModule()
     {
-        DataDomain.DefaultDaoType = typeof(DeferredDao<>);
-        _dataDomain = dataDomain ?? InitializeDataDomain();
-
-        // oping a connection to SQLite
-        _cacheScope = (EFCoreDataDomainScope)_dataDomain.CreateScope();
-        Debug.Assert(_cacheScope.DbContext != null);
-        _cacheDbConnection = _cacheScope.DbContext.Database.GetDbConnection();
-        _cacheDbConnection.Open();
-
-        // ensures that the test database is clean created. 
-        // we drop the DB first because some database providers might have a
-        // test database not cleaned in an inconsistent state.
-        _cacheScope.DbContext.Database.EnsureDeleted();
-        _cacheScope.DbContext.Database.EnsureCreated();
-    }
-
-    public void Dispose()
-    {
-        _cacheDbConnection.Close();
-        _cacheScope.Dispose();
-    }
-
-    public static IDataDomain InitializeDataDomain(DbContextOptions? dbContextOptions = null)
-    {
-        if (dbContextOptions == null)
-        {
-            var contextOptionBuilder = new DbContextOptionsBuilder();
-
-            // testing against SQLite database
-            // Requires NuGet package Microsoft.EntityFrameworkCore.Sqlite
-            contextOptionBuilder.UseSqlite($"Data Source={nameof(DeferredDaoSampleModelTests)};Mode=Memory;Cache=Shared");
-
-            // testing against a local SQL Server database
-            // Requires NuGet package Microsoft.EntityFrameworkCore.SqlServer
-            //contextOptionBuilder.UseSqlServer(@"Server=(local);Database=EFProviders.InMemory;Trusted_Connection=True;ConnectRetryCount=0",
-            //    opts => opts.CommandTimeout((int)TimeSpan.FromMinutes(10).TotalSeconds));
-
-            dbContextOptions = contextOptionBuilder.Options;
-        }
-
         ModuleEngine.InitiateModule(typeof(SampleModelModule));
-
-        return new EFCoreDataDomain(dbContextOptions);
     }
 
     private static async Task SeedMathCourse(IDataDomain dataDomain)
@@ -115,7 +61,7 @@ public class DeferredDaoSampleModelTests : IDisposable
     [Fact]
     public void CheckEmptyDatabase()
     {
-        using var scope = _dataDomain.CreateScope();
+        using var scope = DataDomain.CreateScope();
         var courseDao = scope.GetDao<Course, DeferredDao<Course>>();
         var enrollmentDao = scope.GetDao<Enrollment, DeferredDao<Enrollment>>();
         var studentDao = scope.GetDao<Student, DeferredDao<Student>>();
@@ -135,11 +81,11 @@ public class DeferredDaoSampleModelTests : IDisposable
     [Fact]
     public async void SeedDatabaseTest()
     {
-        await SeedMathCourse(_dataDomain);
-        await SeedJohnAdamsStudent(_dataDomain);
-        await SeedJohnAdamsEnrollment(_dataDomain);
+        await SeedMathCourse(DataDomain);
+        await SeedJohnAdamsStudent(DataDomain);
+        await SeedJohnAdamsEnrollment(DataDomain);
 
-        using var scope = _dataDomain.CreateScope();
+        using var scope = DataDomain.CreateScope();
         var courseDao = scope.GetDao<Course>();
 
         Assert.Equal(1, courseDao.AsQueryable().Count());
@@ -181,12 +127,12 @@ public class DeferredDaoSampleModelTests : IDisposable
     [Fact]
     public async Task DeleteSeededDataTest()
     {
-        await SeedMathCourse(_dataDomain);
-        await SeedJohnAdamsStudent(_dataDomain);
-        await SeedJohnAdamsEnrollment(_dataDomain);
+        await SeedMathCourse(DataDomain);
+        await SeedJohnAdamsStudent(DataDomain);
+        await SeedJohnAdamsEnrollment(DataDomain);
         // ... todo add other seeded data
 
-        using var scope = _dataDomain.CreateScope();
+        using var scope = DataDomain.CreateScope();
         var courseDao = scope.GetDao<Course, DeferredDao<Course>>();
         await courseDao.DeleteRangeAsync(courseDao.AsQueryableForUpdate());
         var enrollmentDao = scope.GetDao<Enrollment, DeferredDao<Enrollment>>();
@@ -209,7 +155,7 @@ public class DeferredDaoSampleModelTests : IDisposable
     [Fact]
     public async Task CreateAndUpdateChangeTrackingTest()
     {
-        using var scope = _dataDomain.CreateScope();
+        using var scope = DataDomain.CreateScope();
         var courseDao = scope.GetDao<Course>();
 
         // note: from SeedMathCourse(...)
@@ -232,10 +178,10 @@ public class DeferredDaoSampleModelTests : IDisposable
     [Fact]
     public async Task ChangeTrackingAndUpdateTest()
     {
-        using var scope = _dataDomain.CreateScope();
+        using var scope = DataDomain.CreateScope();
         var courseDao = scope.GetDao<Course>();
 
-        await SeedMathCourse(_dataDomain);
+        await SeedMathCourse(DataDomain);
 
         Assert.Equal(1, courseDao.AsQueryable().Count());
         Assert.Equal(1, await courseDao.AsQueryable().CountAsync());
@@ -243,7 +189,7 @@ public class DeferredDaoSampleModelTests : IDisposable
         Assert.Equal(15, courseDao.AsQueryable().First().Credits);
 
         // test update via 'StartChangeTracking'
-        using (var scope2 = _dataDomain.CreateScope())
+        using (var scope2 = DataDomain.CreateScope())
         {
             var courseDao2 = scope2.GetDao<Course>();
 
@@ -260,7 +206,7 @@ public class DeferredDaoSampleModelTests : IDisposable
         }
 
         // test update via 'AsQueryableForUpdate'
-        using (var scope2 = _dataDomain.CreateScope())
+        using (var scope2 = DataDomain.CreateScope())
         {
             var courseDao2 = scope2.GetDao<Course>();
 
@@ -284,7 +230,7 @@ public class DeferredDaoSampleModelTests : IDisposable
 
         // test update via 'Update'
         /*
-        using (var scope2 = _dataDomain.CreateScope())
+        using (var scope2 = DataDomain.CreateScope())
         {
             var courseDao2 = scope2.GetDao<Course>();
 
@@ -305,7 +251,7 @@ public class DeferredDaoSampleModelTests : IDisposable
         await scope.SaveAsync();
 
         // test no update via 'AsQueryable'
-        using (var scope2 = _dataDomain.CreateScope())
+        using (var scope2 = DataDomain.CreateScope())
         {
             var courseDao2 = scope2.GetDao<Course>();
 
@@ -321,7 +267,7 @@ public class DeferredDaoSampleModelTests : IDisposable
         }
 
         // test no update via 'NotForUpdate'
-        using (var scope2 = _dataDomain.CreateScope())
+        using (var scope2 = DataDomain.CreateScope())
         {
             var courseDao2 = scope2.GetDao<Course>();
 
@@ -340,9 +286,9 @@ public class DeferredDaoSampleModelTests : IDisposable
     [Fact]
     public async Task UpdateNotTrackedEntityFailTest()
     {
-        await SeedMathCourse(_dataDomain);
+        await SeedMathCourse(DataDomain);
 
-        using var scope = _dataDomain.CreateScope();
+        using var scope = DataDomain.CreateScope();
         var courseDao = scope.GetDao<Course>();
 
         var mathCourse = courseDao.AsQueryable().First();
@@ -354,9 +300,9 @@ public class DeferredDaoSampleModelTests : IDisposable
     [Fact(Skip = "SQLite does not support RowVersion/Timestamp")]
     public async Task TestUpdateRowVersion()
     {
-        await SeedMathCourse(_dataDomain);
+        await SeedMathCourse(DataDomain);
 
-        using var scope = _dataDomain.CreateScope();
+        using var scope = DataDomain.CreateScope();
         var courseDao = scope.GetDao<Course>();
 
         var mathCourse = courseDao.AsQueryableForUpdate().First();
