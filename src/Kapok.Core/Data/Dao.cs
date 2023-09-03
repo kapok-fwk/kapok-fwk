@@ -37,7 +37,7 @@ public class Dao<T> : DaoBase<T>
                         Expression.Convert(param, dataScope.InterfaceType),
                         dataScope.PartitionProperty
                     ),
-                    Expression.Constant(dataScope.Value, dataScope.PartitionProperty.PropertyType)
+                    Expression.Convert(Expression.Constant(dataScope.Value), dataScope.PartitionProperty.PropertyType)
                 ),
                 param
             );
