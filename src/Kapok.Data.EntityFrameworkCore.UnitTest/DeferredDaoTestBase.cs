@@ -49,7 +49,7 @@ public abstract class DeferredDaoTestBase : IDisposable
 
             // testing against SQLite database
             // Requires NuGet package Microsoft.EntityFrameworkCore.Sqlite
-            contextOptionBuilder.UseSqlite($"Data Source={nameof(DeferredDaoSampleModelTests)};Mode=Memory;Cache=Shared");
+            contextOptionBuilder.UseSqlite($"Data Source={GetType().FullName};Mode=Memory;Cache=Shared");
 
             // testing against a local SQL Server database
             // Requires NuGet package Microsoft.EntityFrameworkCore.SqlServer
