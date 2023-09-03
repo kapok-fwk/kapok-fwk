@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Diagnostics;
 using Kapok.BusinessLayer;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 namespace Kapok.Data.EntityFrameworkCore.UnitTest;
@@ -31,7 +32,26 @@ public abstract class DeferredDaoTestBase : IDisposable
         // ensures that the test database is clean created. 
         // we drop the DB first because some database providers might have a
         // test database not cleaned in an inconsistent state.
-        _cacheScope.DbContext.Database.EnsureDeleted();
+        if (_cacheScope.DbContext.Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite")
+        { 
+            // A workaround to make 'EnsureDeleted' work for SQlite inmemory database.
+            // See https://github.com/dotnet/efcore/issues/15923
+            var context = _cacheScope.DbContext;
+            //context.ChangeTracker.Clear();
+            SqliteConnection connection = (SqliteConnection)context.Database.GetDbConnection();
+            connection.Open();
+            int rc;
+            rc = SQLitePCL.raw.sqlite3_db_config(connection.Handle, SQLitePCL.raw.SQLITE_DBCONFIG_RESET_DATABASE, 1, out _);
+            SqliteException.ThrowExceptionForRC(rc, connection.Handle);
+            rc = SQLitePCL.raw.sqlite3_exec(connection.Handle, "VACUUM");
+            SqliteException.ThrowExceptionForRC(rc, connection.Handle);
+            rc = SQLitePCL.raw.sqlite3_db_config(connection.Handle, SQLitePCL.raw.SQLITE_DBCONFIG_RESET_DATABASE, 0, out _);
+            SqliteException.ThrowExceptionForRC(rc, connection.Handle);
+        }
+        else
+        {
+            _cacheScope.DbContext.Database.EnsureDeleted();
+        }
         _cacheScope.DbContext.Database.EnsureCreated();
     }
     
