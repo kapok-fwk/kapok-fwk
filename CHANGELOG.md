@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.1.9 (2023-09-03)
+
+### Kapok.Acl
+
+- :tada: add LoginProvider to database with new `Configuration` property
+
+### Kapok.Core
+- :rocket: *change* InMemoryDataDomain to hold data during livetime of DataDomain, not only scope repository livetime
+- :rocket: set DataPartition when `DaoBase.New()` is called
+- :bug: *fix* type casting issue when DataPartition property is a primitive type
+
+### Kapok.Data.EntityFrameworkCore
+
+- :tada: add support for Json serialization based on `System.Text.Json.Node` objects
+- :bug: *fix* parallel SQLite unit test executioning
+
+### Kapok.View
+
+- :tada: add support relative WPF path image names in ImageManager (e.g. `/AssemblyName;component/Images/Untitled.png`)
+
 ## 0.1.8 (2023-08-13)
 
 ### Kapok.View
