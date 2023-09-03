@@ -19,6 +19,11 @@ public class InMemoryRepository<T> : IRepository<T>
         _list = new List<T>();
     }
 
+    public InMemoryRepository(List<T> inMemoryList)
+    {
+        _list = inMemoryList ?? throw new ArgumentNullException(nameof(inMemoryList));
+    }
+
     public virtual IQueryable<T> AsQueryable()
     {
         return _list.AsQueryable();

@@ -8,7 +8,8 @@ public class InMemoryDataDomainScope : DataDomainScope
 
     protected override IRepository<T> InitializeRepository<T>()
     {
-        return new InMemoryRepository<T>();
+        var inMemoryList = ((InMemoryDataDomain)DataDomain).GetInMemoryData<T>();
+        return new InMemoryRepository<T>(inMemoryList);
     }
 
     public override bool CanSave()
