@@ -3,7 +3,7 @@ using Kapok.Entity;
 
 namespace Kapok.Core.UnitTest.DataModel;
 
-public class ToDoList : EditableEntityBase
+public class ToDoList : EditableEntityBase, ITenantEntity
 {
     static ToDoList()
     {
@@ -15,9 +15,16 @@ public class ToDoList : EditableEntityBase
         });
     }
 
+    private long _tenantId;
     private Guid _id;
     private string _name = string.Empty;
 
+    public long TenantId
+    {
+        get => _tenantId;
+        set => SetProperty(ref _tenantId, value);
+    }
+    
     public Guid Id
     {
         get => _id;

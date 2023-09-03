@@ -34,8 +34,34 @@ public abstract class DaoBase<T> : IDao<T>
             if (newEntry is EditableEntityBase newEditableEntity)
                 EditableEntityBase.SetBusinessLayerService(newEditableEntity, this);
         }
+        SetDataPartitionProperties(newEntry);
         Init(newEntry);
         return newEntry;
+    }
+
+    /// <summary>
+    /// Sets the current value of the data partition to the entry.
+    /// </summary>
+    /// <param name="entry"></param>
+    private void SetDataPartitionProperties(T entry)
+    {
+        foreach (var pair in DataDomainScope.DataPartitions)
+        {
+            var dataPartitionKey = pair.Key;
+            var dataPartition = pair.Value;
+            
+            if (dataPartition.InterfaceType.IsAssignableFrom(typeof(T)))
+            {
+#pragma warning disable CS8602
+                dataPartition.PartitionProperty.SetMethod.Invoke(entry,
+#pragma warning restore CS8602
+                    new object?[]
+                    {
+                        DataDomainScope.DataPartitions[dataPartitionKey].Value
+                        // current value
+                    });
+            }
+        }
     }
         
     public abstract void Create(T entry);
