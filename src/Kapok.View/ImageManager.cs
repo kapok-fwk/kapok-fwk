@@ -115,6 +115,11 @@ public static class ImageManager
         */
         string imageSize = size.ToString().ToLower();
 
+        if (name.StartsWith("/"))
+        {
+            return "pack://application:,,," + name;
+        }
+
         switch (name)
         {
             // from https://icons8.com/
