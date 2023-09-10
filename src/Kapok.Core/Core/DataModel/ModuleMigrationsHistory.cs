@@ -1,6 +1,6 @@
-﻿using Kapok.Entity;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Kapok.Entity;
 
 namespace Kapok.Core.DataModel;
 

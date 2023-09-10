@@ -1,8 +1,8 @@
-﻿using NLog;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Kapok.Core.BusinessLayer;
 using Kapok.Core.DataModel;
 using Kapok.Data;
+using NLog;
 
 namespace Kapok.Module;
 
