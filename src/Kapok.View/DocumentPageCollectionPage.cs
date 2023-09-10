@@ -138,6 +138,7 @@ public partial class DocumentPageCollectionPage : InteractivePage
     // ReSharper disable CollectionNeverQueried.Global
     // ReSharper disable MemberCanBePrivate.Global
     // ReSharper disable UnusedMember.Global
+    // ReSharper disable UnusedAutoPropertyAccessor.Global
     /// <summary>
     /// The current selected document page.
     /// </summary>
@@ -149,7 +150,7 @@ public partial class DocumentPageCollectionPage : InteractivePage
             var oldPage = _currentDocumentPage;
             if (SetProperty(ref _currentDocumentPage, value))
             {
-                OnSelectedDocumentPageChanged(oldPage, value);
+                OnSelectedDocumentPageChangedInternal(oldPage, value);
             }
         }
     }
@@ -163,55 +164,24 @@ public partial class DocumentPageCollectionPage : InteractivePage
     /// Closes the current selected document page (property SelectedDocumentPage).
     /// </summary>
     public IAction CloseCurrentDocumentPageAction { get; }
+    // ReSharper restore UnusedAutoPropertyAccessor.Global
     // ReSharper restore UnusedMember.Global
     // ReSharper restore MemberCanBePrivate.Global
     // ReSharper restore CollectionNeverQueried.Global
 
     /// <summary>
-    /// Is invoked when the selected page is changed.
+    /// It is called internally when a document page is prepared for to be
+    /// shown in the UI or the UI might already show the page.
     /// </summary>
-    /// <param name="oldPage">
-    /// The page which was selected before.
-    /// </param>
-    /// <param name="page">
-    /// The page which is selected now.
-    /// </param>
-    protected virtual void OnSelectedDocumentPageChanged(IPage? oldPage, IPage? page)
-    {
-        // switch detail pages
-        if (oldPage is InteractivePage oldInteractivePage)
-        {
-            DetailPages.RemoveRange(oldInteractivePage.DetailPages);
-        }
-
-        if (page is InteractivePage interactivePage)
-        {
-            DetailPages.AddRange(interactivePage.DetailPages);
-        }
-
-        // select first tab of contextual tab if exist
-        if (page != null && _contextualMenuItems.ContainsKey(page))
-        {
-            if (_contextualMenuItems[page].Count > 0)
-            {
-                _contextualMenuItems[page][0].IsSelected = true;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Is invoked when a new page is added to the Pages property.
-    /// </summary>
-    /// <param name="page">
-    /// The new page object.
-    /// </param>
-    protected virtual void OnAddDocumentPage(IPage page)
+    /// <param name="page"></param>
+    private void ShowDocumentPageInternal(IPage page)
     {
         if (page is InteractivePage interactivePage)
         {
+            // add menus
             if (interactivePage.Menu.ContainsKey(UIMenu.BaseMenuName))
             {
-                List<UIMenuItemTab> newMenuTabs = new List<UIMenuItemTab>();
+                var newMenuTabs = new List<UIMenuItemTab>();
 
                 foreach (var tabMenuItem in interactivePage.Menu[UIMenu.BaseMenuName].MenuItems)
                 {
@@ -223,7 +193,7 @@ public partial class DocumentPageCollectionPage : InteractivePage
                                 Description = tabMenuItem.Description,
                                 Image = tabMenuItem.Image,
                                 BasePage = page
-                                // TODO: IsVisible is not transfered
+                                // TODO: IsVisible is not transferred
                                 // TODO: Order is not taken over
                                 // TODO: RibbonKeyTip is not rewritten here
                             };
@@ -235,9 +205,100 @@ public partial class DocumentPageCollectionPage : InteractivePage
                 _contextualMenuItems.Add(page, newMenuTabs);
                 Menu[UIMenu.BaseMenuName].MenuItems.AddRange(newMenuTabs);
             }
-
+            
+            // select first tab of contextual tab if exist
+            if (_contextualMenuItems.ContainsKey(page))
+            {
+                if (_contextualMenuItems[page].Count > 0)
+                {
+                    _contextualMenuItems[page][0].IsSelected = true;
+                }
+            }
+            
+            // add detail pages
+            DetailPages.AddRange(interactivePage.DetailPages);
             interactivePage.DetailPages.CollectionChanged += DetailPages_CollectionChanged;
         }
+    }
+    
+    /// <summary>
+    /// It is called internally when a document page is prepared for to be
+    /// hidden in the UI or is already closed.
+    /// </summary>
+    /// <param name="page"></param>
+    private void HideDocumentPageInternal(IPage page)
+    {
+        if (page is InteractivePage interactivePage)
+        {
+            // add menus
+            if (_contextualMenuItems.ContainsKey(page))
+            {
+                Menu[UIMenu.BaseMenuName].MenuItems.RemoveRange(_contextualMenuItems[page]);
+                _contextualMenuItems.Remove(page);
+            }
+
+            // if a Menu item exist which is not part of the page (e.g. a general App menu), show it
+            if (Menu[UIMenu.BaseMenuName].MenuItems.Count > 0)
+            {
+                if (Menu[UIMenu.BaseMenuName].MenuItems[0] is UIMenuItemTab menuItemTab)
+                {
+                    menuItemTab.IsSelected = true;
+                }
+                else if (Menu[UIMenu.BaseMenuName].MenuItems[0].SubMenuItems.Count > 0)
+                {
+                    if (Menu[UIMenu.BaseMenuName].MenuItems[0].SubMenuItems[0] is UIMenuItemTab menuItemTab2)
+                    {
+                        menuItemTab2.IsSelected = true;
+                    }
+                }
+            }
+            
+            // add detail pages
+            interactivePage.DetailPages.CollectionChanged -= DetailPages_CollectionChanged;
+            DetailPages.RemoveRange(interactivePage.DetailPages);
+        }
+        
+        // select first tab of contextual tab if exist
+        if (_contextualMenuItems.ContainsKey(page))
+        {
+            if (_contextualMenuItems[page].Count > 0)
+            {
+                _contextualMenuItems[page][0].IsSelected = true;
+            }
+        }
+    }
+    
+    private void OnSelectedDocumentPageChangedInternal(IPage? oldPage, IPage? page)
+    {
+        if (oldPage != null)
+            HideDocumentPageInternal(oldPage);
+        if (page != null)
+            ShowDocumentPageInternal(page);
+
+        OnSelectedDocumentPageChanged(oldPage, page);
+    }
+    
+    /// <summary>
+    /// Is invoked when the selected page is changed.
+    /// </summary>
+    /// <param name="oldPage">
+    /// The page which was selected before.
+    /// </param>
+    /// <param name="page">
+    /// The page which is selected now.
+    /// </param>
+    protected virtual void OnSelectedDocumentPageChanged(IPage? oldPage, IPage? page)
+    {
+    }
+
+    /// <summary>
+    /// Is invoked when a new page is added to the Pages property.
+    /// </summary>
+    /// <param name="page">
+    /// The new page object.
+    /// </param>
+    protected virtual void OnAddDocumentPage(IPage page)
+    {
     }
 
     /// <summary>
@@ -248,17 +309,8 @@ public partial class DocumentPageCollectionPage : InteractivePage
     /// <param name="page"></param>
     protected virtual void OnCloseDocumentPage(IPage page)
     {
-        if (page is InteractivePage interactivePage)
-        {
-            interactivePage.DetailPages.CollectionChanged -= DetailPages_CollectionChanged;
-            DetailPages.RemoveRange(interactivePage.DetailPages);
-
-            if (_contextualMenuItems.ContainsKey(page))
-            {
-                Menu[UIMenu.BaseMenuName].MenuItems.RemoveRange(_contextualMenuItems[page]);
-                _contextualMenuItems.Remove(page);
-            }
-        }
+        if (CurrentDocumentPage == page)
+            HideDocumentPageInternal(page);
 
         // TODO: The WPF Avalon Dock is not stable here; as workaround we will add this code to make sure that when the last page is removed the 'SelectedDocumentPage' is set to null {to release as well the reference so that the GC can clean up the memory for the last document)
         if (DocumentPages.Count == 0)
@@ -272,6 +324,7 @@ public partial class DocumentPageCollectionPage : InteractivePage
 
     #region Routed events to SelectedDocumentPage
 
+    // ReSharper disable UnusedAutoPropertyAccessor.Global
     public IAction CurrentDocumentSaveDataAction { get; }
     public IAction CurrentDocumentRefreshAction { get; }
     public IAction CurrentDocumentCreateNewEntryAction { get; }
@@ -279,6 +332,7 @@ public partial class DocumentPageCollectionPage : InteractivePage
     public IAction CurrentDocumentEditEntryAction { get; }
     public IAction CurrentDocumentToggleFilterVisibleAction { get; }
     public IAction CurrentDocumentExportAsExcelSheetAction { get; }
+    // ReSharper restore UnusedAutoPropertyAccessor.Global
     
     private bool CanCurrentDocumentSaveData()
     {
