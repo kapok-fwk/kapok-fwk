@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.9.1 (2023-09-10)
+
+### Kapok.Core
+
+- :bug: *fixing* menu issues with DocumentPageCollectionPage
+
 ## 0.1.9 (2023-09-03)
 
 ### Kapok.Acl
