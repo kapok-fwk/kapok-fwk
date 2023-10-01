@@ -2,7 +2,7 @@
 
 ## 0.1.9.1 (2023-09-10)
 
-### Kapok.Core
+### Kapok.View
 
 - :bug: *fixing* menu issues with DocumentPageCollectionPage
 
