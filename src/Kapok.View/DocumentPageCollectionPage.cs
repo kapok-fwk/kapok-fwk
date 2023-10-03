@@ -187,7 +187,7 @@ public partial class DocumentPageCollectionPage : InteractivePage
                 {
                     var newTabMenuItem =
                         new UIMenuItemTab(
-                                $"{page.GetType().Name}_{menuItem.Name}") // TODO: name might not be unique!
+                                $"{page.GetType().Name}_{menuItem.Name}") // NOTE: name might not be unique!
                             {
                                 Label = menuItem.Label,
                                 Description = menuItem.Description,
