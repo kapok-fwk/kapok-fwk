@@ -6,10 +6,10 @@ using System.Diagnostics;
 namespace Kapok.View;
 
 /// <summary>
-/// A page which shows a collection of document pages (similar to Visual Studio).
+/// A page which shows a collection of document pages (similar to Visual Studio and old midi window forms).
 /// </summary>
 // ReSharper disable once ClassNeverInstantiated.Global
-public partial class DocumentPageCollectionPage : InteractivePage
+public class DocumentPageCollectionPage : InteractivePage
 {
     private IPage? _currentDocumentPage;
     private readonly Dictionary<IPage, List<UIMenuItemTab>> _contextualMenuItems = new();
@@ -122,17 +122,83 @@ public partial class DocumentPageCollectionPage : InteractivePage
 
     #endregion
 
-    // ReSharper disable once ReturnTypeCanBeNotNullable
-    private IPage? FindDocumentPageBySource(object source)
+    /// <summary>
+    /// Shows the page on this page.
+    /// </summary>
+    /// <param name="page">
+    /// The page to be opened in this <see cref="DocumentPageCollectionPage"/>.
+    /// </param>
+    /// <param name="source">
+    /// An optional reference to be passed to identify the page. This could be e.g. the menu item which opened this page.
+    /// </param>
+    public void ShowDocumentPage(IPage page, object? source = null)
+    {
+        DocumentPages.Add(page);
+
+        if (source != null)
+            _documentPageSource.Add(page, source);
+
+        CurrentDocumentPage = page;
+    }
+
+    /// <summary>
+    /// Returns the document page by the given source reference.
+    /// </summary>
+    /// <param name="source">
+    /// The source reference passed over in <see cref="ShowDocumentPage"/>.
+    /// </param>
+    /// <returns></returns>
+    public IPage? FindDocumentPageBySource(object source)
     {
         return _documentPageSource.FirstOrDefault(p => p.Value == source).Key;
     }
 
-    private void AddDocumentPageWithSource(IPage page, object? source)
+    /// <summary>
+    /// Tells all open page actions in the given menu to open itself in this <see cref="DocumentPageCollectionPage"/> by setting the <c>HostPage</c> property
+    /// to this page.
+    /// </summary>
+    public void PatchMenuToOpenHere(string menuName)
     {
-        DocumentPages.Add(page);
-        if (source != null)
-            _documentPageSource.Add(page, source);
+        PatchMenuToOpenHere(Menu[menuName]);
+    }
+
+    /// <summary>
+    /// Tells all open page actions in the given menu to open itself in this <see cref="DocumentPageCollectionPage"/> by setting the <c>HostPage</c> property
+    /// to this page.
+    /// </summary>
+    public void PatchMenuToOpenHere(UIMenu menu)
+    {
+        foreach (var menuMenuItem in menu.MenuItems)
+        {
+            PatchMenuToOpenHere(menuMenuItem);
+        }
+    }
+
+    /// <summary>
+    /// Tells all open page actions in the given menu to open itself in this <see cref="DocumentPageCollectionPage"/> by setting the <c>HostPage</c> property
+    /// to this page.
+    /// </summary>
+    public void PatchMenuToOpenHere(UIMenuItem menuItem)
+    {
+        if (menuItem is UIMenuItemAction menuItemAction)
+        {
+            if (menuItemAction.Action is IOpenPageAction openPageAction)
+                openPageAction.HostPage = this;
+        }
+        else
+        {
+            var menuItemType = menuItem.GetType();
+            if (menuItemType.IsGenericType && menuItemType.GetGenericTypeDefinition() == typeof(UIMenuItemAction<>))  // is generic
+            {
+                var hostPageProperty = menuItemType.GetProperty(nameof(IOpenPageAction.HostPage));
+                hostPageProperty?.SetValue(menuItem, this);
+            }
+        }
+
+        foreach (var menuItemSubMenuItem in menuItem.SubMenuItems)
+        {
+            PatchMenuToOpenHere(menuItemSubMenuItem);
+        }
     }
 
     // ReSharper disable CollectionNeverQueried.Global

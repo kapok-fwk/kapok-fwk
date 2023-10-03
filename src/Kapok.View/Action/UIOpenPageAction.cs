@@ -14,6 +14,7 @@ public class UIOpenPageAction : UIAction, IOpenPageAction
     private readonly Type? _pageType;
     private readonly IViewDomain? _viewDomain;
     private readonly IPage? _page;
+    private DocumentPageCollectionPage? _hostPage;
     protected readonly Dictionary<Type, object>? PageConstructorParamValues;
 
     public UIOpenPageAction(string name, IPage page, Func<bool>? canExecute = null)
@@ -25,7 +26,7 @@ public class UIOpenPageAction : UIAction, IOpenPageAction
         // main constructor code
         _page = page ?? throw new ArgumentNullException(nameof(page));
     }
-        
+
     public UIOpenPageAction(string name, Type pageType, IViewDomain viewDomain, Func<bool>? canExecute = null)
         : base(name, DummyExecute, canExecute)
     {
@@ -55,8 +56,25 @@ public class UIOpenPageAction : UIAction, IOpenPageAction
 #pragma warning restore CS8602
     }
 
+    public DocumentPageCollectionPage? HostPage
+    {
+        get => _hostPage;
+        set => SetProperty(ref _hostPage, value);
+    }
+
     private void OpenPage()
     {
+        if (HostPage != null)
+        {
+            // Check if the page is already opened. If yes: Jump to it
+            var existingDocumentPage = HostPage.FindDocumentPageBySource(this);
+            if (existingDocumentPage != null)
+            {
+                HostPage.CurrentDocumentPage = existingDocumentPage;
+                return;
+            }
+        }
+
         IPage page;
 
         try
@@ -77,6 +95,13 @@ public class UIOpenPageAction : UIAction, IOpenPageAction
             return;
         }
 
-        page.Show();
+        if (HostPage != null)
+        {
+            HostPage.ShowDocumentPage(page, this);
+        }
+        else
+        {
+            page.Show();
+        }
     }
 }

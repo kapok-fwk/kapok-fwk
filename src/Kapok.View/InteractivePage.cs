@@ -35,7 +35,7 @@ public abstract class InteractivePage : Page, IInteractivePage
             DefaultReferencingDataSet = referencingDataSet
         });
     }
-    
+
     protected void AddMenu(UIMenu menu)
     {
         if (menu == null)

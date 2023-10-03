@@ -68,4 +68,22 @@ public class DocumentPageCollectionPageTest
         Assert.Single(hostPage.Menu[UIMenu.BaseMenuName].MenuItems);
         Assert.Empty(hostPage.Menu[UIMenu.BaseMenuName].MenuItems[0].SubMenuItems);
     }
+
+    [Fact]
+    void MenuPatching()
+    {
+        var hostPage = new MockupDocumentPageCollectionPage(ViewDomain);
+
+        var openPageMenuItem =
+            new UIMenuItemAction(new UIOpenPageAction("OpenPageMenuItem1", typeof(Page), ViewDomain));
+        Assert.NotNull(openPageMenuItem.Action);
+
+        Assert.Null(((UIOpenPageAction)openPageMenuItem.Action).HostPage);
+
+        hostPage.Menu[UIMenu.BaseMenuName].MenuItems.Add(openPageMenuItem);
+
+        hostPage.PatchMenuToOpenHere(UIMenu.BaseMenuName);
+        Assert.NotNull(((UIOpenPageAction)openPageMenuItem.Action).HostPage);
+        Assert.Equal(hostPage, ((UIOpenPageAction)openPageMenuItem.Action).HostPage);
+    }
 }

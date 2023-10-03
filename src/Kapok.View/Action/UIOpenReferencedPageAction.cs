@@ -4,7 +4,7 @@ using Kapok.BusinessLayer;
 namespace Kapok.View;
 
 // ReSharper disable once InconsistentNaming
-public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction<TEntry>
+public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction<TEntry>, IOpenPageAction
     where TEntry : class, new()
 {
     private static void DummyExecute(TEntry selected)
@@ -15,6 +15,7 @@ public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction
     private readonly Type _pageType;
     private readonly IViewDomain? _viewDomain;
     private readonly IDataPage? _page;
+    private DocumentPageCollectionPage? _hostPage;
     protected readonly Dictionary<Type, object>? PageConstructorParamValues;
     private readonly IDataSetView<TEntry>? _baseDataSetView;
     private readonly Action<IFilterSet, TEntry, IReadOnlyDictionary<string, object?>>? _filter;
@@ -89,20 +90,42 @@ public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction
         return (IFilterSet)emptyConstructorInfo.Invoke(null);
     }
 
+    public IDataPage GetOrConstructPage()
+    {
+#pragma warning disable CS8602
+#pragma warning disable CS8604
+#pragma warning disable CS8620
+        return (IDataPage)_viewDomain.ConstructPage(_pageType, PageConstructorParamValues);
+#pragma warning restore CS8620
+#pragma warning restore CS8604
+#pragma warning restore CS8602
+    }
+
+    public DocumentPageCollectionPage? HostPage
+    {
+        get => _hostPage;
+        set => SetProperty(ref _hostPage, value);
+    }
+
     private void OpenPage(TEntry selectedEntry)
     {
+        if (HostPage != null)
+        {
+            // Check if the page is already opened. If yes: Jump to it
+            var existingDocumentPage = HostPage.FindDocumentPageBySource(this);
+            if (existingDocumentPage != null)
+            {
+                HostPage.CurrentDocumentPage = existingDocumentPage;
+                return;
+            }
+        }
+
         var page = _page;
         if (page == null)
         {
             try
             {
-#pragma warning disable CS8602
-#pragma warning disable CS8604
-#pragma warning disable CS8620
-                page = (IDataPage)_viewDomain.ConstructPage(_pageType, PageConstructorParamValues);
-#pragma warning restore CS8620
-#pragma warning restore CS8604
-#pragma warning restore CS8602
+                page = GetOrConstructPage();
             }
             catch (BusinessLayerErrorException)
             {
@@ -143,6 +166,22 @@ public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction
             }
         }
 
-        page.Show();
+        if (HostPage != null)
+        {
+            HostPage.ShowDocumentPage(page, this);
+        }
+        else
+        {
+            page.Show();
+        }
     }
+
+    #region IOpenPageAction
+
+    IPage IOpenPageAction.GetOrConstructPage()
+    {
+        return GetOrConstructPage();
+    }
+
+    #endregion
 }

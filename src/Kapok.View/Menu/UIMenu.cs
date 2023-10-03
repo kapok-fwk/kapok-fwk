@@ -180,10 +180,12 @@ public class UIMenu
             if (action == null) // skip action which is not defined
                 continue;
 
-            if (action is IOpenPageAction openPageAction &&
-                _basePage is DocumentPageCollectionPage pageCollectionPage)
+            if (_basePage is DocumentPageCollectionPage pageCollectionPage)
             {
-                action = new DocumentPageCollectionPage.OpenPageActionWrapper(openPageAction, pageCollectionPage);
+                if (action is IOpenPageAction openPageAction)
+                {
+                    openPageAction.HostPage = pageCollectionPage;
+                }
             }
 
             if (prop.PropertyType == typeof(IToggleAction))
