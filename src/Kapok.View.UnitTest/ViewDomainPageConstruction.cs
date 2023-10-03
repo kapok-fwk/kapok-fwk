@@ -53,7 +53,7 @@ public class ViewDomainPageConstruction
     }
 
     [Fact]
-    public void BuildThroughOpenCardPageAcgion()
+    public void BuildThroughOpenCardPageAction()
     {
         using var scope = DataDomain.CreateScope();
 
