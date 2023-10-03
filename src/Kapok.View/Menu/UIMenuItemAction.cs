@@ -70,7 +70,7 @@ public class UIMenuItemAction<T> : UIMenuItem, IAction<T>
         }
     }
 
-    protected IAction<T> Action { get; }
+    public IAction<T> Action { get; }
 
     protected virtual void PassActionOnPropertyChangedEvent(object? sender, PropertyChangedEventArgs e)
     {

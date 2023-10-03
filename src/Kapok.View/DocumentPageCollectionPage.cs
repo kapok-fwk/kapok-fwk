@@ -194,10 +194,37 @@ public class DocumentPageCollectionPage : InteractivePage
         else
         {
             var menuItemType = menuItem.GetType();
-            if (menuItemType.IsGenericType && menuItemType.GetGenericTypeDefinition() == typeof(UIMenuItemAction<>))  // is generic
+
+            if (menuItemType.IsGenericType)
             {
-                var hostPageProperty = menuItemType.GetProperty(nameof(IOpenPageAction.HostPage));
-                hostPageProperty?.SetValue(menuItem, this);
+                if (menuItemType.GetGenericTypeDefinition() == typeof(UIMenuItemAction<>))
+                {
+                    // get Action
+                    var actionProperty =
+                        typeof(UIMenuItemAction<>)
+                            .MakeGenericType(menuItemType.GetGenericArguments()[0])
+                            .GetProperty(nameof(UIMenuItemAction<object>.Action));
+                    var action = actionProperty?.GetMethod?.Invoke(menuItem, Array.Empty<object>());
+
+                    if (action is IOpenPageAction openPageAction)
+                    {
+                        openPageAction.HostPage = this;
+                    }
+                }
+                else if (menuItemType.GetGenericTypeDefinition() == typeof(UIMenuItemDataSetSelectionAction<>))
+                {
+                    // get Action
+                    var actionProperty =
+                        typeof(UIMenuItemDataSetSelectionAction<>)
+                            .MakeGenericType(menuItemType.GetGenericArguments()[0])
+                            .GetProperty(nameof(UIMenuItemDataSetSelectionAction<object>.Action));
+                    var action = actionProperty?.GetMethod?.Invoke(menuItem, Array.Empty<object>());
+
+                    if (action is IOpenPageAction openPageAction)
+                    {
+                        openPageAction.HostPage = this;
+                    }
+                }
             }
         }
 

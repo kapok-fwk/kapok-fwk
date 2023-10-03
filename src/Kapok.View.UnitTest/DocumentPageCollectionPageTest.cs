@@ -77,14 +77,35 @@ public class DocumentPageCollectionPageTest
         var openPageMenuItem =
             new UIMenuItemAction(new UIOpenPageAction("OpenPageMenuItem1", typeof(Page), ViewDomain));
         Assert.NotNull(openPageMenuItem.Action);
-
         Assert.Null(((UIOpenPageAction)openPageMenuItem.Action).HostPage);
-
         hostPage.Menu[UIMenu.BaseMenuName].MenuItems.Add(openPageMenuItem);
 
+        var openReferencedPageMenuItem =
+            new UIMenuItemDataSetSelectionAction<SampleEntity>(new UIOpenReferencedPageAction<SampleEntity>("OpenReferencedPageMenuItem1",
+                typeof(DataPage<SampleEntity>), ViewDomain));
+
+        Assert.NotNull(openReferencedPageMenuItem.Action);
+        Assert.Null(((UIOpenReferencedPageAction<SampleEntity>)openReferencedPageMenuItem.Action).HostPage);
+        hostPage.Menu[UIMenu.BaseMenuName].MenuItems.Add(openReferencedPageMenuItem);
+
+        var openReferencedCardPageMenuItem =
+            new UIMenuItemDataSetSelectionAction<SampleEntity>(new UIOpenReferencedCardPageAction<SampleEntity>("OpenReferencedCardPageMenuItem1",
+                typeof(CardPage<SampleEntity>), ViewDomain));
+
+        Assert.NotNull(openReferencedCardPageMenuItem.Action);
+        Assert.Null(((UIOpenReferencedCardPageAction<SampleEntity>)openReferencedCardPageMenuItem.Action).HostPage);
+        hostPage.Menu[UIMenu.BaseMenuName].MenuItems.Add(openReferencedCardPageMenuItem);
+
         hostPage.PatchMenuToOpenHere(UIMenu.BaseMenuName);
+
         Assert.NotNull(((UIOpenPageAction)openPageMenuItem.Action).HostPage);
         Assert.Equal(hostPage, ((UIOpenPageAction)openPageMenuItem.Action).HostPage);
+
+        Assert.NotNull(((UIOpenReferencedPageAction<SampleEntity>)openReferencedPageMenuItem.Action).HostPage);
+        Assert.Equal(hostPage, ((UIOpenReferencedPageAction<SampleEntity>)openReferencedPageMenuItem.Action).HostPage);
+
+        Assert.NotNull(((UIOpenReferencedCardPageAction<SampleEntity>)openReferencedCardPageMenuItem.Action).HostPage);
+        Assert.Equal(hostPage, ((UIOpenReferencedCardPageAction<SampleEntity>)openReferencedCardPageMenuItem.Action).HostPage);
     }
 
     [Fact]
