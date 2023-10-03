@@ -2,12 +2,12 @@
 
 ## 0.1.10.2 (2023-10-03)
 
-## Kapok.View
+### Kapok.View
 - :bug: *fix* set HostPage for referenced pages
 
 ## 0.1.10.1 (2023-10-03)
 
-## Kapok.View
+### Kapok.View
 
 - :bug: *fix* patch menus before adding pages in DocumentPageCollectionPage
 
