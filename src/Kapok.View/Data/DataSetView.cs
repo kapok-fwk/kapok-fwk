@@ -796,6 +796,14 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
             if (deferredCommitDao.CanSave())
                 return true;
         }
+        else if (DataDomainScope.GetType().Name == "EFCoreDataDomainScope")
+        {
+            // Hacky code:
+            // If the DAO does not implement IDeferredCommitDao, it will write directly to the
+            // EF Core change tracker. For such cases, we always return 'true' to allow the user
+            // to execute `dbContext.SaveChanges()`.
+            return true;
+        }
 
         return DataDomainScope.CanSave();
     }
