@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.10 (2023-10-03)
+
+### Kapok.Acl
+- :tada: add ClaimType Partition
+
+### Kapok.View
+
+- :rocket: improve menu item creation in DocumentPageCollectionPage
+- :rocket: allow saving always when DAO is not deferred and is EF Core
+- :rocket: allow construction of UIMenuItem.SubMenuItems
+- :rocket: *refactoring* DocumentPageCollectionPage integration
+
 ## 0.1.9.1 (2023-09-10)
 
 ### Kapok.View
