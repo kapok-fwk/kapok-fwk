@@ -133,6 +133,12 @@ public class DocumentPageCollectionPage : InteractivePage
     /// </param>
     public void ShowDocumentPage(IPage page, object? source = null)
     {
+        if (page is InteractivePage interactivePage)
+        {
+            if (interactivePage.Menu.TryGetValue(UIMenu.BaseMenuName, out var mainMenu))
+                PatchMenuToOpenHere(mainMenu);
+        }
+
         DocumentPages.Add(page);
 
         if (source != null)
