@@ -97,6 +97,15 @@ namespace Kapok.Acl.Resources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Data partition ähnelt.
+        /// </summary>
+        public static string Partition {
+            get {
+                return ResourceManager.GetString("Partition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die System ähnelt.
         /// </summary>
         public static string System {

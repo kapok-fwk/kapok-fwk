@@ -129,6 +129,9 @@
   <data name="Page" xml:space="preserve">
     <value>Seite</value>
   </data>
+  <data name="Partition" xml:space="preserve">
+    <value>Datenpartition</value>
+  </data>
   <data name="System" xml:space="preserve">
     <value>System</value>
   </data>

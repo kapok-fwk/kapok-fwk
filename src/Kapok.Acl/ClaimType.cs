@@ -15,12 +15,15 @@ public enum ClaimType
     [Display(Name = nameof(DataWrite), ResourceType = typeof(Res))]
     DataWrite = 3,
 
-    /* TODO rethink architecture if that is necessary
-    [Display(Name = nameof(TableCreate), ResourceType = typeof(Res))]
-    TableCreate = 4,
+    /// <summary>
+    /// Grants access to a specific data partition.
+    ///
+    /// The claim value is defined as `PartitionName:PartitionKey`.
+    /// </summary>
+    [Display(Name = nameof(Partition), ResourceType = typeof(Res))]
+    Partition = 4,
 
-    [Display(Name = nameof(TableDelete), ResourceType = typeof(Res))]
-    TableDelete = 5,*/
+    // Enum 5 is not used yet
 
     [Display(Name = nameof(Function), ResourceType = typeof(Res))]
     Function = 6,
