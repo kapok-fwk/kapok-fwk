@@ -129,5 +129,5 @@ public class UIMenuItem : BindableObjectBase
         set => SetProperty(ref _ribbonKeyTip, value);
     }
 
-    public ObservableCollection<UIMenuItem> SubMenuItems { get; } = new();
+    public ObservableCollection<UIMenuItem> SubMenuItems { get; set; } = new();
 }
