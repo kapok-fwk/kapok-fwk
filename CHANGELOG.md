@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.10.1 (2023-10-03)
+
+## Kapok.View
+
+- :bug: *fix* patch menus before adding pages in DocumentPageCollectionPage
+
 ## 0.1.10 (2023-10-03)
 
 ### Kapok.Acl
