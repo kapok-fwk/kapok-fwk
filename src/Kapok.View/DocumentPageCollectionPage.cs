@@ -183,21 +183,21 @@ public partial class DocumentPageCollectionPage : InteractivePage
             {
                 var newMenuTabs = new List<UIMenuItemTab>();
 
-                foreach (var tabMenuItem in interactivePage.Menu[UIMenu.BaseMenuName].MenuItems)
+                foreach (var menuItem in interactivePage.Menu[UIMenu.BaseMenuName].MenuItems)
                 {
                     var newTabMenuItem =
                         new UIMenuItemTab(
-                                $"{page.GetType().Name}_{tabMenuItem.Name}") // TODO: name might not be unique!
+                                $"{page.GetType().Name}_{menuItem.Name}") // TODO: name might not be unique!
                             {
-                                Label = tabMenuItem.Label,
-                                Description = tabMenuItem.Description,
-                                Image = tabMenuItem.Image,
-                                BasePage = page
-                                // TODO: IsVisible is not transferred
-                                // TODO: Order is not taken over
-                                // TODO: RibbonKeyTip is not rewritten here
+                                Label = menuItem.Label,
+                                Description = menuItem.Description,
+                                Image = menuItem.Image,
+                                BasePage = menuItem is UIMenuItemTab menuItemTab ? menuItemTab.BasePage : page,
+                                IsVisible = menuItem.IsVisible,  
+                                Order = menuItem.Order,
+                                RibbonKeyTip = menuItem.RibbonKeyTip,
                             };
-                    newTabMenuItem.SubMenuItems.AddRange(tabMenuItem.SubMenuItems);
+                    newTabMenuItem.SubMenuItems.AddRange(menuItem.SubMenuItems);
 
                     newMenuTabs.Add(newTabMenuItem);
                 }
