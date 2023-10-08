@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.10.3 (2023-10-08)
+
+### Kapok.View
+
+- :bug: *fix* bug using PropertyView.Name instead of PropertyInfo.Name
+- :bug: *fix* memomy leak by unregistering the PageContainer from the view domain in InteractivePage
+
 ## 0.1.10.2 (2023-10-03)
 
 ### Kapok.View
