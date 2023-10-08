@@ -136,9 +136,9 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
         
         if (column.PropertyInfo.GetCustomAttribute<AutoCalculateAttribute>() != null)
         {
-            if (!AutoCalculateProperties.Contains(column.PropertyInfo.Name))
+            if (!AutoCalculateProperties.Contains(column.Name))
             {
-                AutoCalculateProperties.Add(column.PropertyInfo.Name);
+                AutoCalculateProperties.Add(column.Name);
             }
         }
     }
@@ -150,12 +150,12 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
 
         if (column.PropertyInfo.GetCustomAttribute<AutoCalculateAttribute>() != null)
         {
-            if (AutoCalculateProperties.Contains(column.PropertyInfo.Name) &&
+            if (AutoCalculateProperties.Contains(column.Name) &&
 
                 // make sure that we don't remove the autocalc. when another column view uses the same PropertyInfo
                 Columns.All(c => c.PropertyInfo != column.PropertyInfo))
             {
-                AutoCalculateProperties.Remove(column.PropertyInfo.Name);
+                AutoCalculateProperties.Remove(column.Name);
             }
         }
     }

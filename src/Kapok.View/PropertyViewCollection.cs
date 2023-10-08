@@ -72,31 +72,31 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>
     {
         // NOTE: move this maybe into the PropertyView constructor?
         item.LookupDefinition ??= _entityModel.Properties
-            .FirstOrDefault(p => p.PropertyName == item.PropertyInfo.Name)?.LookupDefinition;
+            .FirstOrDefault(p => p.PropertyName == item.Name)?.LookupDefinition;
 
         if (item.LookupDefinition != null)
         {
             // NOTE: here we make sure that when a property is used twice we just load it once... TODO maybe something to improve/change? e.g. with a dedicated 'Name' property in the PropertyView class
-            if (!_lookupViews.ContainsKey(item.PropertyInfo.Name))
+            if (!_lookupViews.ContainsKey(item.Name))
             {
                 var lookupView = _viewDomain.CreatePropertyLookupView(item.LookupDefinition, _dataDomain, _currentSelector);
                 if (lookupView != null)
-                    _lookupViews.Add(item.PropertyInfo.Name, lookupView);
+                    _lookupViews.Add(item.Name, lookupView);
             }
         }
 
         // NOTE: move this maybe into the PropertyView constructor?
         item.DrillDownDefinition ??= _entityModel.Properties
-            .FirstOrDefault(p => p.PropertyName == item.PropertyInfo.Name)?.DrillDownDefinition;
+            .FirstOrDefault(p => p.PropertyName == item.Name)?.DrillDownDefinition;
 
         if (item.DrillDownDefinition != null &&
                     
             // TODO: this is (maybe only) temporary necessary because when a card is open a second time with the TableData instance of the list, here this would crash because the propertyView object is already initialized
-            !_drillDown.ContainsKey(item.PropertyInfo.Name)
+            !_drillDown.ContainsKey(item.Name)
 
            )
         {
-            var drillDownActionName = $"DrillDownOn{item.PropertyInfo.Name}";
+            var drillDownActionName = $"DrillDownOn{item.Name}";
             IDataSetSelectionAction<TEntity>? drillDownAction;
 
             /*if (newItem.DrillDownDefinition.DrillDownAction != null)
@@ -115,13 +115,13 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>
 
                     if (pageType == null)
                         throw new NotSupportedException(
-                            $"The entity type {item.DrillDownDefinition.PageType.FullName} has no default page type. Error during drill down configuration of the property {item.PropertyInfo.Name}.");
+                            $"The entity type {item.DrillDownDefinition.PageType.FullName} has no default page type. Error during drill down configuration of the property {item.Name}.");
                 }
 
                 if (!typeof(IDataPage).IsAssignableFrom(pageType))
                 {
                     throw new NotSupportedException(
-                        $"The page type {pageType.FullName} for the drill down of property {item.PropertyInfo.Name} must inherit the {typeof(IDataPage)} interface.");
+                        $"The page type {pageType.FullName} for the drill down of property {item.Name} must inherit the {typeof(IDataPage)} interface.");
                 }
 
                 drillDownAction = new UIOpenReferencedPageAction<TEntity>(
@@ -137,15 +137,15 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>
             }
 
             if (drillDownAction != null)
-                _drillDown.Add(item.PropertyInfo.Name, drillDownAction);
+                _drillDown.Add(item.Name, drillDownAction);
         }
     }
 
     protected virtual void OnRemove(PropertyView item)
     {
         // NOTE: when we would use a property twice, this would cause the property lookup to fail when the first one is deleted!
-        if (_lookupViews.ContainsKey(item.PropertyInfo.Name))
-            _lookupViews.Remove(item.PropertyInfo.Name);
+        if (_lookupViews.ContainsKey(item.Name))
+            _lookupViews.Remove(item.Name);
     }
         
     #region IList<PropertyView>

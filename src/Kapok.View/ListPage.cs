@@ -380,6 +380,9 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
 
         foreach (var columnPropertyView in dataSet.Columns.Where(c => !((ColumnPropertyView)c).IsHidden).Cast<ColumnPropertyView>())
         {
+            columnPropertyView.DeclaringType ??= typeof(TEntry);
+            Debug.Assert(columnPropertyView.PropertyInfo != null);
+
             var exportType = columnPropertyView.PropertyInfo.PropertyType;
             if (exportType.IsSubclassOfRawGeneric(typeof(Nullable<>)))
             {
@@ -391,7 +394,7 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
                 exportType = typeof(string);
             }
 
-            var originColumnName = columnPropertyView.PropertyInfo.Name;
+            var originColumnName = columnPropertyView.Name;
             string columnName = originColumnName;
 
             // Check if column is already used - if yes, add an postfix number
