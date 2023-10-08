@@ -2,9 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
-#if DEBUG
 using System.Diagnostics;
-#endif
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using Kapok.Data;
