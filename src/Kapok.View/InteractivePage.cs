@@ -22,6 +22,12 @@ public abstract class InteractivePage : Page, IInteractivePage
         ViewDomain.RegisterPageContainer(this, DetailPages);
     }
 
+    public override void Close()
+    {
+        ViewDomain.UnregisterPageContainer(this);
+        base.Close();
+    }
+
     protected void AddMenu(string menuName, IDataSetView? referencingDataSet = null)
     {
         if (string.IsNullOrEmpty(menuName))

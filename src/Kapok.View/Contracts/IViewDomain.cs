@@ -39,7 +39,20 @@ public interface IViewDomain
     IHierarchyDataSetView<TEntry> CreateHierarchyDataSetView<TEntry>(IDataDomainScope dataDomainScope, IDao<TEntry>? dao = null)
         where TEntry : class, IHierarchyEntry<TEntry>, new();
 
+    /// <summary>
+    /// Informs the ViewDomain that a page contains sub pages.
+    /// </summary>
+    /// <param name="owningPage"></param>
+    /// <param name="pageContainer"></param>
     void RegisterPageContainer(IPage owningPage, IEnumerable<IPage> pageContainer);
+
+    /// <summary>
+    /// Informs the ViewDomain that a page dos not (anymore) contains sub pages.
+    ///
+    /// This command should use optimistic behavior: If the page is not known or is already unregistered, it should
+    /// just end without throwing any exception.
+    /// </summary>
+    /// <param name="owningPage"></param>
     void UnregisterPageContainer(IPage owningPage);
 
     // messaging
