@@ -1,6 +1,7 @@
 ﻿using Kapok.Core.UnitTest.DataModel;
 using Kapok.Data;
 using Kapok.Data.InMemory;
+using Kapok.Module;
 using Xunit;
 
 namespace Kapok.Core.UnitTest;
@@ -12,8 +13,7 @@ public class DataPartitionTest
     {
         const int myTenantId = 12345;
         
-        DataDomain.RegisterEntity<ToDoList>();
-        DataDomain.RegisterEntity<ToDoItem>();
+        ModuleEngine.InitiateModule(typeof(ToDoModule));
 
         var dataDomain = new InMemoryDataDomain();
         dataDomain.RegisterDataPartition("Tenant", typeof(ITenantEntity), nameof(ITenantEntity.TenantId));
