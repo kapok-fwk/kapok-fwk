@@ -24,7 +24,8 @@ public class ToDoList : EditableEntityBase, ITenantEntity
         get => _tenantId;
         set => SetProperty(ref _tenantId, value);
     }
-    
+
+    [AutoGenerateValue(AutoGenerateValueType.Identity)]
     public Guid Id
     {
         get => _id;

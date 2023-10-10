@@ -20,9 +20,15 @@ public enum AutoGenerateValueType
     ///
     /// Can only be applied to properties of the type DateTime.
     /// </summary>
-    LastModifiedDateTime
+    LastModifiedDateTime,
+
+    /// <summary>
+    /// Sets the property with a default value on initialization.
+    /// </summary>
+    Identity
 }
 
+[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false)]
 public class AutoGenerateValueAttribute : Attribute
 {
     public AutoGenerateValueAttribute(AutoGenerateValueType type)

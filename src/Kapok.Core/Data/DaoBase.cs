@@ -87,6 +87,21 @@ public abstract class DaoBase<T> : IDao<T>
             {
                 property.SetValue(entry, defaultValueAttribute.Value);
             }
+
+            var autoGenerateValueAttribute = property.GetCustomAttribute<AutoGenerateValueAttribute>();
+            if (autoGenerateValueAttribute is { Type: AutoGenerateValueType.Identity })
+            {
+                if (property.PropertyType == typeof(Guid))
+                {
+                    // Generates a new Guid
+                    property.SetValue(entry, Guid.NewGuid());
+                }
+                else
+                {
+                    throw new NotSupportedException(
+                        $"The {nameof(AutoGenerateValueAttribute)} is not supported with Identity for properties of type {property.PropertyType.FullName}");
+                }
+            }
         }
     }
 
