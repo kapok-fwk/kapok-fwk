@@ -103,8 +103,7 @@ public class LookupDefinition<TBaseEntry, TLookupEntry, TFieldType> : ILookupDef
         }
         set
         {
-            if (value == null)
-                throw new ArgumentNullException(nameof(value));
+            ArgumentNullException.ThrowIfNull(value);
 
             EntriesFunc = (entry, dataDomainScope) => value.Invoke(entry, dataDomainScope).Cast<TLookupEntry>();
         }

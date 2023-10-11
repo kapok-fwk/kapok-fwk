@@ -11,7 +11,7 @@ public static class EnumExtension
 {
     static void TestIsEnumType(Type enumType)
     {
-        if (enumType == null) throw new ArgumentNullException(nameof(enumType));
+        ArgumentNullException.ThrowIfNull(enumType);
         if (!enumType.IsEnum)
             throw new ArgumentException("TEnum must be an enum.");
     }

@@ -14,7 +14,8 @@ public class EFCoreRepository<T> : IRepository<T>
 
     public EFCoreRepository(EFCoreDataDomainScope dataDomainScope)
     {
-        _dataDomainScope = dataDomainScope ?? throw new ArgumentNullException(nameof(dataDomainScope));
+        ArgumentNullException.ThrowIfNull(dataDomainScope);
+        _dataDomainScope = dataDomainScope;
 
         var entityType = DbContext.Model.FindEntityType(typeof(T));
         _efCoreEntityType = entityType ?? throw new Exception($"Could not find model of entity type {typeof(T).FullName} in the DB Context (dataDomainScope.DbContext.Model.FindEntityType)");

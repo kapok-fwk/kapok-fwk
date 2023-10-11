@@ -198,8 +198,7 @@ public class ChangeTracker : IEnumerable<ChangeTracking>
 
     public ChangeTracking Add(object entity)
     {
-        if (entity == null)
-            throw new ArgumentNullException(nameof(entity));
+        ArgumentNullException.ThrowIfNull(entity, nameof(entity));
 
         var entityType = entity.GetType();
 
@@ -217,8 +216,7 @@ public class ChangeTracker : IEnumerable<ChangeTracking>
 
     public ChangeTracking? Get(object entity)
     {
-        if (entity == null)
-            throw new ArgumentNullException(nameof(entity));
+        ArgumentNullException.ThrowIfNull(entity, nameof(entity));
 
         return _changeTracker.FirstOrDefault(ct => ct.Entity == entity && ct.State != ChangeTrackingState.Detached);
     }

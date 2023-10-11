@@ -44,8 +44,7 @@ public abstract class InteractivePage : Page, IInteractivePage
 
     protected void AddMenu(UIMenu menu)
     {
-        if (menu == null)
-            throw new ArgumentNullException(nameof(menu));
+        ArgumentNullException.ThrowIfNull(menu);
 
         if (string.IsNullOrEmpty(menu.Name))
             throw new ArgumentException($"{nameof(menu)}.Name can not be empty or null.", nameof(menu));

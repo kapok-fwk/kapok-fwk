@@ -16,8 +16,7 @@ public class MemoryReportResourceProvider : IReportResourceProvider
 
     public void Add(ReportResource resource)
     {
-        if (resource == null)
-            throw new ArgumentNullException(nameof(resource));
+        ArgumentNullException.ThrowIfNull(resource);
 
         if (string.IsNullOrEmpty(resource.Name))
             throw new ArgumentException("The resource must have a name (property Name)");

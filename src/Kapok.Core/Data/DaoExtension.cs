@@ -42,12 +42,10 @@ public static class DaoExtension
     private static T? InternalFindByKey<T>(IReadOnlyDao<T> @this, bool forUpdate, params object?[] keyValues)
         where T : class, new()
     {
-        if (@this == null)
-            throw new ArgumentNullException(nameof(@this));
+        ArgumentNullException.ThrowIfNull(@this, nameof(@this));
         if (@this.Model.PrimaryKeyProperties == null || @this.Model.PrimaryKeyProperties.Length == 0)
             throw new EntityNoPrimaryKeyException(typeof(T), string.Format("You can not use method {0} with this entity. It has no primary key", nameof(FindByKey)));
-        if (keyValues == null)
-            throw new ArgumentNullException(nameof(keyValues));
+        ArgumentNullException.ThrowIfNull(keyValues, nameof(keyValues));
         if (keyValues.Length == 0)
             throw new ArgumentException("No primary key value was given", nameof(keyValues));
         if (@this.Model.PrimaryKeyProperties.Length != keyValues.Length)
@@ -132,12 +130,10 @@ public static class DaoExtension
     public static Task<T?> FindByKeyAsync<T>(this IReadOnlyDao<T> @this, params object?[] keyValues)
         where T : class, new()
     {
-        if (@this == null)
-            throw new ArgumentNullException(nameof(@this));
+        ArgumentNullException.ThrowIfNull(@this, nameof(@this));
         if (@this.Model.PrimaryKeyProperties == null || @this.Model.PrimaryKeyProperties.Length == 0)
             throw new EntityNoPrimaryKeyException(typeof(T), string.Format("You can not use method {0} with this entity.", nameof(FindByKey)));
-        if (keyValues == null)
-            throw new ArgumentNullException(nameof(keyValues));
+        ArgumentNullException.ThrowIfNull(keyValues, nameof(keyValues));
         if (keyValues.Length == 0)
             throw new ArgumentException("No primary key values where given", nameof(keyValues));
         if (@this.Model.PrimaryKeyProperties.Length != keyValues.Length)

@@ -27,7 +27,7 @@ public class JsonTest : DeferredDaoTestBase
             newCourse.Title = "Leaning about JSON and its benefits compared to other formats";
             newCourse.Metadata = (JsonObject?)JsonNode.Parse(@"{""Language"": ""en-US""}");
             Assert.NotNull(newCourse.Metadata);
-            Assert.Equal("en-US", newCourse.Metadata?["Language"].GetValue<string>());
+            Assert.Equal("en-US", newCourse.Metadata?["Language"]?.GetValue<string>());
             await courseDao.CreateAsync(newCourse);
             await scope.SaveAsync();
         }
@@ -40,7 +40,7 @@ public class JsonTest : DeferredDaoTestBase
             Assert.Equal(1, course.CourseId);
             Assert.Equal("Leaning about JSON and its benefits compared to other formats", course.Title);
             Assert.NotNull(course.Metadata);
-            Assert.Equal("en-US", course.Metadata?["Language"].GetValue<string>());
+            Assert.Equal("en-US", course.Metadata?["Language"]?.GetValue<string>());
         }
     }
 }

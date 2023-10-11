@@ -55,7 +55,7 @@ public abstract class DaoBase<T> : IDao<T>
 #pragma warning disable CS8602
                 dataPartition.PartitionProperty.SetMethod.Invoke(entry,
 #pragma warning restore CS8602
-                    new object?[]
+                    new[]
                     {
                         DataDomainScope.DataPartitions[dataPartitionKey].Value
                         // current value

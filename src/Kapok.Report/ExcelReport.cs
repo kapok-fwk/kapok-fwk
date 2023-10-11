@@ -39,8 +39,7 @@ public abstract class ExcelReport : Model.Report
     {
         if (inputString == null)
             return null;
-        if (getVariableValue == null)
-            throw new ArgumentNullException(nameof(getVariableValue));
+        ArgumentNullException.ThrowIfNull(getVariableValue);
 
         cultureInfo ??= CultureInfo.CurrentCulture;
 

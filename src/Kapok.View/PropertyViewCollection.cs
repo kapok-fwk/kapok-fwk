@@ -26,18 +26,24 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>
     public PropertyViewCollection(IViewDomain viewDomain, IDataDomain dataDomain,
         IEntityModel entityModel, Func<TEntity?>? currentSelector = null)
     {
-        _viewDomain = viewDomain ?? throw new ArgumentNullException(nameof(viewDomain));
-        _dataDomain = dataDomain ?? throw new ArgumentNullException(nameof(dataDomain));
-        _entityModel = entityModel ?? throw new ArgumentNullException(nameof(entityModel));
+        ArgumentNullException.ThrowIfNull(viewDomain);
+        ArgumentNullException.ThrowIfNull(dataDomain);
+        ArgumentNullException.ThrowIfNull(entityModel);
+        _viewDomain = viewDomain;
+        _dataDomain = dataDomain;
+        _entityModel = entityModel;
         _currentSelector = currentSelector;
     }
     
     public PropertyViewCollection(IViewDomain viewDomain, IDataDomain dataDomain,
         IEntityModel entityModel, IDataSetView<TEntity>? baseDataSet = null)
     {
-        _viewDomain = viewDomain ?? throw new ArgumentNullException(nameof(viewDomain));
-        _dataDomain = dataDomain ?? throw new ArgumentNullException(nameof(dataDomain));
-        _entityModel = entityModel ?? throw new ArgumentNullException(nameof(entityModel));
+        ArgumentNullException.ThrowIfNull(viewDomain);
+        ArgumentNullException.ThrowIfNull(dataDomain);
+        ArgumentNullException.ThrowIfNull(entityModel);
+        _viewDomain = viewDomain;
+        _dataDomain = dataDomain;
+        _entityModel = entityModel;
         _currentSelector = () => baseDataSet?.Current;
         _dataSet = baseDataSet;
     }
@@ -217,14 +223,14 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>
 
     int IList.Add(object? value)
     {
-        if (value == null) throw new ArgumentNullException(nameof(value));
+        ArgumentNullException.ThrowIfNull(value);
         this.Add((PropertyView)value);
         return this.IndexOf((PropertyView)value);
     }
         
     bool IList.Contains(object? value)
     {
-        if (value == null) throw new ArgumentNullException(nameof(value));
+        ArgumentNullException.ThrowIfNull(value);
         if (value is PropertyView propertyView)
             return this.Contains(propertyView);
             
@@ -233,7 +239,7 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>
 
     int IList.IndexOf(object? value)
     {
-        if (value == null) throw new ArgumentNullException(nameof(value));
+        ArgumentNullException.ThrowIfNull(value);
         if (value is PropertyView propertyView)
             return this.IndexOf(propertyView);
 
@@ -242,13 +248,13 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>
 
     void IList.Insert(int index, object? value)
     {
-        if (value == null) throw new ArgumentNullException(nameof(value));
+        ArgumentNullException.ThrowIfNull(value);
         this.Insert(index, (PropertyView)value);
     }
         
     void IList.Remove(object? value)
     {
-        if (value == null) throw new ArgumentNullException(nameof(value));
+        ArgumentNullException.ThrowIfNull(value);
         this.Remove((PropertyView) value);
     }
 
@@ -263,7 +269,7 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>
         set
 #pragma warning restore CS8769
         {
-            if (value == null) throw new ArgumentNullException(nameof(value));
+            ArgumentNullException.ThrowIfNull(value);
             this[index] = (PropertyView)value;
         }
     }

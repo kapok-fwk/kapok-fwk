@@ -18,9 +18,10 @@ public class UIAction : BindableObjectBase, IAction
 
     public UIAction(string name, Action execute, Func<bool>? canExecute = null)
     {
+        ArgumentNullException.ThrowIfNull(execute);
         Name = name;
         _isVisible = true;
-        ExecuteFunc = execute ?? throw new ArgumentNullException(nameof(execute));
+        ExecuteFunc = execute;
         _canExecuteFunc = canExecute;
     }
 
@@ -113,9 +114,10 @@ public class UIAction<T> : BindableObjectBase, IAction<T>
 
     public UIAction(string name, Action<T?> execute, Func<T?, bool>? canExecute = null)
     {
+        ArgumentNullException.ThrowIfNull(execute);
         Name = name;
         _isVisible = true;
-        ExecuteFunc = execute ?? throw new ArgumentNullException(nameof(execute));
+        ExecuteFunc = execute;
         CanExecuteFunc = canExecute;
     }
 

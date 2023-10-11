@@ -59,14 +59,14 @@ public class Caption : IXmlSerializable, ICollection<KeyValuePair<string, string
         if (_captionPerLanguage.Count == 0)
             return null;
 
-        if (_captionPerLanguage.ContainsKey(language))
-            return _captionPerLanguage[language];
+        if (_captionPerLanguage.TryGetValue(language, out var languageValue))
+            return languageValue;
 
         if (_captionPerLanguage.ContainsKey(CultureInfo.GetCultureInfo(language).Name))
             return _captionPerLanguage[CultureInfo.GetCultureInfo(language).Name];
 
-        if (_captionPerLanguage.ContainsKey(EmptyLanguage))
-            return _captionPerLanguage[EmptyLanguage];
+        if (_captionPerLanguage.TryGetValue(EmptyLanguage, out var emptyLanguageValue))
+            return emptyLanguageValue;
 
         return _captionPerLanguage.First().Value;
     }

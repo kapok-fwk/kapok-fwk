@@ -204,7 +204,7 @@ public abstract class EditableEntityBase : EntityBase, IEditableObject, INotifyD
 
     protected virtual void ValidateProperty(object? value, [CallerMemberName] string? propertyName = null)
     {
-        if (propertyName == null) throw new ArgumentNullException(nameof(propertyName));
+        ArgumentNullException.ThrowIfNull(propertyName);
 
         if (_service == null)
         {

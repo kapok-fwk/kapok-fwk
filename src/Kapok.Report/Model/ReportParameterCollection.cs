@@ -20,8 +20,7 @@ public class ReportParameterCollection : ICollection<ReportParameter>
 
     public void Add(ReportParameter parameter)
     {
-        if (parameter == null)
-            throw new ArgumentNullException(nameof(parameter));
+        ArgumentNullException.ThrowIfNull(parameter);
 
         if (string.IsNullOrEmpty(parameter.Name))
             throw new ArgumentException($"The parameter.Name {nameof(parameter.Name)} can not be null or empty.");

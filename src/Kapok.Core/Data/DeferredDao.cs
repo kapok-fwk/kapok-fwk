@@ -15,10 +15,8 @@ public static class DeferredDaoIQueryable
     public static IQueryable NotForUpdate<T>(this IQueryable source, IQueryable newSource)
         where T : class, new()
     {
-        if (source == null)
-            throw new ArgumentNullException(nameof(source));
-        if (newSource is null)
-            throw new ArgumentNullException(nameof(newSource));
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(newSource);
 
         var genericVisitor = new QueryTranslatorExpressionVisitor(newSource, typeof(T));
         var expression = source.Expression;
@@ -29,8 +27,7 @@ public static class DeferredDaoIQueryable
     public static IQueryable<T> NotForUpdate<T>(this IQueryable<T> source)
         where T : class, new()
     {
-        if (source == null)
-            throw new ArgumentNullException(nameof(source));
+        ArgumentNullException.ThrowIfNull(source);
 
         if (source.Provider is QueryTranslatorProvider<T> qtProvider)
         {
@@ -61,7 +58,8 @@ internal class QueryTranslator<T> : IOrderedQueryable<T>
 
     public QueryTranslator(IQueryable source, Expression e, ChangeTracker changeTracker, PropertyInfo[] primaryKeyProperties, Dictionary<int, object>? primaryKeyIndex = null)
     {
-        Expression = e ?? throw new ArgumentNullException(nameof(e));
+        ArgumentNullException.ThrowIfNull(e);
+        Expression = e;
         _provider = new QueryTranslatorProvider<T>(source, changeTracker, primaryKeyProperties, primaryKeyIndex);
     }
 
@@ -93,26 +91,27 @@ internal class QueryTranslatorProvider<T> : ExpressionVisitor, IQueryProvider
 
     public QueryTranslatorProvider(IQueryable source, ChangeTracker changeTracker, PropertyInfo[] primaryKeyProperties, Dictionary<int, object>? primaryKeyIndex = null)
     {
-        Source = source ?? throw new ArgumentNullException(nameof(source));
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(primaryKeyProperties);
+        Source = source;
         ChangeTracker = changeTracker;
-        _primaryKeyProperties = primaryKeyProperties ?? throw new ArgumentNullException(nameof(primaryKeyProperties));
+        _primaryKeyProperties = primaryKeyProperties;
         _primaryKeyIndex = primaryKeyIndex;
     }
 
     public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
     {
-        if (expression == null) throw new ArgumentNullException(nameof(expression));
+        ArgumentNullException.ThrowIfNull(expression);
 
         return new QueryTranslator<TElement>(Source, expression, ChangeTracker, _primaryKeyProperties, _primaryKeyIndex);
     }
 
     public IQueryable CreateQuery(Expression expression)
     {
-        if (expression == null) throw new ArgumentNullException(nameof(expression));
+        ArgumentNullException.ThrowIfNull(expression);
         Type elementType = expression.Type.GetGenericArguments().First();
 #pragma warning disable CS8600
-        IQueryable result = (IQueryable)Activator.CreateInstance(typeof(QueryTranslator<>).MakeGenericType(elementType),
-            new object[] { Source, expression });
+        IQueryable result = (IQueryable)Activator.CreateInstance(typeof(QueryTranslator<>).MakeGenericType(elementType), Source, expression);
 #pragma warning restore CS8600
 #pragma warning disable CS8603
         return result;
@@ -131,7 +130,7 @@ internal class QueryTranslatorProvider<T> : ExpressionVisitor, IQueryProvider
 
     public TResult Execute<TResult>(Expression expression)
     {
-        if (expression == null) throw new ArgumentNullException(nameof(expression));
+        ArgumentNullException.ThrowIfNull(expression);
 #pragma warning disable CS8600
         object result = ((IQueryProvider)this).Execute(expression);
 #pragma warning restore CS8600
@@ -144,7 +143,7 @@ internal class QueryTranslatorProvider<T> : ExpressionVisitor, IQueryProvider
 
     public object Execute(Expression expression)
     {
-        if (expression == null) throw new ArgumentNullException(nameof(expression));
+        ArgumentNullException.ThrowIfNull(expression);
 
         Expression translated = this.Visit(expression);
         var entity = Source.Provider.Execute(translated);
@@ -159,7 +158,7 @@ internal class QueryTranslatorProvider<T> : ExpressionVisitor, IQueryProvider
 
     internal IEnumerable<T> ExecuteEnumerableTyped(Expression expression)
     {
-        if (expression == null) throw new ArgumentNullException(nameof(expression));
+        ArgumentNullException.ThrowIfNull(expression);
 
         Expression translated = this.Visit(expression);
         var result = (IEnumerable<T>)Source.Provider.CreateQuery(translated);
@@ -175,7 +174,7 @@ internal class QueryTranslatorProvider<T> : ExpressionVisitor, IQueryProvider
     }
     internal IEnumerable ExecuteEnumerable(Expression expression)
     {
-        if (expression == null) throw new ArgumentNullException(nameof(expression));
+        ArgumentNullException.ThrowIfNull(expression);
 
         Expression translated = this.Visit(expression);
         var result = Source.Provider.CreateQuery(translated);
@@ -353,7 +352,7 @@ public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
 
     private void TrackCreated(T entity)
     {
-        if (entity == null) throw new ArgumentNullException(nameof(entity));
+        ArgumentNullException.ThrowIfNull(entity);
 
         var entityPkHash = entity.GetPrimaryKeyHash(_primaryKeyProperties);
         if (_primaryKeyIndex.ContainsKey(entityPkHash))
@@ -384,7 +383,7 @@ public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
     }
     private void TrackUpdate(T entity)
     {
-        if (entity == null) throw new ArgumentNullException(nameof(entity));
+        ArgumentNullException.ThrowIfNull(entity);
 
         var entityPkHash = entity.GetPrimaryKeyHash(_primaryKeyProperties);
         if (_primaryKeyIndex.ContainsKey(entityPkHash) &&
@@ -418,7 +417,7 @@ public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
     }
     private void TrackDelete(T entity)
     {
-        if (entity == null) throw new ArgumentNullException(nameof(entity));
+        ArgumentNullException.ThrowIfNull(entity);
 
         var entityPkHash = entity.GetPrimaryKeyHash(_primaryKeyProperties);
         if (_primaryKeyIndex.ContainsKey(entityPkHash) &&
@@ -717,7 +716,7 @@ public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
     /// <param name="entity"></param>
     public void StartChangeTracking(object entity)
     {
-        if (entity == null) throw new ArgumentNullException(nameof(entity));
+        ArgumentNullException.ThrowIfNull(entity);
 
         var entityPkHash = entity.GetPrimaryKeyHash(_primaryKeyProperties);
         ChangeTrackingState? newChangeTrackingState = null;

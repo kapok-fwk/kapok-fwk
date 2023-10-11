@@ -107,7 +107,7 @@ public class ValidatableBindableObjectBase : BindableObjectBase, INotifyDataErro
         
     protected void ValidateProperty(object? value, [CallerMemberName] string? propertyName = null)
     {
-        if (propertyName == null) throw new ArgumentNullException(nameof(propertyName));
+        ArgumentNullException.ThrowIfNull(propertyName, nameof(propertyName));
 
         if (!_allPropertiesValidated)
         {

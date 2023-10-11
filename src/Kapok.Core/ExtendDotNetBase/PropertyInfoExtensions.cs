@@ -27,8 +27,7 @@ public static class PropertyInfoExtensions
 
     public static string GetDisplayAttributeNameOrDefault(this PropertyInfo propertyInfo)
     {
-        if (propertyInfo == null)
-            throw new ArgumentNullException(nameof(propertyInfo));
+        ArgumentNullException.ThrowIfNull(propertyInfo);
         var displayAttribute = propertyInfo.GetCustomAttribute<DisplayAttribute>();
 
         if (displayAttribute?.Name == null)
@@ -41,8 +40,7 @@ public static class PropertyInfoExtensions
 
     public static string GetDisplayAttributeName(this PropertyInfo propertyInfo)
     {
-        if (propertyInfo == null)
-            throw new ArgumentNullException(nameof(propertyInfo));
+        ArgumentNullException.ThrowIfNull(propertyInfo);
         var displayAttribute = propertyInfo.GetCustomAttribute<DisplayAttribute>();
 
         if (displayAttribute == null)
@@ -58,8 +56,7 @@ public static class PropertyInfoExtensions
 
     public static string GetDisplayAttributeNameOrDefault(this PropertyInfo propertyInfo, CultureInfo? cultureInfo)
     {
-        if (propertyInfo == null)
-            throw new ArgumentNullException(nameof(propertyInfo));
+        ArgumentNullException.ThrowIfNull(propertyInfo);
         var displayAttribute = propertyInfo.GetCustomAttribute<DisplayAttribute>();
 
         if (displayAttribute?.Name == null)
@@ -74,8 +71,7 @@ public static class PropertyInfoExtensions
 
     public static string GetDisplayAttributeName(this PropertyInfo propertyInfo, CultureInfo? cultureInfo)
     {
-        if (propertyInfo == null)
-            throw new ArgumentNullException(nameof(propertyInfo));
+        ArgumentNullException.ThrowIfNull(propertyInfo);
         var displayAttribute = propertyInfo.GetCustomAttribute<DisplayAttribute>();
 
         if (displayAttribute == null)
@@ -93,8 +89,7 @@ public static class PropertyInfoExtensions
 
     public static string? GetDisplayAttributeDescriptionOrDefault(this PropertyInfo propertyInfo)
     {
-        if (propertyInfo == null)
-            throw new ArgumentNullException(nameof(propertyInfo));
+        ArgumentNullException.ThrowIfNull(propertyInfo);
         var displayAttribute = propertyInfo.GetCustomAttribute<DisplayAttribute>();
 
         if (displayAttribute?.Description == null)
@@ -107,8 +102,7 @@ public static class PropertyInfoExtensions
 
     public static string? GetDisplayAttributeDescription(this PropertyInfo propertyInfo)
     {
-        if (propertyInfo == null)
-            throw new ArgumentNullException(nameof(propertyInfo));
+        ArgumentNullException.ThrowIfNull(propertyInfo);
         var displayAttribute = propertyInfo.GetCustomAttribute<DisplayAttribute>();
 
         if (displayAttribute == null)
@@ -124,8 +118,7 @@ public static class PropertyInfoExtensions
 
     public static string? GetDisplayAttributeDescriptionOrDefault(this PropertyInfo propertyInfo, CultureInfo? cultureInfo)
     {
-        if (propertyInfo == null)
-            throw new ArgumentNullException(nameof(propertyInfo));
+        ArgumentNullException.ThrowIfNull(propertyInfo);
         var displayAttribute = propertyInfo.GetCustomAttribute<DisplayAttribute>();
 
         if (displayAttribute?.Description == null)
@@ -140,8 +133,7 @@ public static class PropertyInfoExtensions
 
     public static string? GetDisplayAttributeDescription(this PropertyInfo propertyInfo, CultureInfo? cultureInfo)
     {
-        if (propertyInfo == null)
-            throw new ArgumentNullException(nameof(propertyInfo));
+        ArgumentNullException.ThrowIfNull(propertyInfo);
         var displayAttribute = propertyInfo.GetCustomAttribute<DisplayAttribute>();
 
         if (displayAttribute == null)
@@ -159,8 +151,7 @@ public static class PropertyInfoExtensions
 
     public static int MaxStringLength(this PropertyInfo propertyInfo)
     {
-        if (propertyInfo == null)
-            throw new ArgumentNullException(nameof(propertyInfo));
+        ArgumentNullException.ThrowIfNull(propertyInfo);
 
         var attributes = propertyInfo.GetCustomAttributes(typeof(StringLengthAttribute), true);
         if (attributes == null || attributes.Length == 0 || !(attributes[0] is StringLengthAttribute stringLengthAttribute))

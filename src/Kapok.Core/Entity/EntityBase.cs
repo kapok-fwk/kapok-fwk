@@ -20,8 +20,8 @@ public abstract class EntityBase : BindableObjectBase, INotifyPropertyChanging
         where TEntity : class
     {
         var entityType = typeof(TEntity);
-        if (EntityModels.ContainsKey(entityType))
-            return EntityModels[entityType];
+        if (EntityModels.TryGetValue(entityType, out var entityModel))
+            return entityModel;
 
         // create an empty instance to make sure that when there is a static method to register the entity, it is called now
         Activator.CreateInstance(entityType);

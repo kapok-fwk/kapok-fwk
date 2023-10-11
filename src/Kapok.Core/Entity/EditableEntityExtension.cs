@@ -9,8 +9,8 @@ public static class EditableEntityExtension
     public static void Map<T>(this T oldEntry, T newEntry, bool mapKey = false)
         where T : class
     {
-        if (oldEntry == null) throw new ArgumentNullException(nameof(oldEntry));
-        if (newEntry == null) throw new ArgumentNullException(nameof(newEntry));
+        ArgumentNullException.ThrowIfNull(oldEntry);
+        ArgumentNullException.ThrowIfNull(newEntry);
         var type = oldEntry.GetType();
 
         var model = EntityBase.GetEntityModel<T>();
@@ -95,7 +95,7 @@ public static class EditableEntityExtension
 
     internal static int GetPrimaryKeyHash<T>(this T entity, PropertyInfo[] primaryKeyProperties)
     {
-        if (primaryKeyProperties == null) throw new ArgumentNullException(nameof(primaryKeyProperties));
+        ArgumentNullException.ThrowIfNull(primaryKeyProperties);
 
         return BuildValuesHash(
             primaryKeyProperties

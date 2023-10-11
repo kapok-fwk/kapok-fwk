@@ -87,8 +87,7 @@ public class DirectoryReportResourceProvider : IReportResourceProvider
     {
         get
         {
-            if (resourceName == null)
-                throw new ArgumentNullException(nameof(resourceName));
+            ArgumentNullException.ThrowIfNull(resourceName);
 
             string fullPath = GetResourceFullPath(resourceName);
             if (!File.Exists(fullPath))
@@ -98,8 +97,7 @@ public class DirectoryReportResourceProvider : IReportResourceProvider
         }
         set
         {
-            if (resourceName == null)
-                throw new ArgumentNullException(nameof(resourceName));
+            ArgumentNullException.ThrowIfNull(resourceName);
 
             Add((FileReportResource) value);
         }

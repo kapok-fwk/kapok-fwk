@@ -19,10 +19,8 @@ public class ModuleMigrationsHistoryDao : Dao<ModuleMigrationsHistory>, IModuleM
 
     public ModuleMigrationsHistory New(string moduleName, Module.Migration migration)
     {
-        if (moduleName is null)
-            throw new ArgumentNullException(nameof(moduleName));
-        if (migration is null)
-            throw new ArgumentNullException(nameof(migration));
+        ArgumentNullException.ThrowIfNull(moduleName, nameof(moduleName));
+        ArgumentNullException.ThrowIfNull(migration, nameof(migration));
 
         moduleName = TrimModuleName(moduleName);
 
@@ -35,10 +33,8 @@ public class ModuleMigrationsHistoryDao : Dao<ModuleMigrationsHistory>, IModuleM
 
     public ModuleMigrationsHistory? Find(string moduleName, Module.Migration migration)
     {
-        if (moduleName is null)
-            throw new ArgumentNullException(nameof(moduleName));
-        if (migration is null)
-            throw new ArgumentNullException(nameof(migration));
+        ArgumentNullException.ThrowIfNull(moduleName, nameof(moduleName));
+        ArgumentNullException.ThrowIfNull(migration, nameof(migration));
 
         moduleName = TrimModuleName(moduleName);
         var migrationId = migration.GetType().Name;

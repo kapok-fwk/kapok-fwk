@@ -17,7 +17,8 @@ public sealed class EFCoreDataDomainScope : DataDomainScope
     public EFCoreDataDomainScope(IEntityFrameworkCoreDataDomain dataDomain)
         : base(dataDomain)
     {
-        _dataDomain = dataDomain ?? throw new ArgumentNullException(nameof(dataDomain));
+        ArgumentNullException.ThrowIfNull(dataDomain);
+        _dataDomain = dataDomain;
     }
 
     // ReSharper disable once InconsistentlySynchronizedField

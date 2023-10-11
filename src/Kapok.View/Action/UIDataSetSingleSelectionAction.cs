@@ -39,11 +39,12 @@ public class UIDataSetSingleSelectionAction<TEntry> : UIAction<IList<TEntry?>?>,
     public UIDataSetSingleSelectionAction(string name, Action<TEntry> execute, Func<TEntry, bool>? canExecute = null)
         : base(name, DummyExecute, DummyCanExecute)
     {
+        ArgumentNullException.ThrowIfNull(execute);
 #pragma warning disable CS8622
         base.ExecuteFunc = InternalOverrideExecute;
         base.CanExecuteFunc = InternalOverrideCanExecute;
 #pragma warning restore CS8622
-        this.ExecuteFunc = execute ?? throw new ArgumentNullException(nameof(execute));
+        this.ExecuteFunc = execute;
         this.CanExecuteFunc = canExecute;
     }
 

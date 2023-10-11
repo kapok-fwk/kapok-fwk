@@ -1,5 +1,4 @@
 ﻿using Kapok.Core.UnitTest.DataModel;
-using Kapok.Data;
 using Kapok.Data.InMemory;
 using Kapok.Module;
 using Xunit;

@@ -1,5 +1,4 @@
-﻿#nullable enable
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 using Kapok.Entity;
@@ -344,8 +343,7 @@ public class DbContextBase : DbContext
 
     private static string SqlFunctionCurrentDateTimeUtc(string? providerName)
     {
-        if (providerName == null)
-            throw new ArgumentNullException(nameof(providerName));
+        ArgumentNullException.ThrowIfNull(providerName);
 
         if (providerName == SqliteProvider)
         {

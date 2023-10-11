@@ -49,8 +49,7 @@ public class ReportParameter
         get => _xmlWrapperDataType;
         set
         {
-            if (value == null)
-                throw new ArgumentNullException(nameof(value));
+            ArgumentNullException.ThrowIfNull(value);
 
             _xmlWrapperDataType = value;
 #pragma warning disable CS8601

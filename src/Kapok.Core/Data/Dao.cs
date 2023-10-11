@@ -136,8 +136,7 @@ public class Dao<T> : DaoBase<T>
     /// <returns></returns>
     public override IQueryable<TNested> GetNestedAsQueryable<TNested>(T entity, string? referenceName = null)
     {
-        if (entity == null)
-            throw new ArgumentNullException(nameof(entity));
+        ArgumentNullException.ThrowIfNull(entity, nameof(entity));
 
         var references = Model.References
             .Where(r => r.RelationshipType == RelationshipType.ManyToOne &&

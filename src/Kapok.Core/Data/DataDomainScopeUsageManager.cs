@@ -8,8 +8,8 @@ public static class DataDomainScopeUsageManager
 
     public static void RegisterUsage(this IDataDomainScope dataDomainScope, object usedInObject)
     {
-        if (dataDomainScope == null) throw new ArgumentNullException(nameof(dataDomainScope));
-        if (usedInObject == null) throw new ArgumentNullException(nameof(usedInObject));
+        ArgumentNullException.ThrowIfNull(dataDomainScope, nameof(dataDomainScope));
+        ArgumentNullException.ThrowIfNull(usedInObject, nameof(usedInObject));
 
         if (DataDomainScopeUsage.ContainsKey(dataDomainScope))
         {
@@ -32,8 +32,8 @@ public static class DataDomainScopeUsageManager
         
     public static void UnregisterUsage(this IDataDomainScope dataDomainScope, object? usedInObject)
     {
-        if (dataDomainScope == null) throw new ArgumentNullException(nameof(dataDomainScope));
-        if (usedInObject == null) throw new ArgumentNullException(nameof(usedInObject));
+        ArgumentNullException.ThrowIfNull(dataDomainScope, nameof(dataDomainScope));
+        ArgumentNullException.ThrowIfNull(usedInObject, nameof(usedInObject));
 
         if (!DataDomainScopeUsage.ContainsKey(dataDomainScope))
         {

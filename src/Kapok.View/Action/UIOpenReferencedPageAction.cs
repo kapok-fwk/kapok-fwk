@@ -28,11 +28,13 @@ public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction
         Func<TEntry, bool>? canExecute = null, string? listViewName = null)
         : base(name, DummyExecute, canExecute)
     {
+        ArgumentNullException.ThrowIfNull(page);
+
         // internal override
         ExecuteFunc = OpenPage;
 
         // main constructor code
-        _page = page ?? throw new ArgumentNullException(nameof(page));
+        _page = page;
         _pageType = page.GetType();
         _baseDataSetView = baseDataSetView;
         _filter = filter;
@@ -45,6 +47,9 @@ public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction
         Func<TEntry, bool>? canExecute = null, string? listViewName = null)
         : base(name, DummyExecute, canExecute)
     {
+        ArgumentNullException.ThrowIfNull(pageType);
+        ArgumentNullException.ThrowIfNull(viewDomain);
+
         // internal override
         ExecuteFunc = OpenPage;
 
@@ -52,8 +57,8 @@ public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction
         if (!typeof(IDataPage).IsAssignableFrom(pageType))
             throw new ArgumentException($"The pageType parameter must have a type which implements the interface {typeof(IDataPage<>).FullName}", nameof(pageType));
 
-        _pageType = pageType ?? throw new ArgumentNullException(nameof(pageType));
-        _viewDomain = viewDomain ?? throw new ArgumentNullException(nameof(viewDomain));
+        _pageType = pageType;
+        _viewDomain = viewDomain;
         PageConstructorParamValues = new Dictionary<Type, object>
         {
             { typeof(IViewDomain), _viewDomain }

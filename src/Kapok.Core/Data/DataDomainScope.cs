@@ -13,7 +13,8 @@ public abstract class DataDomainScope : IDataDomainScope
 
     protected DataDomainScope(IDataDomain dataDomain)
     {
-        DataDomain = dataDomain ?? throw new ArgumentNullException(nameof(dataDomain));
+        ArgumentNullException.ThrowIfNull(dataDomain, nameof(dataDomain));
+        DataDomain = dataDomain;
         DataPartitions = dataDomain.DataPartitions;
     }
 
@@ -185,7 +186,7 @@ public abstract class DataDomainScope : IDataDomainScope
     public void AddDao<T>(IDao<T> dao)
         where T : class, new()
     {
-        if (dao == null) throw new ArgumentNullException(nameof(dao));
+        ArgumentNullException.ThrowIfNull(dao, nameof(dao));
         CheckIsDisposed();
         var entityType = typeof(T);
 
@@ -201,8 +202,8 @@ public abstract class DataDomainScope : IDataDomainScope
         CheckIsDisposed();
         var entityType = typeof(T);
 
-        if (_daos.ContainsKey(entityType))
-            return (IDao<T>)_daos[entityType];
+        if (_daos.TryGetValue(entityType, out var dao))
+            return (IDao<T>)dao;
 
         IDao<T> newDao = InitializeDao(GetRepository<T>());
         AddDaoInternal(newDao);

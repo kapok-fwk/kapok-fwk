@@ -8,7 +8,7 @@ public static class TypeExtensions
 {
     public static bool IsSameOrSubclassOf(this Type potentialDescendant, Type potentialBase)
     {
-        if (potentialBase == null) throw new ArgumentNullException(nameof(potentialBase));
+        ArgumentNullException.ThrowIfNull(potentialBase);
 
         return potentialDescendant.IsSubclassOf(potentialBase)
                || potentialDescendant == potentialBase;
@@ -74,7 +74,7 @@ public static class TypeExtensions
 
     public static string? GetDisplayAttributeName(this Type type)
     {
-        if (type == null) throw new ArgumentNullException(nameof(type));
+        ArgumentNullException.ThrowIfNull(type);
 
         var displayAttribute = type.GetCustomAttribute<DisplayAttribute>();
 
@@ -93,7 +93,7 @@ public static class TypeExtensions
 
     public static string? GetDisplayAttributeNameOrDefault(this Type type)
     {
-        if (type == null) throw new ArgumentNullException(nameof(type));
+        ArgumentNullException.ThrowIfNull(type);
 
         var displayAttribute = type.GetCustomAttribute<DisplayAttribute>();
 
@@ -113,7 +113,7 @@ public static class TypeExtensions
     // Source: https://stackoverflow.com/questions/74616/how-to-detect-if-type-is-another-generic-type/1075059#1075059
     public static bool IsAssignableToGenericType(this Type givenType, Type genericType)
     {
-        if (givenType == null) throw new ArgumentNullException(nameof(givenType));
+        ArgumentNullException.ThrowIfNull(givenType);
 
         var interfaceTypes = givenType.GetInterfaces();
 
@@ -134,7 +134,7 @@ public static class TypeExtensions
 
     public static bool IsSubclassOfRawGeneric(this Type toCheck, Type genericType)
     {
-        if (toCheck == null) throw new ArgumentNullException(nameof(toCheck));
+        ArgumentNullException.ThrowIfNull(toCheck);
 
         while (toCheck != typeof(object))
         {
@@ -306,8 +306,8 @@ public static class TypeExtensions
     /// </summary>
     private static bool IsSimilarType(this Type thisType, Type type)
     {
-        if (thisType == null) throw new ArgumentNullException(nameof(thisType));
-        if (type == null) throw new ArgumentNullException(nameof(type));
+        ArgumentNullException.ThrowIfNull(thisType);
+        ArgumentNullException.ThrowIfNull(type);
 
 #pragma warning disable CS8600
         // Ignore any 'ref' types

@@ -43,7 +43,8 @@ public abstract class DataDomain : IDataDomain
             if (_defaultDaoType == value)
                 return;
 
-            _defaultDaoType = value ?? throw new ArgumentNullException(nameof(value));
+            ArgumentNullException.ThrowIfNull(value, nameof(value));
+            _defaultDaoType = value;
         }
     }
 
@@ -160,8 +161,7 @@ public abstract class DataDomain : IDataDomain
 
     public void RegisterDataPartition(string name, Type interfaceType, string propertyName)
     {
-        if (name == null)
-            throw new ArgumentNullException(nameof(name));
+        ArgumentNullException.ThrowIfNull(name, nameof(name));
 
         if (!interfaceType.IsInterface)
             throw new ArgumentException("The type must be an interface", nameof(interfaceType));

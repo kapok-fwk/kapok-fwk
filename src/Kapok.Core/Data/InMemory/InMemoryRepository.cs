@@ -21,7 +21,8 @@ public class InMemoryRepository<T> : IRepository<T>
 
     public InMemoryRepository(List<T> inMemoryList)
     {
-        _list = inMemoryList ?? throw new ArgumentNullException(nameof(inMemoryList));
+        ArgumentNullException.ThrowIfNull(inMemoryList);
+        _list = inMemoryList;
     }
 
     public virtual IQueryable<T> AsQueryable()

@@ -228,8 +228,8 @@ public class FilterSet<T> : FilterBase<T>, IDisposable, IFilterSet<T>
 
     public void Clear(FilterLayer layer)
     {
-        if (_layers.ContainsKey(layer))
-            _layers[layer].Clear();
+        if (_layers.TryGetValue(layer, out var layerFilter))
+            layerFilter.Clear();
     }
 
     public static implicit operator Expression<Func<T, bool>>?(FilterSet<T>? filterSet)

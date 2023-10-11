@@ -20,16 +20,21 @@ public class UIOpenPageAction : UIAction, IOpenPageAction
     public UIOpenPageAction(string name, IPage page, Func<bool>? canExecute = null)
         : base(name, DummyExecute, canExecute)
     {
+        ArgumentNullException.ThrowIfNull(page);
+
         // internal override
         ExecuteFunc = OpenPage;
 
         // main constructor code
-        _page = page ?? throw new ArgumentNullException(nameof(page));
+        _page = page;
     }
 
     public UIOpenPageAction(string name, Type pageType, IViewDomain viewDomain, Func<bool>? canExecute = null)
         : base(name, DummyExecute, canExecute)
     {
+        ArgumentNullException.ThrowIfNull(pageType);
+        ArgumentNullException.ThrowIfNull(viewDomain);
+
         // internal override
         ExecuteFunc = OpenPage;
 
@@ -37,8 +42,8 @@ public class UIOpenPageAction : UIAction, IOpenPageAction
         if (!typeof(IPage).IsAssignableFrom(pageType))
             throw new ArgumentException($"The pageType parameter must have a type which implements the interface {typeof(IPage).FullName}", nameof(pageType));
 
-        _pageType = pageType ?? throw new ArgumentNullException(nameof(pageType));
-        _viewDomain = viewDomain ?? throw new ArgumentNullException(nameof(viewDomain));
+        _pageType = pageType;
+        _viewDomain = viewDomain;
         PageConstructorParamValues = new Dictionary<Type, object>
         {
             { typeof(IViewDomain), _viewDomain }

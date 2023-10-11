@@ -40,20 +40,13 @@ public class UnitTestViewDomain : ViewDomain
 
     public override void RegisterPageContainer(IPage owningPage, IEnumerable<IPage> pageContainer)
     {
-        if (owningPage is null)
-        {
-            throw new ArgumentNullException(nameof(owningPage));
-        }
+        ArgumentNullException.ThrowIfNull(owningPage);
+        ArgumentNullException.ThrowIfNull(pageContainer);
 
-        if (pageContainer is null)
-        {
-            throw new ArgumentNullException(nameof(pageContainer));
-        }
-
-        if (_registeredPageContainer.ContainsKey(owningPage))
+        if (_registeredPageContainer.TryGetValue(owningPage, out var registeredPageContainer))
         {
             // ReSharper disable once PossibleUnintendedReferenceComparison
-            if (_registeredPageContainer[owningPage] == pageContainer)
+            if (registeredPageContainer == pageContainer)
             {
                 throw new ArgumentException("You cannot register a page container twice for a page");
             }
