@@ -12,8 +12,8 @@ namespace Kapok.View;
 public abstract class HierarchyListPage<TEntry> : ListPage<TEntry>, IHierarchyListPage<TEntry>
     where TEntry : class, IHierarchyEntry<TEntry>, new()
 {
-    public HierarchyListPage(IViewDomain? viewDomain, IDataDomainScope? dataDomainScope = null)
-        : base(viewDomain, dataDomainScope)
+    public HierarchyListPage(IViewDomain? viewDomain, IDataDomain? dataDomain = null)
+        : base(viewDomain, dataDomain)
     {
         MoveInEntryAction = new UIAction(
             "MoveInEntry",
@@ -25,6 +25,23 @@ public abstract class HierarchyListPage<TEntry> : ListPage<TEntry>, IHierarchyLi
             () => (DataSet as IHierarchyDataSetView<TEntry>)?.MoveOutAction.Execute(),
             () => (DataSet as IHierarchyDataSetView<TEntry>)?.MoveOutAction.CanExecute() ?? false
         ) {Image = "table-row-extract"};
+    }
+
+    public HierarchyListPage(IViewDomain? viewDomain, IDataDomainScope? dataDomainScope = null)
+        : this(viewDomain, dataDomainScope?.DataDomain)
+    {
+        MoveInEntryAction = new UIAction(
+                "MoveInEntry",
+                () => (DataSet as IHierarchyDataSetView<TEntry>)?.MoveInAction.Execute(),
+                () => (DataSet as IHierarchyDataSetView<TEntry>)?.MoveInAction.CanExecute() ?? false
+            )
+            { Image = "table-row-insert" };
+        MoveOutEntryAction = new UIAction(
+                "MoveOutEntry",
+                () => (DataSet as IHierarchyDataSetView<TEntry>)?.MoveOutAction.Execute(),
+                () => (DataSet as IHierarchyDataSetView<TEntry>)?.MoveOutAction.CanExecute() ?? false
+            )
+            { Image = "table-row-extract" };
     }
 
     // ReSharper disable MemberCanBePrivate.Global

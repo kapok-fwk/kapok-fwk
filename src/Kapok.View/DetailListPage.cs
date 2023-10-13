@@ -11,6 +11,11 @@ public abstract class DetailListPage<TBaseEntry, TLinkedEntry> : LinkedDetailPag
     where TBaseEntry : class, new()
     where TLinkedEntry : class, new()
 {
+    protected DetailListPage(IDataSetView<TBaseEntry> sourceDataSet, IViewDomain? viewDomain = null, IDataDomain? dataDomain = null)
+        : base(sourceDataSet, viewDomain, dataDomain)
+    {
+    }
+
     protected DetailListPage(IDataSetView<TBaseEntry> sourceDataSet, IViewDomain? viewDomain = null, IDataDomainScope? dataDomainScope = null)
         : base(sourceDataSet, viewDomain, dataDomainScope)
     {

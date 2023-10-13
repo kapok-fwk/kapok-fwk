@@ -13,6 +13,11 @@ public abstract class CardPage<TEntry> : DataPage<TEntry>, ICardPage, ICardPage<
 {
     private PropertyViewCollection<TEntry>? _propertyViewDefinitions;
 
+    protected CardPage(IDataSetView<TEntry> tableData, IViewDomain? viewDomain = null, IDataDomain? dataDomain = null)
+        : base(tableData, viewDomain, dataDomain)
+    {
+    }
+
     protected CardPage(IDataSetView<TEntry> tableData, IViewDomain? viewDomain = null, IDataDomainScope? dataDomainScope = null)
         : base(tableData, viewDomain, dataDomainScope)
     {

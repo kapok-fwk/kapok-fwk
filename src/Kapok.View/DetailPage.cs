@@ -11,19 +11,28 @@ namespace Kapok.View;
 public abstract class DetailPage<TEntry> : DataPage<TEntry>, IDetailPage<TEntry>
     where TEntry : class, new()
 {
+    protected DetailPage(IDataSetView<TEntry> tableData, IViewDomain? viewDomain = null, IDataDomain? dataDomain = null)
+        : base(tableData, viewDomain, dataDomain)
+    {
+    }
+
     protected DetailPage(IDataSetView<TEntry> tableData, IViewDomain? viewDomain = null, IDataDomainScope? dataDomainScope = null)
         : base(tableData, viewDomain, dataDomainScope)
     {
-        IsClosed = false;
+    }
+
+    internal DetailPage(IViewDomain? viewDomain = null, IDataDomain? dataDomain = null)
+        : base(viewDomain, dataDomain)
+    {
     }
 
     internal DetailPage(IViewDomain? viewDomain = null, IDataDomainScope? dataDomainScope = null)
         : base(viewDomain, dataDomainScope)
     {
-        IsClosed = false;
     }
 
-    private bool _isClosed;
+    // ReSharper disable once RedundantDefaultMemberInitializer
+    private bool _isClosed = false;
 
     protected override void OnLoaded()
     {
