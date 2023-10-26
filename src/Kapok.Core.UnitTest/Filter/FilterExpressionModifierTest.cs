@@ -3,7 +3,7 @@ using System.Reflection;
 using Kapok.BusinessLayer;
 using Xunit;
 
-namespace Kapok.Core.UnitTest;
+namespace Kapok.Core.UnitTest.Filter;
 
 public class FilterExpressionModifierTest
 {
@@ -43,7 +43,7 @@ public class FilterExpressionModifierTest
         Expression<Func<Entity, bool>> whereExpression = entity => entity.Partition == 1;
 
         var modifier =
-            new FilterExpressionModifier(FilterExpressionModifierAction.GetFilterValue, typeof(Entity),PartitionPropertyInfo);
+            new FilterExpressionModifier(FilterExpressionModifierAction.GetFilterValue, typeof(Entity), PartitionPropertyInfo);
         modifier.Visit(whereExpression);
 
         Assert.True(modifier.FoundFilter);
@@ -56,7 +56,7 @@ public class FilterExpressionModifierTest
         Expression<Func<Entity, bool>> whereExpression = entity => entity.DataArea == "A";
 
         var modifier =
-            new FilterExpressionModifier(FilterExpressionModifierAction.GetFilterValue, typeof(Entity),DataAreaPropertyInfo);
+            new FilterExpressionModifier(FilterExpressionModifierAction.GetFilterValue, typeof(Entity), DataAreaPropertyInfo);
         modifier.Visit(whereExpression);
 
         Assert.True(modifier.FoundFilter);
@@ -69,10 +69,10 @@ public class FilterExpressionModifierTest
         var list = BuildList();
 
         Expression<Func<Entity, bool>>? whereExpression = entity => true;
-            
+
         Assert.Equal(6, list.Where(whereExpression.Compile()).Count());
 
-            
+
         var modifier = new FilterExpressionModifier(
             FilterExpressionModifierAction.SetFilterValue,
             typeof(Entity),
@@ -94,7 +94,7 @@ public class FilterExpressionModifierTest
         var list = BuildList();
 
         Expression<Func<Entity, bool>>? whereExpression = entity => true;
-            
+
         Assert.Equal(6, list.Where(whereExpression.Compile()).Count());
 
         var modifier = new FilterExpressionModifier(
@@ -111,17 +111,17 @@ public class FilterExpressionModifierTest
         Assert.Equal(4, list.Where(whereExpression.Compile()).Count());
 #pragma warning restore CS8602
     }
-        
+
     [Fact]
     public void ChangeSetPropertyIntNullableTest()
     {
         var list = BuildList();
 
         Expression<Func<Entity, bool>>? whereExpression = entity => entity.Partition == 1;
-            
+
         Assert.Equal(2, list.Where(whereExpression.Compile()).Count());
 
-            
+
         var modifier = new FilterExpressionModifier(
             FilterExpressionModifierAction.SetFilterValue,
             typeof(Entity),
@@ -167,7 +167,7 @@ public class FilterExpressionModifierTest
         var list = BuildList();
 
         Expression<Func<Entity, bool>>? whereExpression = entity => entity.Partition == 1;
-            
+
         Assert.Equal(2, list.Where(whereExpression.Compile()).Count());
 
         var modifier = new FilterExpressionModifier(
@@ -190,7 +190,7 @@ public class FilterExpressionModifierTest
         var list = BuildList();
 
         Expression<Func<Entity, bool>>? whereExpression = entity => entity.DataArea == "A";
-            
+
         Assert.Single(list.Where(whereExpression.Compile()));
 
         var modifier = new FilterExpressionModifier(

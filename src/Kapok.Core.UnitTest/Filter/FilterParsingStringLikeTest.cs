@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using Kapok.BusinessLayer.FilterParsing;
 using Xunit;
 
-namespace Kapok.Core.UnitTest;
+namespace Kapok.Core.UnitTest.Filter;
 
 public class FilterParsingStringLikeTest
 {
