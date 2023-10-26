@@ -9,13 +9,13 @@ public class ColumnPropertyViewTest
         PropertyViewTest.ValidatePropertyId(propertyViewId);
         Assert.True(propertyViewId.IsReadOnly);
     }
-    
+
     internal static void ValidatePropertyName(ColumnPropertyView propertyViewName)
     {
         PropertyViewTest.ValidatePropertyName(propertyViewName);
         Assert.False(propertyViewName.IsReadOnly);
     }
-    
+
     [Fact]
     public void PropertyInfoTest()
     {

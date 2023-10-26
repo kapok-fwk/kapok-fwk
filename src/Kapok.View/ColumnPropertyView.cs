@@ -39,10 +39,14 @@ public class ColumnPropertyView : PropertyView
     /// <summary>
     /// Gives back if the property view can be filtered in the view.
     /// </summary>
+    [DefaultValue(true)]
     public bool IsFilterable
     {
         get
         {
+            if (PropertyInfo == null)
+                return true;  // by default we assume a field is filterable.
+
             // The attribute 'NotMapped' says that the data is not stored in the database.
             // Since next to all repositories are liked to the database (except you use InMemory repositories)
             // we disable this here in general.
@@ -66,6 +70,7 @@ public class ColumnPropertyView : PropertyView
     /// Indicates that this column field is hidden from the user view.
     /// </summary>
     // ReSharper disable once UnusedAutoPropertyAccessor.Global
+    [DefaultValue(false)]
     public bool IsHidden { get; set; }
 
     /// <summary>
@@ -73,10 +78,12 @@ public class ColumnPropertyView : PropertyView
     ///
     /// This requires that the entity implements IHierarchyEntry`1.
     /// </summary>
+    [DefaultValue(false)]
     public bool ShowHierarchicalTree { get; set; }
 
     /// <summary>
     /// If the text shall be wrapped to a second line if longer than <see cref="Width"/>.
     /// </summary>
+    [DefaultValue(false)]
     public bool TextWrap { get; set; } = false;
 }

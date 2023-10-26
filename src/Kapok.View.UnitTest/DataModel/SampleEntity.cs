@@ -11,5 +11,6 @@ public class SampleEntity
     [ReadOnly(isReadOnly: true)]
     public Guid? Id { get; set; }
 
-    [Required(AllowEmptyStrings = false)] public string Name { get; set; } = string.Empty;
+    [Required(AllowEmptyStrings = false)]
+    public string Name { get; set; } = string.Empty;
 }

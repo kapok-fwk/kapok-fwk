@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using Kapok.Entity.Model;
 
 namespace Kapok.View;
@@ -133,6 +135,7 @@ public class PropertyView
     /// <exception cref="InvalidOperationException">
     /// Is thrown when setting the declaring type and a property with name <see cref="Name"/> is not found in the type definition.  
     /// </exception>
+    [JsonIgnore]
     public Type? DeclaringType
     {
         get => _propertyInfo?.DeclaringType;
@@ -162,12 +165,19 @@ public class PropertyView
     public string Name => _propertyInfo?.Name ?? _propertyName;
 #pragma warning restore CS8603
 
+    [JsonIgnore]
     public PropertyInfo? PropertyInfo
     {
         get => _propertyInfo;
-        set => _propertyInfo = value;
+        set
+        {
+            _propertyInfo = value;
+            if (value != null)
+                _propertyName = value.Name;
+        }
     }
 
+    [DefaultValue(false)]
     public bool IsReadOnly { get; set; }
 
     public int? ArrayIndex { get; set; }
