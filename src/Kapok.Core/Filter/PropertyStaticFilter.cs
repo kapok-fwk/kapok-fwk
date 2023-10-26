@@ -50,7 +50,7 @@ public class PropertyStaticFilter : PropertyFilter, IPropertyStaticFilter
 
         if (value != null)
         {
-            if (PropertyInfo.PropertyType.IsAssignableFrom(value.GetType()))
+            if (!PropertyInfo.PropertyType.IsAssignableFrom(value.GetType()))
             {
                 throw new NotSupportedException(string.Format("The static value type {0} is not assignable to the property type {1}.", value.GetType(), PropertyInfo.PropertyType));
             }
