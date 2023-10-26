@@ -68,17 +68,18 @@ public class DbContextBase : DbContext
 
         base.OnModelCreating(modelBuilder);
 
+        // call modelBuilder.Entity<TEntity>()
+        var method = (from m in typeof(ModelBuilder).GetMethods(BindingFlags.Public | BindingFlags.Instance)
+            where m.Name == nameof(ModelBuilder.Entity) &&
+                  m.IsGenericMethodDefinition
+            select m).First();
+
         // build models
         foreach (var entityType in DataDomain.DataEntities)
         {
-            // call modelBuilder.Entity<TEntity>()
-            var method = (from m in typeof(ModelBuilder).GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                where m.Name == nameof(ModelBuilder.Entity) &&
-                      m.IsGenericMethodDefinition
-                select m).FirstOrDefault();
             // ReSharper disable once PossibleNullReferenceException
             EntityTypeBuilder? entityTypeBuilder = (EntityTypeBuilder?)method
-                ?.MakeGenericMethod(entityType)
+                .MakeGenericMethod(entityType)
                 .Invoke(modelBuilder, null);
             if (entityTypeBuilder == null)
                 throw new NotSupportedException("The method modelBuilder.Entity<TEntity>() must return a value and cannot be null.");
