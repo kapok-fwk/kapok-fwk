@@ -10,6 +10,7 @@ using ModelBuilder = Microsoft.EntityFrameworkCore.ModelBuilder;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Nodes;
+using Kapok.Data.EntityFrameworkCore.JsonConvert;
 
 namespace Kapok.Data.EntityFrameworkCore;
 
@@ -268,16 +269,33 @@ public class DbContextBase : DbContext
                 if (Attribute.IsDefined(property, typeof(NotMappedAttribute)))
                     continue;
 
-                if (property.PropertyType == typeof(JsonObject) ||
-                    property.PropertyType == typeof(JsonArray) ||
-#if USE_JSON_LIBRARY_NEWTONSOFT
-                    property.PropertyType == typeof(JObject) ||
-                    property.PropertyType == typeof(JArray) ||
-#endif
-                    property.PropertyType == typeof(Caption))
+                if (property.PropertyType == typeof(JsonObject))
                 {
                     entityTypeBuilder.Property(property.Name)
-                        .HasJsonValueConversion(property.PropertyType);
+                        .HasConversion<JsonObjectConverter, JsonObjectComparer>();
+                }
+                else if (property.PropertyType == typeof(JsonArray))
+                {
+                    entityTypeBuilder.Property(property.Name)
+                        .HasConversion<JsonArrayConverter, JsonArrayComparer>();
+                }
+#if USE_JSON_LIBRARY_NEWTONSOFT
+                else if (property.PropertyType == typeof(JObject))
+                {
+                    entityTypeBuilder.Property(property.Name)
+                        .HasConversion<JObjectConverter, JObjectComparer>();
+                }
+                else if (property.PropertyType == typeof(JArray))
+                {
+                    entityTypeBuilder.Property(property.Name)
+                        .HasConversion<JArrayConverter, JArrayComparer>();
+                }
+#endif
+
+                else if (property.PropertyType == typeof(Caption))
+                {
+                    entityTypeBuilder.Property(property.Name)
+                        .HasConversion<CaptionConverter, CaptionComparer>();
                 }
                 else if (property.PropertyType == typeof(decimal) || property.PropertyType == typeof(decimal?))
                 {

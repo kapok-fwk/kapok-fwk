@@ -1,22 +1,19 @@
 ﻿using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-#if USE_JSON_LIBRARY_NEWTONSOFT
-using Newtonsoft.Json;
-#endif
 
-namespace Kapok.Data.EntityFrameworkCore;
+namespace Kapok.Data.EntityFrameworkCore.JsonConvert;
 
-internal class JsonValueComparer<T> : ValueComparer<T>
+public class JsonValueComparer<T> : ValueComparer<T>
 {
     public JsonValueComparer()
         : base(
-            (left, right) => IsJsonEquals(left, right), 
-            t => GetJsonHashCode(t), 
+            (left, right) => IsJsonEquals(left, right),
+            t => GetJsonHashCode(t),
             t => GetJsonSnapshot(t))
     {
     }
 
-    private static T GetJsonSnapshot(T instance)
+    internal static T GetJsonSnapshot(T instance)
     {
         if (instance is ICloneable cloneable)
             return (T)cloneable.Clone();
@@ -26,9 +23,9 @@ internal class JsonValueComparer<T> : ValueComparer<T>
             object? obj2 = JsonNode.Parse(jsonNode.ToJsonString());
             return (T)obj2;
         }
-        
+
 #if USE_JSON_LIBRARY_NEWTONSOFT
-        var obj = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(instance), typeof(T));
+        var obj = Newtonsoft.Json.JsonConvert.DeserializeObject(Newtonsoft.Json.JsonConvert.SerializeObject(instance), typeof(T));
         if (obj == null)
             throw new NotSupportedException("Deserialized JSON object is null");
 
@@ -38,7 +35,7 @@ internal class JsonValueComparer<T> : ValueComparer<T>
 #endif
     }
 
-    private static int GetJsonHashCode(T instance)
+    internal static int GetJsonHashCode(T instance)
     {
         if (instance is IEquatable<T>)
             return instance.GetHashCode();
@@ -49,13 +46,13 @@ internal class JsonValueComparer<T> : ValueComparer<T>
         }
 
 #if USE_JSON_LIBRARY_NEWTONSOFT
-        return JsonConvert.SerializeObject(instance).GetHashCode();
+        return Newtonsoft.Json.JsonConvert.SerializeObject(instance).GetHashCode();
 #else
         throw new NotImplementedException();
 #endif
     }
 
-    private static bool IsJsonEquals(T? left, T? right)
+    internal static bool IsJsonEquals(T? left, T? right)
     {
         if (left is IEquatable<T> equatable)
             return equatable.Equals(right);
@@ -69,7 +66,7 @@ internal class JsonValueComparer<T> : ValueComparer<T>
         }
 
 #if USE_JSON_LIBRARY_NEWTONSOFT       
-        return JsonConvert.SerializeObject(left).Equals(JsonConvert.SerializeObject(right));
+        return Newtonsoft.Json.JsonConvert.SerializeObject(left).Equals(Newtonsoft.Json.JsonConvert.SerializeObject(right));
 #else
         throw new NotImplementedException();
 #endif

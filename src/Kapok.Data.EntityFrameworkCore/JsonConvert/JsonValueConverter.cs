@@ -1,10 +1,7 @@
 ﻿using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-#if USE_JSON_LIBRARY_NEWTONSOFT
-using Newtonsoft.Json;
-#endif
 
-namespace Kapok.Data.EntityFrameworkCore;
+namespace Kapok.Data.EntityFrameworkCore.JsonConvert;
 
 public class JsonValueConverter<T> : ValueConverter<T, string>
     where T : class
@@ -18,22 +15,22 @@ public class JsonValueConverter<T> : ValueConverter<T, string>
     {
     }
 
-    private static string? ObjectToJsonString(T? value)
+    internal static string? ObjectToJsonString(T? value)
     {
         if (value == null)
             return null;
-        
+
         if (value is JsonNode jsonNode)
             return jsonNode.ToJsonString();
 
 #if USE_JSON_LIBRARY_NEWTONSOFT
-        return JsonConvert.SerializeObject(value);
+        return Newtonsoft.Json.JsonConvert.SerializeObject(value);
 #else
         throw new NotImplementedException();
 #endif
     }
 
-    private static T? JsonStringToObject(string value)
+    internal static T? JsonStringToObject(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
             return null;
@@ -45,7 +42,7 @@ public class JsonValueConverter<T> : ValueConverter<T, string>
         }
 
 #if USE_JSON_LIBRARY_NEWTONSOFT
-        return JsonConvert.DeserializeObject<T>(value);
+        return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(value);
 #else
         throw new NotImplementedException();
 #endif
