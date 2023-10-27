@@ -13,7 +13,7 @@ public class JsonValueComparer<T> : ValueComparer<T>
     {
     }
 
-    internal static T GetJsonSnapshot(T instance)
+    public static T GetJsonSnapshot(T instance)
     {
         if (instance is ICloneable cloneable)
             return (T)cloneable.Clone();
@@ -35,7 +35,7 @@ public class JsonValueComparer<T> : ValueComparer<T>
 #endif
     }
 
-    internal static int GetJsonHashCode(T instance)
+    public static int GetJsonHashCode(T instance)
     {
         if (instance is IEquatable<T>)
             return instance.GetHashCode();
@@ -52,7 +52,7 @@ public class JsonValueComparer<T> : ValueComparer<T>
 #endif
     }
 
-    internal static bool IsJsonEquals(T? left, T? right)
+    public static bool IsJsonEquals(T? left, T? right)
     {
         if (left is IEquatable<T> equatable)
             return equatable.Equals(right);

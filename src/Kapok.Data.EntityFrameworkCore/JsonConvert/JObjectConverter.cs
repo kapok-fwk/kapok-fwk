@@ -6,6 +6,12 @@ namespace Kapok.Data.EntityFrameworkCore.JsonConvert;
 
 public class JObjectConverter : ValueConverter<JObject, string>
 {
+    // ReSharper disable once UnusedMember.Global
+    public JObjectConverter()
+        : this(default)
+    {
+    }
+
     public JObjectConverter(ConverterMappingHints? hints = default)
 #pragma warning disable CS8603 // Possible null reference return.
         : base(value => JsonValueConverter<JObject>.ObjectToJsonString(value),

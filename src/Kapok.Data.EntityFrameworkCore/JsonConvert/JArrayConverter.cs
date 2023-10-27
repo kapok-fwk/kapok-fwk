@@ -7,6 +7,12 @@ namespace Kapok.Data.EntityFrameworkCore.JsonConvert;
 
 public class JArrayConverter : ValueConverter<JArray, string>
 {
+    // ReSharper disable once UnusedMember.Global
+    public JArrayConverter()
+        : this(default)
+    {
+    }
+
     public JArrayConverter(ConverterMappingHints? hints = default)
 #pragma warning disable CS8603 // Possible null reference return.
         : base(value => JsonValueConverter<JArray>.ObjectToJsonString(value),

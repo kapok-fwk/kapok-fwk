@@ -6,6 +6,12 @@ namespace Kapok.Data.EntityFrameworkCore.JsonConvert;
 public class JsonValueConverter<T> : ValueConverter<T, string>
     where T : class
 {
+    // ReSharper disable once UnusedMember.Global
+    public JsonValueConverter()
+        : this(default)
+    {
+    }
+
     public JsonValueConverter(ConverterMappingHints? hints = default) :
 #pragma warning disable 8603
         base(value => ObjectToJsonString(value),
@@ -15,7 +21,7 @@ public class JsonValueConverter<T> : ValueConverter<T, string>
     {
     }
 
-    internal static string? ObjectToJsonString(T? value)
+    public static string? ObjectToJsonString(T? value)
     {
         if (value == null)
             return null;
@@ -30,7 +36,7 @@ public class JsonValueConverter<T> : ValueConverter<T, string>
 #endif
     }
 
-    internal static T? JsonStringToObject(string value)
+    public static T? JsonStringToObject(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
             return null;
