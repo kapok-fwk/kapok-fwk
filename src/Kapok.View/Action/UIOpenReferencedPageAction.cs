@@ -19,9 +19,7 @@ public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction
     protected readonly Dictionary<Type, object>? PageConstructorParamValues;
     private readonly IDataSetView<TEntry>? _baseDataSetView;
     private readonly Action<IFilterSet, TEntry, IReadOnlyDictionary<string, object?>>? _filter;
-
-    private readonly string? _listViewName;
-
+    
     public UIOpenReferencedPageAction(string name, IDataPage page,
         IDataSetView<TEntry>? baseDataSetView = null,
         Action<IFilterSet, TEntry, IReadOnlyDictionary<string, object?>>? filter = null,
@@ -38,7 +36,7 @@ public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction
         _pageType = page.GetType();
         _baseDataSetView = baseDataSetView;
         _filter = filter;
-        _listViewName = listViewName;
+        ListViewName = listViewName;
     }
 
     public UIOpenReferencedPageAction(string name, Type pageType, IViewDomain viewDomain,
@@ -67,7 +65,7 @@ public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction
             PageConstructorParamValues.Add(typeof(IDataSetView<TEntry>), baseDataSetView);
         _baseDataSetView = baseDataSetView;
         _filter = filter;
-        _listViewName = listViewName;
+        ListViewName = listViewName;
     }
 
     private Type GetTSourceEntryType()
@@ -105,6 +103,12 @@ public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction
 #pragma warning restore CS8604
 #pragma warning restore CS8602
     }
+
+    /// <summary>
+    /// The list view of the page which shall be selected before the page is
+    /// opened.
+    /// </summary>
+    public string? ListViewName { get; init; }
 
     public DocumentPageCollectionPage? HostPage
     {
@@ -158,15 +162,15 @@ public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction
             page.DataSet.Filter.Add(filterSet);
         }
 
-        if (_listViewName != null)
+        if (ListViewName != null)
         {
             if (page is not IListPage listPage)
             {
-                Debug.Fail($"UIOpenReferencedPageAction<> has been called with ListViewName '{_listViewName}' set but the page is no list view type. The parameter will be ignored.");
+                Debug.Fail($"UIOpenReferencedPageAction<> has been called with ListViewName '{ListViewName}' set but the page is no list view type. The parameter will be ignored.");
             }
             else
             {
-                var listView = listPage.ListViews.FirstOrDefault(lv => lv.Name == _listViewName);
+                var listView = listPage.ListViews.FirstOrDefault(lv => lv.Name == ListViewName);
                 listPage.CurrentListView = listView;
             }
         }

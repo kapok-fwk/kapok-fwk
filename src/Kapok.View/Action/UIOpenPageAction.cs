@@ -67,6 +67,12 @@ public class UIOpenPageAction : UIAction, IOpenPageAction
         set => SetProperty(ref _hostPage, value);
     }
 
+    /// <summary>
+    /// The list view of the page which shall be selected before the page is
+    /// opened.
+    /// </summary>
+    public string? ListViewName { get; init; }
+
     private void OpenPage()
     {
         if (HostPage != null)
@@ -98,6 +104,19 @@ public class UIOpenPageAction : UIAction, IOpenPageAction
             _viewDomain?.ShowErrorMessage($"An error occurred during opening of page type {_pageType.FullName}", exception: e);
 #pragma warning restore CS8602
             return;
+        }
+
+        if (ListViewName != null)
+        {
+            if (page is not IListPage listPage)
+            {
+                Debug.Fail($"UIOpenReferencedPageAction<> has been called with ListViewName '{ListViewName}' set but the page is no list view type. The parameter will be ignored.");
+            }
+            else
+            {
+                var listView = listPage.ListViews.FirstOrDefault(lv => lv.Name == ListViewName);
+                listPage.CurrentListView = listView;
+            }
         }
 
         if (HostPage != null)
