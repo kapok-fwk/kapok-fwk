@@ -24,10 +24,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\src\Kapok.Acl\Kapok.Acl.csproj" />
-      <ProjectReference Include="..\src\Kapok.Core\Kapok.Core.csproj" />
-      <ProjectReference Include="..\src\Kapok.Data.EntityFrameworkCore.UnitTest\Kapok.Data.EntityFrameworkCore.UnitTest.csproj" />
-      <ProjectReference Include="..\src\Kapok.Data.EntityFrameworkCore\Kapok.Data.EntityFrameworkCore.csproj" />
+      <ProjectReference Include="..\Kapok.Acl\Kapok.Acl.csproj" />
+      <ProjectReference Include="..\Kapok.Core\Kapok.Core.csproj" />
+      <ProjectReference Include="..\Kapok.Data.EntityFrameworkCore.UnitTest\Kapok.Data.EntityFrameworkCore.UnitTest.csproj" />
+      <ProjectReference Include="..\Kapok.Data.EntityFrameworkCore\Kapok.Data.EntityFrameworkCore.csproj" />
     </ItemGroup>
 
 </Project>
