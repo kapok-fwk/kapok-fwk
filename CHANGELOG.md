@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.1.11 (2023-10-28)
+
+### General
+
+- :rocket: dependency upgrades
+
+### Kapok.Core
+
+- :tada: add support to generate automatically a new GUID for properties with attribute `AutoGenerateValue`, option `Identity`
+- :rocket: smaller (micro) optimizations
+- :bug: *fix* type check bug in `PropertyStaticFilter` class
+
+### Kapok.Data.EntityFrameworkCore
+
+- :rocket: EF Core: use no generic value comparer/converter for ef core Json convertion (preparing support for EF core precompiled models)
+- :rocket: smaller (micro) optimizations
+
+### Kapok.View
+
+- :tada: add metadata manager for page list views and optional metadata
+- :rocket: smaller (micro) optimizations
+- :rocket: add page constructors for `IDataDomain` and instanciate scope on demand
+- :rocket: add serialization support for DataSetListView and expressions (requires nuget package `Nuqleon.Linq.Expressions.Bonsai.Serialization`)
+
 ## 0.1.10.3 (2023-10-08)
 
 ### Kapok.View

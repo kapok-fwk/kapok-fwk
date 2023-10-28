@@ -31,7 +31,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kapok.View", "src\Kapok.Vie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kapok.View.UnitTest", "src\Kapok.View.UnitTest\Kapok.View.UnitTest.csproj", "{8D48D6BD-FDAB-4FA5-AFEF-1C96236D3C56}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kapok.Acl.UnitTest", "Kapok.Acl.UnitTest\Kapok.Acl.UnitTest.csproj", "{4199E3DC-AE49-4777-84C4-4FC592F58E3B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kapok.Acl.UnitTest", "src\Kapok.Acl.UnitTest\Kapok.Acl.UnitTest.csproj", "{4199E3DC-AE49-4777-84C4-4FC592F58E3B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
