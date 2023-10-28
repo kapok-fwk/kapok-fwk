@@ -96,6 +96,14 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
 
         base.OnLoaded();
 
+        // load list view metadata
+        var listViews = MetadataEngine.ActiveMetadataEngine?.GetPageListViews(GetType(), typeof(TEntry));
+        if (listViews != null)
+        {
+            // NOTE: use await here when OnLoaded is changed to support async.
+            ListViews.AddRange(listViews.ToListAsync().Result);
+        }
+
         if (DataSet == null || ((ICollection)DataSet.Columns).Count == 0 && CurrentListView == null && ListViews.Count > 0)
         {
             CurrentListView = ListViews[0];

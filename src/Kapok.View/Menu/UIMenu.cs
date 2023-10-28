@@ -14,6 +14,10 @@ public class UIMenu
     private readonly IPage _basePage;
     private ObservableCollection<UIMenuItem>? _menuItems;
 
+    protected UIMenu()
+    {
+    }
+
     /// <summary>
     /// 
     /// </summary>
