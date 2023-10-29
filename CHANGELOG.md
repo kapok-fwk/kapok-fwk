@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.12 (2023-10-29)
+
+### Kapok.View
+
+- :tada: add ListViewName to UIOpenPageAction, add as property for  UIOpenReferencedPageAction
+- :rocket: refactoring EntityDefaultPageType, allow non IDataPage pages to be a default page type
+
 ## 0.1.11 (2023-10-28)
 
 ### General
