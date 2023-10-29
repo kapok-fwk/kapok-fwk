@@ -89,6 +89,8 @@ public abstract class ViewDomain : IViewDomain
             constructorParamValues = new Dictionary<Type, object?>
             {
                 { typeof(IViewDomain), this },
+                { typeof(IDataDomain), DataDomain.Default },
+                { typeof(IDataDomainScope), DataDomain.Default?.CreateScope() },
             };
         }
         else
@@ -96,6 +98,16 @@ public abstract class ViewDomain : IViewDomain
             if (!constructorParamValues.ContainsKey(typeof(IViewDomain)))
             {
                 constructorParamValues.Add(typeof(IViewDomain), this);
+            }
+
+            if (!constructorParamValues.ContainsKey(typeof(IDataDomain)))
+            {
+                constructorParamValues.Add(typeof(IDataDomain), this);
+            }
+
+            if (!constructorParamValues.ContainsKey(typeof(IDataDomainScope)))
+            {
+                constructorParamValues.Add(typeof(IDataDomainScope), DataDomain.Default?.CreateScope());
             }
         }
 
