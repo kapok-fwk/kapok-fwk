@@ -1,4 +1,5 @@
-﻿using Kapok.Core.UnitTest.DataModel;
+﻿using Kapok.Core.UnitTest.BusinessLayer;
+using Kapok.Core.UnitTest.DataModel;
 using Kapok.Data;
 using Kapok.Module;
 
@@ -14,7 +15,7 @@ public class ToDoModule : ModuleBase
     {
         base.Initiate();
 
-        DataDomain.RegisterEntity<ToDoItem>();
+        DataDomain.RegisterEntity<ToDoItem, ToDoItemDao>();
         DataDomain.RegisterEntity<ToDoList>();
     }
 }

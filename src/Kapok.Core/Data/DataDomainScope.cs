@@ -1,11 +1,13 @@
 ﻿using System.Transactions;
 using Kapok.BusinessLayer;
+using Microsoft.Extensions.DependencyInjection;
 using Res = Kapok.Resources.Data.DataDomainScope;
 
 namespace Kapok.Data;
 
 public abstract class DataDomainScope : IDataDomainScope
 {
+    private IServiceProvider? _serviceProvider;
     private readonly List<TransactionScope> _transactionScopes = new();
     private readonly Dictionary<Type, object> _daos = new();
     private readonly Dictionary<Type, object> _repositories = new();
@@ -16,6 +18,29 @@ public abstract class DataDomainScope : IDataDomainScope
         ArgumentNullException.ThrowIfNull(dataDomain, nameof(dataDomain));
         DataDomain = dataDomain;
         DataPartitions = dataDomain.DataPartitions;
+    }
+
+    protected DataDomainScope(IDataDomain dataDomain, IServiceProvider serviceProvider)
+        : this(dataDomain)
+    {
+        _serviceProvider = serviceProvider;
+    }
+
+    /// <summary>
+    /// The service provider to be used for page construction.
+    /// </summary>
+    protected IServiceProvider ServiceProvider
+    {
+        get => _serviceProvider ??= CreateDefaultServiceProvider();
+        set => _serviceProvider = value;
+    }
+
+    private IServiceProvider CreateDefaultServiceProvider()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<IDataDomain>(p => DataDomain);
+        services.AddSingleton<IDataDomainScope>(p => this);
+        return services.BuildServiceProvider();
     }
 
     #region Deferred commit Dao handling
@@ -172,7 +197,7 @@ public abstract class DataDomainScope : IDataDomainScope
     private IDao<T> InitializeDao<T>(IRepository<T> repository)
         where T : class, new()
     {
-        return Kapok.Data.DataDomain.ConstructNewDao(this, repository);
+        return Kapok.Data.DataDomain.ConstructNewDao(ServiceProvider, repository);
     }
 
     private void AddDaoInternal<T>(IDao<T> dao)
