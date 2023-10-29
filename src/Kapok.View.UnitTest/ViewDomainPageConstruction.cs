@@ -53,6 +53,18 @@ public class ViewDomainPageConstruction
     }
 
     [Fact]
+    public void ConstructSampleListPage()
+    {
+        using var scope = DataDomain.CreateScope();
+
+        var page = ViewDomain.ConstructPage<SampleListPage>(null);
+        Assert.NotNull(page);
+
+        page = ViewDomain.ConstructPage<SampleListPage>(scope);
+        Assert.NotNull(page);
+    }
+
+    [Fact]
     public void BuildThroughOpenCardPageAction()
     {
         using var scope = DataDomain.CreateScope();

@@ -1,6 +1,5 @@
-﻿using System.Diagnostics;
-using System.Globalization;
-using System.Reflection;
+﻿using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
 using Kapok.BusinessLayer;
 using Kapok.Data;
 using Kapok.Entity;
@@ -28,11 +27,31 @@ public class PageConstructionException : Exception
 /// </summary>
 public abstract class ViewDomain : IViewDomain
 {
+    private IServiceProvider? _serviceProvider;
+
     protected ViewDomain()
     {
         Culture = Thread.CurrentThread.CurrentUICulture;
 
         Default ??= this;
+    }
+
+    /// <summary>
+    /// The service provider to be used for page construction.
+    /// </summary>
+    protected IServiceProvider ServiceProvider
+    {
+        get => _serviceProvider ??= CreateDefaultServiceProvider();
+        set => _serviceProvider = value;
+    }
+
+    private IServiceProvider CreateDefaultServiceProvider()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<IViewDomain>(p => this);
+        services.AddSingleton<IDataDomain>(p => DataDomain.Default);
+        services.AddScoped<IDataDomainScope>(p => p.GetService<IDataDomain>()?.CreateScope());
+        return services.BuildServiceProvider();
     }
 
     public CultureInfo Culture { get; }
@@ -75,77 +94,15 @@ public abstract class ViewDomain : IViewDomain
 
     public IPage ConstructPage(Type pageType)
     {
-        return ConstructPage(pageType, constructorParamValues: null);
-    }
+        var page = (IPage?)ServiceProvider.GetService(pageType);
 
-    public IPage ConstructPage(Type pageType, Dictionary<Type, object?>? constructorParamValues)
-    {
-        var constructors = pageType.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
-        ConstructorInfo? foundConstructorInfo = null;
-        var constructorParameterValues = new List<object?>();
+        if (page != null)
+            return page;
 
-        if (constructorParamValues == null)
-        {
-            constructorParamValues = new Dictionary<Type, object?>
-            {
-                { typeof(IViewDomain), this },
-                { typeof(IDataDomain), DataDomain.Default },
-                { typeof(IDataDomainScope), DataDomain.Default?.CreateScope() },
-            };
-        }
-        else
-        {
-            if (!constructorParamValues.ContainsKey(typeof(IViewDomain)))
-            {
-                constructorParamValues.Add(typeof(IViewDomain), this);
-            }
-
-            if (!constructorParamValues.ContainsKey(typeof(IDataDomain)))
-            {
-                constructorParamValues.Add(typeof(IDataDomain), this);
-            }
-
-            if (!constructorParamValues.ContainsKey(typeof(IDataDomainScope)))
-            {
-                constructorParamValues.Add(typeof(IDataDomainScope), DataDomain.Default?.CreateScope());
-            }
-        }
-
-        foreach (var constructorInfo in constructors)
-        {
-            bool isValid = true;
-            constructorParameterValues.Clear();
-            foreach (var parameterInfo in constructorInfo.GetParameters())
-            {
-                if (constructorParamValues.TryGetValue(parameterInfo.ParameterType, out var parameterDefaultValue))
-                {
-                    constructorParameterValues.Add(parameterDefaultValue);
-                }
-                else if (parameterInfo.HasDefaultValue)
-                {
-                    constructorParameterValues.Add(parameterInfo.DefaultValue);
-                }
-                else
-                {
-                    isValid = false;
-                    break;
-                }
-            }
-
-            if (!isValid)
-                continue;
-
-            foundConstructorInfo = constructorInfo;
-            break;
-        }
-
-        if (foundConstructorInfo == null)
-            throw new NotSupportedException("The TPage does not implement a constructor with a valid list of parameters in its constructor(s).");
-
-        IPage newPage;
+        // page is not registered in the provider, so we invoke the page creation ourselves
         try
         {
-            newPage = (IPage)foundConstructorInfo.Invoke(constructorParameterValues.ToArray());
+            page = (IPage)ActivatorUtilities.CreateInstance(ServiceProvider, pageType);
         }
         catch (BusinessLayerErrorException e)
         {
@@ -153,15 +110,63 @@ public abstract class ViewDomain : IViewDomain
         }
         catch (Exception e)
         {
-            Debugger.Break();
+            throw new PageConstructionException(pageType, innerException: e);
+        }
+
+        return page;
+    }
+
+    public IPage ConstructPage(Type pageType, IServiceScope scope)
+    {
+        var page = (IPage?)scope.ServiceProvider.GetService(pageType);
+
+        if(page != null)
+            return page;
+
+        // page is not registered in the provider, so we invoke the page creation ourselves
+        try
+        {
+            page = (IPage)ActivatorUtilities.CreateInstance(scope.ServiceProvider, pageType);
+        }
+        catch (BusinessLayerErrorException e)
+        {
+            throw new PageConstructionException(pageType, innerException: e);
+        }
+        catch (Exception e)
+        {
+            throw new PageConstructionException(pageType, innerException: e);
+        }
+
+        return page;
+    }
+
+    [Obsolete]
+    public IPage ConstructPage(Type pageType, Dictionary<Type, object?>? constructorParamValues)
+    {
+        IPage newPage;
+        try
+        {
+            newPage = (IPage)ActivatorUtilities.CreateInstance(ServiceProvider, pageType,
+                (object[]?)constructorParamValues?.Values.Where(v => v is not null).ToArray() ?? Array.Empty<object>());
+        }
+        catch (BusinessLayerErrorException e)
+        {
+            throw new PageConstructionException(pageType, innerException: e);
+        }
+        catch (Exception e)
+        {
             throw new PageConstructionException(pageType, innerException: e);
         }
 
         return newPage;
     }
 
+    [Obsolete]
     public IPage ConstructPage(Type pageType, IDataDomainScope? dataDomainScope)
     {
+        if (dataDomainScope == null)
+            return ConstructPage(pageType);
+
         return ConstructPage(pageType, new Dictionary<Type, object?>
         {
             { typeof(IDataDomain), dataDomainScope?.DataDomain },
@@ -169,45 +174,20 @@ public abstract class ViewDomain : IViewDomain
         });
     }
 
+    [Obsolete]
     public TPage ConstructPage<TPage>(IDataDomainScope? dataDomainScope = null)
         where TPage : IPage
     {
-        var constructors = typeof(TPage).GetConstructors(BindingFlags.Public | BindingFlags.Static |
-                                                         BindingFlags.Instance);
-        ConstructorInfo? foundConstructorInfo = null;
-        var constructorParameterValues = new List<object?>();
-
-        foreach (var constructorInfo in constructors)
-        {
-            bool isValid = true;
-            constructorParameterValues.Clear();
-            foreach (var parameterInfo in constructorInfo.GetParameters())
-            {
-                if (parameterInfo.ParameterType == typeof(IDataDomainScope))
-                {
-                    constructorParameterValues.Add(dataDomainScope);
-                }
-                else
-                {
-                    isValid = false;
-                    break;
-                }
-            }
-
-            if (!isValid)
-                continue;
-
-            foundConstructorInfo = constructorInfo;
-            break;
-        }
-
-        if (foundConstructorInfo == null)
-            throw new NotSupportedException("The TPage does not implement a constructor with a valid list of ");
+        dataDomainScope ??= ServiceProvider.GetService<IDataDomainScope>();
 
         TPage newPage;
         try
         {
-            newPage = (TPage)foundConstructorInfo.Invoke(constructorParameterValues.ToArray());
+            newPage = ActivatorUtilities.CreateInstance<TPage>(ServiceProvider, dataDomainScope);
+        }
+        catch (BusinessLayerErrorException e)
+        {
+            throw new PageConstructionException(typeof(TPage), innerException: e);
         }
         catch (Exception e)
         {
