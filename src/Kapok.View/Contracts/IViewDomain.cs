@@ -23,10 +23,11 @@ public interface IViewDomain
 
     Type GetPageControlType(Type pageType);
 
+    IPage ConstructPage(Type pageType);
     IPage ConstructPage(Type pageType, Dictionary<Type, object?>? constructorParamValues);
     TPage ConstructPage<TPage>(IDataDomainScope? dataDomainScope = null)
         where TPage : IPage;
-    IDataPage ConstructEntityDefaultPage(Type entityType, IDataDomainScope? dataDomainScope = null);
+    IPage ConstructEntityDefaultPage(Type entityType, IDataDomainScope? dataDomainScope);
 
     IQueryableView<TEntity> CreateQueryableView<TEntity>(IQueryable<TEntity> queryable)
         where TEntity : class;

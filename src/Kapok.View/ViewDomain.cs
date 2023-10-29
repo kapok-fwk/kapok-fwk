@@ -50,12 +50,11 @@ public abstract class ViewDomain : IViewDomain
 
     private static readonly Dictionary<Type, Type> EntityDefaultPageOfEntityType = new();
 
-    // TODO: maybe rename to 'RegisterEntityDefaultListPage' and create a new for RegisterEntityDefaultCardPage ? --> architecture decision required for that
     public static void RegisterEntityDefaultPage<TEntity>(Type pageType)
         where TEntity : class
     {
-        if (!typeof(IDataPage).IsAssignableFrom(pageType))
-            throw new ArgumentException("The default page type must inherit the interface IDataPage.", nameof(pageType));
+        if (!typeof(IPage).IsAssignableFrom(pageType))
+            throw new ArgumentException(string.Format("The default page type must inherit the interface {0}.", typeof(IPage)), nameof(pageType));
 
         if (EntityDefaultPageOfEntityType.ContainsKey(typeof(TEntity)))
         {
@@ -69,20 +68,36 @@ public abstract class ViewDomain : IViewDomain
 
     public Type? GetEntityDefaultPageType(Type entityType)
     {
-        if (EntityDefaultPageOfEntityType.ContainsKey(entityType))
-            return EntityDefaultPageOfEntityType[entityType];
-
-        return null;
+        return EntityDefaultPageOfEntityType.TryGetValue(entityType, out var type) ? type : null;
     }
 
     public abstract Type GetPageControlType(Type pageType);
 
+    public IPage ConstructPage(Type pageType)
+    {
+        return ConstructPage(pageType, constructorParamValues: null);
+    }
+
     public IPage ConstructPage(Type pageType, Dictionary<Type, object?>? constructorParamValues)
     {
-        var constructors = pageType.GetConstructors(BindingFlags.Public | BindingFlags.Static |
-                                                    BindingFlags.Instance);
+        var constructors = pageType.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
         ConstructorInfo? foundConstructorInfo = null;
         var constructorParameterValues = new List<object?>();
+
+        if (constructorParamValues == null)
+        {
+            constructorParamValues = new Dictionary<Type, object?>
+            {
+                { typeof(IViewDomain), this },
+            };
+        }
+        else
+        {
+            if (!constructorParamValues.ContainsKey(typeof(IViewDomain)))
+            {
+                constructorParamValues.Add(typeof(IViewDomain), this);
+            }
+        }
 
         foreach (var constructorInfo in constructors)
         {
@@ -90,24 +105,9 @@ public abstract class ViewDomain : IViewDomain
             constructorParameterValues.Clear();
             foreach (var parameterInfo in constructorInfo.GetParameters())
             {
-                if (constructorParamValues != null && constructorParamValues.ContainsKey(parameterInfo.ParameterType))
+                if (constructorParamValues.TryGetValue(parameterInfo.ParameterType, out var parameterDefaultValue))
                 {
-                    constructorParameterValues.Add(constructorParamValues[parameterInfo.ParameterType]);
-                }
-                else if (parameterInfo.ParameterType == typeof(IViewDomain))
-                {
-                    constructorParameterValues.Add(this);
-                }
-                else if (parameterInfo.ParameterType == typeof(IDataDomainScope))
-                {
-                    if (DataDomain.Default == null)
-                    {
-                        isValid = false;
-                        break;
-                    }
-
-                    var scope = DataDomain.Default.CreateScope();
-                    constructorParameterValues.Add(scope);
+                    constructorParameterValues.Add(parameterDefaultValue);
                 }
                 else if (parameterInfo.HasDefaultValue)
                 {
@@ -148,11 +148,12 @@ public abstract class ViewDomain : IViewDomain
         return newPage;
     }
 
-    public IPage ConstructPage(Type pageType, IDataDomainScope? dataDomainScope = null)
+    public IPage ConstructPage(Type pageType, IDataDomainScope? dataDomainScope)
     {
         return ConstructPage(pageType, new Dictionary<Type, object?>
         {
-            {typeof(IDataDomainScope), dataDomainScope}
+            { typeof(IDataDomain), dataDomainScope?.DataDomain },
+            { typeof(IDataDomainScope), dataDomainScope }
         });
     }
 
@@ -220,14 +221,14 @@ public abstract class ViewDomain : IViewDomain
         return CreatePropertyLookupView(lookupDefinition, dataDomain, () => dataSet.Current);
     }
 
-    public IDataPage ConstructEntityDefaultPage(Type entityType, IDataDomainScope? dataDomainScope = null)
+    public IPage ConstructEntityDefaultPage(Type entityType, IDataDomainScope? dataDomainScope = null)
     {
         var pageType = GetEntityDefaultPageType(entityType);
         if (pageType == null)
             throw new ArgumentException($"For the entity type {entityType.FullName} is no default page defined.",
                 nameof(entityType));
 
-        return (IDataPage)ConstructPage(pageType, dataDomainScope);
+        return ConstructPage(pageType, dataDomainScope);
     }
 
     public abstract IDataSetView<TEntry> CreateDataSetView<TEntry>(IDataDomainScope dataDomainScope, IDao<TEntry>? repository = null)
