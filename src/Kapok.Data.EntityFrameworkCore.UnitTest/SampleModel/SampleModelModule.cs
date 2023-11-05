@@ -23,5 +23,6 @@ public sealed class SampleModelModule : ModuleBase
         DataDomain.RegisterEntity<Course>();
         DataDomain.RegisterEntity<Enrollment>();
         DataDomain.RegisterEntity<Student>();
+        DataDomain.RegisterEntity<StudentVirtual>(isVirtual: true);
     }
 }

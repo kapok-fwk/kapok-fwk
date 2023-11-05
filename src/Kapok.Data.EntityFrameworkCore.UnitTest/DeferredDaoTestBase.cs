@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Kapok.Data.EntityFrameworkCore.UnitTest;
 
-public abstract class DeferredDaoTestBase : IDisposable
+public abstract class DeferredDaoTestBase : EFUnitTestBase, IDisposable
 {
     private readonly IDataDomain _dataDomain;
 
@@ -17,7 +17,7 @@ public abstract class DeferredDaoTestBase : IDisposable
     // https://docs.microsoft.com/en-us/dotnet/standard/data/sqlite/in-memory-databases
     private readonly IDbConnection _cacheDbConnection;
     private readonly EFCoreDataDomainScope _cacheScope;
-    
+
     public DeferredDaoTestBase(IDataDomain? dataDomain = null)
     {
         Kapok.Data.DataDomain.DefaultDaoType = typeof(DeferredDao<>);
@@ -54,37 +54,12 @@ public abstract class DeferredDaoTestBase : IDisposable
         }
         _cacheScope.DbContext.Database.EnsureCreated();
     }
-    
+
     public void Dispose()
     {
         _cacheDbConnection.Close();
         _cacheScope.Dispose();
     }
-    
-    public IDataDomain InitializeDataDomain(DbContextOptions? dbContextOptions = null)
-    {
-        if (dbContextOptions == null)
-        {
-            var contextOptionBuilder = new DbContextOptionsBuilder();
-
-            // testing against SQLite database
-            // Requires NuGet package Microsoft.EntityFrameworkCore.Sqlite
-            contextOptionBuilder.UseSqlite($"Data Source={GetType().FullName};Mode=Memory;Cache=Shared");
-
-            // testing against a local SQL Server database
-            // Requires NuGet package Microsoft.EntityFrameworkCore.SqlServer
-            //contextOptionBuilder.UseSqlServer(@"Server=(local);Database=EFProviders.InMemory;Trusted_Connection=True;ConnectRetryCount=0",
-            //    opts => opts.CommandTimeout((int)TimeSpan.FromMinutes(10).TotalSeconds));
-
-            dbContextOptions = contextOptionBuilder.Options;
-        }
-
-        InitiateModule();
-
-        return new EFCoreDataDomain(dbContextOptions);
-    }
-
-    protected abstract void InitiateModule();
 
     public IDataDomain DataDomain => _dataDomain;
 }

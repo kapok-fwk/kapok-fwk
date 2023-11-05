@@ -1,5 +1,6 @@
 ﻿using System.Transactions;
 using Kapok.BusinessLayer;
+using Kapok.Data.InMemory;
 using Microsoft.Extensions.DependencyInjection;
 using Res = Kapok.Resources.Data.DataDomainScope;
 
@@ -161,6 +162,16 @@ public abstract class DataDomainScope : IDataDomainScope
         where T : class, new()
     {
         CheckIsDisposed();
+
+        if (Data.DataDomain.Entities.TryGetValue(typeof(T), out var registeredEntity))
+        {
+            if (registeredEntity.IsVirtual)
+            {
+                // return in memory repository to cache virtually the data
+                return new InMemoryRepository<T>();
+            }
+        }
+
         return ServiceProvider.GetRequiredService<IRepository<T>>();
     }
 

@@ -150,7 +150,7 @@ public abstract class DataDomain : IDataDomain
             if (dao != null) return dao;
         }
 
-        dao = (IDao<T>)ActivatorUtilities.CreateInstance(serviceProvider, _entities[entityType].DaoType);
+        dao = (IDao<T>)ActivatorUtilities.CreateInstance(serviceProvider, _entities[entityType].DaoType, repository);
 
         return dao;
     }
