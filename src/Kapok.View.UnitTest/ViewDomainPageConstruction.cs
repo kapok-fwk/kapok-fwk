@@ -15,11 +15,15 @@ public class ViewDomainPageConstruction
     public UnitTestViewDomain ViewDomain { get; }
     public IDataDomain DataDomain { get; }
 
+    static ViewDomainPageConstruction()
+    {
+        Data.DataDomain.RegisterEntity<SampleEntity>();
+    }
+
     public ViewDomainPageConstruction()
     {
         ViewDomain = new UnitTestViewDomain();
 
-        Data.DataDomain.RegisterEntity<SampleEntity>();
         DataDomain = new InMemoryDataDomain();
     }
 
@@ -50,6 +54,18 @@ public class ViewDomainPageConstruction
             Assert.NotNull(viewDomain);
             Assert.NotNull(dataDomainScope);
         }
+    }
+
+    [Fact]
+    public void ConstructSampleListPage()
+    {
+        using var scope = DataDomain.CreateScope();
+
+        var page = ViewDomain.ConstructPage<SampleListPage>(null);
+        Assert.NotNull(page);
+
+        page = ViewDomain.ConstructPage<SampleListPage>(scope);
+        Assert.NotNull(page);
     }
 
     [Fact]

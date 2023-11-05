@@ -31,9 +31,9 @@ public interface IDataDomainScope : IDisposable
     IDao<TEntity> GetDao<TEntity>()
         where TEntity : class, new();
 
-    TDao GetDao<TEntity, TDao>()
+    TService GetDao<TEntity, TService>()
         where TEntity : class, new()
-        where TDao : IDao<TEntity>;
+        where TService : IDao<TEntity>;
 
     ITransactionScope BeginTransaction()
         => BeginTransaction(IsolationLevel.ReadUncommitted);

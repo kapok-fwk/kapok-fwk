@@ -1,11 +1,11 @@
 ﻿using System.Diagnostics;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using Kapok.BusinessLayer;
 using Kapok.Data;
 using Kapok.Report.BusinessLayer;
 using Kapok.Report.DataModel;
 using Kapok.View;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Kapok.Report;
 // TODO: implement status reporting from the ReportEngine class e.g. to the UI
@@ -119,10 +119,36 @@ public sealed class ReportEngine
     #endregion
 
     private readonly IDataDomain? _dataDomain;
+    private IServiceProvider? _serviceProvider;
 
     public ReportEngine(IDataDomain? dataDomain = default)
     {
         _dataDomain = dataDomain;
+    }
+
+    public ReportEngine(IDataDomain? dataDomain = default, IServiceProvider? serviceProvider = default)
+        : this(dataDomain)
+    {
+        _serviceProvider = serviceProvider;
+    }
+
+    /// <summary>
+    /// The service provider to be used for page construction.
+    /// </summary>
+    public IServiceProvider ServiceProvider
+    {
+        get => _serviceProvider ??= CreateDefaultServiceProvider();
+        set => _serviceProvider = value;
+    }
+
+    private IServiceProvider CreateDefaultServiceProvider()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton(this);
+#pragma warning disable CS8603 // Possible null reference return.
+        services.AddSingleton<IDataDomain>(p => _dataDomain);
+#pragma warning restore CS8603 // Possible null reference return.
+        return services.BuildServiceProvider();
     }
 
     private void CheckDataDomainSet([CallerMemberName] string? memberName = null)
@@ -327,50 +353,7 @@ public sealed class ReportEngine
 
     private object CreateReportProcessorInstance(Type reportProcessorType)
     {
-        var constructorArgs = new List<object?>();
-
-        ConstructorInfo? constructorToUse = null;
-
-        foreach (var constructor in reportProcessorType.GetConstructors())
-        {
-            if (!constructor.IsPublic)
-                continue;
-
-            bool usableConstructor = true;
-
-            foreach (var parameterInfo in constructor.GetParameters())
-            {
-                if (parameterInfo.ParameterType == typeof(ReportEngine))
-                {
-                    constructorArgs.Add(this);
-                }
-                else if (parameterInfo.ParameterType == typeof(IDataDomain))
-                {
-                    CheckDataDomainSet();
-                    constructorArgs.Add(_dataDomain);
-                }
-                else if (parameterInfo.HasDefaultValue)
-                {
-                    constructorArgs.Add(parameterInfo.DefaultValue);
-                }
-                else
-                {
-                    usableConstructor = false;
-                    break;
-                }
-            }
-
-            if (!usableConstructor)
-                continue;
-
-            constructorToUse = constructor;
-            break;
-        }
-
-        if (constructorToUse == null)
-            throw new NotSupportedException($"Could not find a public constructor for report processor type {reportProcessorType.FullName} with assignable parameters for construction");
-
-        return constructorToUse.Invoke(constructorArgs.ToArray());
+        return ActivatorUtilities.CreateInstance(ServiceProvider, reportProcessorType);
     }
 
     private Task<Tuple<ReportLayout, ReportDesign?, IMimeTypeReportProcessor>>

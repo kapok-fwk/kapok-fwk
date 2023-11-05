@@ -1,15 +1,17 @@
 ﻿using System.Reflection;
 using Kapok.BusinessLayer;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Kapok.Data;
 
 public abstract class DataDomain : IDataDomain
 {
-    private struct RegisteredEntity
+    internal record RegisteredEntity
     {
-        public RegisteredEntity(Type entityType, Type daoType, bool isReadOnly, bool isVirtual)
+        public RegisteredEntity(Type entityType, Type daoType, bool isReadOnly, bool isVirtual, Type? contractType = null)
         {
             EntityType = entityType;
+            ContractType = contractType;
             DaoType = daoType;
             IsReadOnly = isReadOnly;
             IsVirtual = isVirtual;
@@ -17,6 +19,7 @@ public abstract class DataDomain : IDataDomain
 
         // ReSharper disable once NotAccessedField.Local
         public readonly Type EntityType;
+        public readonly Type? ContractType;
         public readonly Type DaoType;
         public readonly bool IsReadOnly;
         // ReSharper disable once NotAccessedField.Local
@@ -25,7 +28,9 @@ public abstract class DataDomain : IDataDomain
 
     #region Static
 
-    private static readonly Dictionary<Type, RegisteredEntity> Entities = new();
+    private static readonly Dictionary<Type, RegisteredEntity> _entities = new();
+
+    internal static IReadOnlyDictionary<Type, RegisteredEntity> Entities => _entities;
 
     /// <summary>
     /// Get all entities which are saved into the database (= not virtual)
@@ -56,7 +61,7 @@ public abstract class DataDomain : IDataDomain
         if (!isVirtual)
             DataEntities.Add(typeof(T));
 
-        Entities.Add(typeof(T), new RegisteredEntity(
+        _entities.Add(typeof(T), new RegisteredEntity(
             entityType: typeof(T),
             daoType: DefaultDaoType.MakeGenericType(typeof(T)),
             isReadOnly: isReadOnly,
@@ -81,7 +86,7 @@ public abstract class DataDomain : IDataDomain
             if (constructorInfo.GetParameters()
                 .Any(p => supportedParameterTypes.Contains(p.ParameterType) || p.HasDefaultValue))
             {
-                Entities.Add(typeof(TEntity), new RegisteredEntity(
+                _entities.Add(typeof(TEntity), new RegisteredEntity(
                     entityType: typeof(TEntity),
                     daoType: typeof(TDao),
                     isReadOnly: false,
@@ -94,67 +99,98 @@ public abstract class DataDomain : IDataDomain
         throw new NotSupportedException($"The dao type {typeof(TDao).FullName} has no public constructor with a list of supported parameters for initialization by this DataDomain.");
     }
 
-    internal static IDao<T> ConstructNewDao<T>(IDataDomainScope dataDomainScope, IRepository<T> repository)
+    public static void RegisterEntity<TEntity, TService, TDao>(bool isVirtual = false)
+        where TEntity : class, new()
+        where TService : IReadOnlyDao<TEntity>
+        where TDao : IReadOnlyDao<TEntity>
+    {
+        var supportedParameterTypes = new List<Type>
+        {
+            typeof(IDataDomainScope),
+            typeof(IRepository<TEntity>)
+        };
+
+        if (!isVirtual)
+            DataEntities.Add(typeof(TEntity));
+
+        foreach (var constructorInfo in typeof(TDao).GetConstructors())
+        {
+            if (constructorInfo.GetParameters()
+                .Any(p => supportedParameterTypes.Contains(p.ParameterType) || p.HasDefaultValue))
+            {
+                _entities.Add(typeof(TEntity), new RegisteredEntity(
+                    entityType: typeof(TEntity),
+                    daoType: typeof(TDao),
+                    isReadOnly: false,
+                    isVirtual: isVirtual,
+                    contractType: typeof(TService)));
+
+                return;
+            }
+        }
+
+        throw new NotSupportedException($"The dao type {typeof(TDao).FullName} has no public constructor with a list of supported parameters for initialization by this DataDomain.");
+    }
+
+    internal static IDao<T> ConstructNewDao<T>(IServiceProvider serviceProvider, IRepository<T> repository)
         where T : class, new()
     {
         var entityType = typeof(T);
 
-        if (!Entities.ContainsKey(entityType))
+        if (!_entities.ContainsKey(entityType))
             throw new ArgumentException(
                 $"The passed generic type {typeof(T).FullName} is not registered as entity. The DAO object cannot be created.");
 
-        foreach (var constructorInfo in Entities[entityType].DaoType.GetConstructors())
+        var dao = (IDao<T>?)serviceProvider.GetService(_entities[entityType].DaoType);
+        if (dao != null) return dao;
+
+        if (_entities[entityType].ContractType != null)
         {
-            var parameters = constructorInfo.GetParameters();
-            var parameterValues = new object?[parameters.Length];
-
-            int i = 0;
-            bool correct = true;
-            foreach (var parameterInfo in parameters)
-            {
-                if (parameterInfo.ParameterType == typeof(IDataDomainScope))
-                {
-                    parameterValues[i] = dataDomainScope;
-                }
-                else if (parameterInfo.ParameterType == typeof(IRepository<T>))
-                {
-                    parameterValues[i] = repository;
-                }
-                else if (parameterInfo.ParameterType == typeof(bool) &&
-                         parameterInfo.Name == "isReadOnly")
-                {
-                    parameterValues[i] = Entities[entityType].IsReadOnly;
-                }
-                else if (parameterInfo.HasDefaultValue)
-                {
-                    parameterValues[i] = parameterInfo.DefaultValue;
-                }
-                else
-                {
-                    correct = false;
-                    break;
-                }
-
-                i++;
-            }
-
-            if (correct)
-            {
-                return (IDao<T>)constructorInfo.Invoke(parameterValues);
-            }
+            dao = (IDao<T>?)serviceProvider.GetService(_entities[entityType].ContractType);
+            if (dao != null) return dao;
         }
 
-        throw new NotSupportedException(
-            $"No constructor for DAO {Entities[entityType].DaoType.FullName} could be found for initialization.");
+        dao = (IDao<T>)ActivatorUtilities.CreateInstance(serviceProvider, _entities[entityType].DaoType);
+
+        return dao;
     }
 
     #endregion
 
     #endregion
 
+    private IServiceProvider? _serviceProvider;
+
     protected DataDomain()
     {
         Default ??= this;
+    }
+
+    protected DataDomain(IServiceProvider? serviceProvider)
+        : this()
+    {
+        _serviceProvider = serviceProvider;
+    }
+
+    protected virtual void ConfigureServices(IServiceCollection serviceCollection)
+    {
+    }
+
+    /// <summary>
+    /// The service provider to be used for page construction.
+    /// </summary>
+    public IServiceProvider ServiceProvider
+    {
+        get => _serviceProvider ??= CreateDefaultServiceProvider();
+        set => _serviceProvider = value;
+    }
+
+    private IServiceProvider CreateDefaultServiceProvider()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<IDataDomain>(p => this);
+        ConfigureServices(services);
+        return services.BuildServiceProvider();
     }
 
     private readonly Dictionary<string, DataPartition> _dataPartitions = new();

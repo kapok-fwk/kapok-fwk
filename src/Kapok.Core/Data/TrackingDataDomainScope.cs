@@ -4,7 +4,7 @@ public abstract class TrackingDataDomainScope : DataDomainScope
 {
     private readonly ChangeTracker _changeTracker;
 
-    protected TrackingDataDomainScope(IDataDomain dataDomain) : base(dataDomain)
+    protected TrackingDataDomainScope(IDataDomain dataDomain, IServiceProvider serviceProvider) : base(dataDomain, serviceProvider)
     {
         _changeTracker = new ChangeTracker();
     }

@@ -1,4 +1,6 @@
 ﻿using System.Collections;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Kapok.Data.InMemory;
 
@@ -8,11 +10,19 @@ namespace Kapok.Data.InMemory;
 public class InMemoryDataDomain : DataDomain
 {
     // holds the in memory cache of the entities.
-    internal Dictionary<Type, IList> InMemoryData = new();
+    private readonly Dictionary<Type, IList> _inMemoryData = new();
+
+    protected override void ConfigureServices(IServiceCollection serviceCollection)
+    {
+        base.ConfigureServices(serviceCollection);
+        serviceCollection.TryAdd(ServiceDescriptor.Scoped<IDataDomainScope>(p => new InMemoryDataDomainScope(p.GetRequiredService<IDataDomain>(), p)));
+        serviceCollection.TryAdd(ServiceDescriptor.Scoped(typeof(IRepository<>), typeof(InMemoryRepository<>)));
+    }
 
     public override IDataDomainScope CreateScope()
     {
-        return new InMemoryDataDomainScope(this);
+        var scope = ServiceProvider.CreateScope();
+        return new InMemoryDataDomainScope(this, scope.ServiceProvider);
     }
 
     internal List<T> GetInMemoryData<T>()
@@ -23,13 +33,13 @@ public class InMemoryDataDomain : DataDomain
             throw new ArgumentException(
                 "You can only pass a entity type which has already been registered to the DataDomain");
 
-        if (InMemoryData.TryGetValue(type, out var inMemoryList))
+        if (_inMemoryData.TryGetValue(type, out var inMemoryList))
         {
             return (List<T>)inMemoryList;
         }
 
         var newList = new List<T>();
-        InMemoryData.Add(type, newList);
+        _inMemoryData.Add(type, newList);
         return newList;
     }
 }
