@@ -1,12 +1,10 @@
-﻿using Kapok.Data.InMemory;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Kapok.Data.EntityFrameworkCore;
 
 public sealed class EFCoreDataDomainScope : DataDomainScope
 {
-    private readonly IEntityFrameworkCoreDataDomain _dataDomain;
     private DbContext? _dbContext;
 
     /// <summary>
@@ -14,15 +12,13 @@ public sealed class EFCoreDataDomainScope : DataDomainScope
     /// </summary>
     private readonly object _dbContextLockObject = new();
 
-    public EFCoreDataDomainScope(IEntityFrameworkCoreDataDomain dataDomain)
-        : base(dataDomain)
+    public EFCoreDataDomainScope(IDataDomain dataDomain, IServiceProvider serviceProvider)
+        : base(dataDomain, serviceProvider)
     {
-        ArgumentNullException.ThrowIfNull(dataDomain);
-        _dataDomain = dataDomain;
     }
 
     // ReSharper disable once InconsistentlySynchronizedField
-    internal DbContext? DbContext => IsDisposed ? null : _dbContext ??= _dataDomain.ConstructNewDbContext();
+    internal DbContext? DbContext => IsDisposed ? null : _dbContext ??= ((IEntityFrameworkCoreDataDomain)DataDomain).ConstructNewDbContext();
 
     public IModel? Model => DbContext?.Model ?? null;
 
@@ -112,7 +108,7 @@ public sealed class EFCoreDataDomainScope : DataDomainScope
         }
     }
 
-    protected override IRepository<T> InitializeRepository<T>()
+    /*protected override IRepository<T> InitializeRepository<T>()
     {
         CheckIsDisposed();
 
@@ -123,7 +119,7 @@ public sealed class EFCoreDataDomainScope : DataDomainScope
             return new EFCoreRepository<T>(this);
 
         // when the repository is not part of the DbContext, it is an
-        // virtual entity so we just return an in-memory repository
+        // virtual entity so we just return an in-memory repository with the lifetime of scope
         return new InMemoryRepository<T>();
-    }
+    }*/
 }

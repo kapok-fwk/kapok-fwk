@@ -3,6 +3,11 @@
 public interface IDataDomain
 {
     /// <summary>
+    /// Gets the service provider.
+    /// </summary>
+    IServiceProvider ServiceProvider { get; }
+
+    /// <summary>
     /// Adds a data partition to the data domain.
     /// 
     /// A data partition can be a tenant id or a company in financial terms.

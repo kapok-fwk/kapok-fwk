@@ -141,11 +141,16 @@ public abstract class DataDomain : IDataDomain
             throw new ArgumentException(
                 $"The passed generic type {typeof(T).FullName} is not registered as entity. The DAO object cannot be created.");
 
-        var dao = (IDao<T>?)serviceProvider.GetService(_entities[entityType].DaoType)
+        var dao = (IDao<T>?)serviceProvider.GetService(_entities[entityType].DaoType);
+        if (dao != null) return dao;
 
-                  // TODO: the construction does not work here since the `Repository` is not if `IRepository<T>` but a final class. Probably it is necessary to use a create factory: ActivatorUtilities.CreateFactory(...)
-                  ?? (IDao<T>)ActivatorUtilities.CreateInstance(serviceProvider, _entities[entityType].DaoType,
-                repository, _entities[entityType].IsReadOnly);
+        if (_entities[entityType].ContractType != null)
+        {
+            dao = (IDao<T>?)serviceProvider.GetService(_entities[entityType].ContractType);
+            if (dao != null) return dao;
+        }
+
+        dao = (IDao<T>)ActivatorUtilities.CreateInstance(serviceProvider, _entities[entityType].DaoType);
 
         return dao;
     }
@@ -154,9 +159,38 @@ public abstract class DataDomain : IDataDomain
 
     #endregion
 
+    private IServiceProvider? _serviceProvider;
+
     protected DataDomain()
     {
         Default ??= this;
+    }
+
+    protected DataDomain(IServiceProvider? serviceProvider)
+        : this()
+    {
+        _serviceProvider = serviceProvider;
+    }
+
+    protected virtual void ConfigureServices(IServiceCollection serviceCollection)
+    {
+    }
+
+    /// <summary>
+    /// The service provider to be used for page construction.
+    /// </summary>
+    public IServiceProvider ServiceProvider
+    {
+        get => _serviceProvider ??= CreateDefaultServiceProvider();
+        set => _serviceProvider = value;
+    }
+
+    private IServiceProvider CreateDefaultServiceProvider()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<IDataDomain>(p => this);
+        ConfigureServices(services);
+        return services.BuildServiceProvider();
     }
 
     private readonly Dictionary<string, DataPartition> _dataPartitions = new();

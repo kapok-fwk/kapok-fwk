@@ -7,40 +7,18 @@ namespace Kapok.Data;
 
 public abstract class DataDomainScope : IDataDomainScope
 {
-    private IServiceProvider? _serviceProvider;
+    private IServiceProvider ServiceProvider { get; }
     private readonly List<TransactionScope> _transactionScopes = new();
     private readonly Dictionary<Type, object> _daos = new();
     private readonly Dictionary<Type, object> _repositories = new();
     private readonly List<IDeferredCommitDao> _deferredCommitDao = new();
 
-    protected DataDomainScope(IDataDomain dataDomain)
+    protected DataDomainScope(IDataDomain dataDomain, IServiceProvider serviceProvider)
     {
         ArgumentNullException.ThrowIfNull(dataDomain, nameof(dataDomain));
         DataDomain = dataDomain;
         DataPartitions = dataDomain.DataPartitions;
-    }
-
-    protected DataDomainScope(IDataDomain dataDomain, IServiceProvider serviceProvider)
-        : this(dataDomain)
-    {
-        _serviceProvider = serviceProvider;
-    }
-
-    /// <summary>
-    /// The service provider to be used for page construction.
-    /// </summary>
-    protected IServiceProvider ServiceProvider
-    {
-        get => _serviceProvider ??= CreateDefaultServiceProvider();
-        set => _serviceProvider = value;
-    }
-
-    private IServiceProvider CreateDefaultServiceProvider()
-    {
-        var services = new ServiceCollection();
-        services.AddSingleton<IDataDomain>(p => DataDomain);
-        services.AddSingleton<IDataDomainScope>(p => this);
-        return services.BuildServiceProvider();
+        ServiceProvider = serviceProvider;
     }
 
     #region Deferred commit Dao handling
@@ -183,16 +161,8 @@ public abstract class DataDomainScope : IDataDomainScope
         where T : class, new()
     {
         CheckIsDisposed();
-        if (_repositories.ContainsKey(typeof(T)))
-            return (IRepository<T>)_repositories[typeof(T)];
-
-        var newRepository = InitializeRepository<T>();
-        _repositories.Add(typeof(T), newRepository);
-        return newRepository;
+        return ServiceProvider.GetRequiredService<IRepository<T>>();
     }
-
-    protected abstract IRepository<T> InitializeRepository<T>()
-        where T : class, new();
 
     private IDao<T> InitializeDao<T>(IRepository<T> repository)
         where T : class, new()

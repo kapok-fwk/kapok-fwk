@@ -2,14 +2,9 @@
 
 public class InMemoryDataDomainScope : DataDomainScope
 {
-    public InMemoryDataDomainScope(IDataDomain dataDomain) : base(dataDomain)
+    public InMemoryDataDomainScope(IDataDomain dataDomain, IServiceProvider serviceProvider)
+        : base(dataDomain, serviceProvider)
     {
-    }
-
-    protected override IRepository<T> InitializeRepository<T>()
-    {
-        var inMemoryList = ((InMemoryDataDomain)DataDomain).GetInMemoryData<T>();
-        return new InMemoryRepository<T>(inMemoryList);
     }
 
     public override bool CanSave()

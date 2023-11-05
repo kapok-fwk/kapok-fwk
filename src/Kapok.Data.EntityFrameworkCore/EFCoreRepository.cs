@@ -12,10 +12,10 @@ public class EFCoreRepository<T> : IRepository<T>
     private readonly EFCoreDataDomainScope _dataDomainScope;
     private readonly IEntityType _efCoreEntityType;
 
-    public EFCoreRepository(EFCoreDataDomainScope dataDomainScope)
+    public EFCoreRepository(IDataDomainScope dataDomainScope)
     {
         ArgumentNullException.ThrowIfNull(dataDomainScope);
-        _dataDomainScope = dataDomainScope;
+        _dataDomainScope = (EFCoreDataDomainScope)dataDomainScope;
 
         var entityType = DbContext.Model.FindEntityType(typeof(T));
         _efCoreEntityType = entityType ?? throw new Exception($"Could not find model of entity type {typeof(T).FullName} in the DB Context (dataDomainScope.DbContext.Model.FindEntityType)");
