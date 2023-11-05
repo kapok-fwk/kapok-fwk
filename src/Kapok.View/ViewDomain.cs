@@ -29,7 +29,7 @@ public abstract class ViewDomain : IViewDomain
 {
     private IServiceProvider? _serviceProvider;
 
-    protected ViewDomain()
+    protected ViewDomain(IServiceProvider? serviceProvider = default)
     {
         Culture = Thread.CurrentThread.CurrentUICulture;
 
@@ -39,7 +39,7 @@ public abstract class ViewDomain : IViewDomain
     /// <summary>
     /// The service provider to be used for page construction.
     /// </summary>
-    protected IServiceProvider ServiceProvider
+    public IServiceProvider ServiceProvider
     {
         get => _serviceProvider ??= CreateDefaultServiceProvider();
         set => _serviceProvider = value;
