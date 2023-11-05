@@ -333,6 +333,7 @@ public abstract class DataPage<TEntry> : InteractivePage, IDataPage<TEntry>
         }
 
         DataDomainScope.UnregisterUsage(this);
+        _dataDomainScope = null;
     }
 
     #endregion
