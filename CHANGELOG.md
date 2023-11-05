@@ -4,6 +4,7 @@
 
 - :bug: *fix* apply filter from DataSetListView on ListPage
 - :bug: *fix* MetadataEngine use IFilterJsonConverter
+- :bug: *fix* dependencies for Kapok.Report
 
 ## 0.1.13 (2032-11-05)
 
