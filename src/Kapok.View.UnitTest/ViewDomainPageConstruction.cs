@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Kapok.Data;
-using Kapok.Data.InMemory;
 using Kapok.Entity;
 using Xunit;
 
@@ -10,21 +9,11 @@ namespace Kapok.View.UnitTest;
 /// <summary>
 /// Tests the page construction from the view domain.
 /// </summary>
-public class ViewDomainPageConstruction
+public class ViewDomainPageConstruction : ViewDomainUnitTestBase
 {
-    public UnitTestViewDomain ViewDomain { get; }
-    public IDataDomain DataDomain { get; }
-
     static ViewDomainPageConstruction()
     {
         Data.DataDomain.RegisterEntity<SampleEntity>();
-    }
-
-    public ViewDomainPageConstruction()
-    {
-        ViewDomain = new UnitTestViewDomain();
-
-        DataDomain = new InMemoryDataDomain();
     }
 
     public class SampleEntity : EditableEntityBase

@@ -2,15 +2,8 @@
 
 namespace Kapok.View.UnitTest;
 
-public class DocumentPageCollectionPageTest
+public class DocumentPageCollectionPageTest : ViewDomainUnitTestBase
 {
-    private UnitTestViewDomain ViewDomain { get; }
-    
-    public DocumentPageCollectionPageTest()
-    {
-        ViewDomain = new UnitTestViewDomain();
-    }
-
     [Fact]
     public void DocumentMenuLinkTest()
     {

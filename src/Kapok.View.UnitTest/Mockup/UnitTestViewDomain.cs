@@ -12,6 +12,11 @@ public class UnitTestViewDomain : ViewDomain
 {
     private readonly Dictionary<IPage, IEnumerable<IPage>> _registeredPageContainer = new();
 
+    public UnitTestViewDomain(IServiceProvider serviceProvider)
+        : base(serviceProvider)
+    {
+    }
+
     public override Type GetPageControlType(Type pageType)
     {
         throw new NotImplementedException();
