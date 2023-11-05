@@ -3,7 +3,6 @@ using Kapok.BusinessLayer;
 using Kapok.Data;
 using Kapok.Entity;
 using Kapok.Entity.Model;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Kapok.View;
 
@@ -25,7 +24,7 @@ public interface IViewDomain
     Type GetPageControlType(Type pageType);
 
     IPage ConstructPage(Type pageType);
-    IPage ConstructPage(Type pageType, IServiceScope scope);
+    IPage ConstructPage(Type pageType, IServiceProvider serviceProvider);
     [Obsolete]
     IPage ConstructPage(Type pageType, Dictionary<Type, object?>? constructorParamValues);
     [Obsolete]

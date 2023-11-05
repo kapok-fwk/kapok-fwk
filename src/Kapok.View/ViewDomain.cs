@@ -117,9 +117,9 @@ public abstract class ViewDomain : IViewDomain
         return page;
     }
 
-    public IPage ConstructPage(Type pageType, IServiceScope scope)
+    public IPage ConstructPage(Type pageType, IServiceProvider serviceProvider)
     {
-        var page = (IPage?)scope.ServiceProvider.GetService(pageType);
+        var page = (IPage?)serviceProvider.GetService(pageType);
 
         if(page != null)
             return page;
@@ -127,7 +127,7 @@ public abstract class ViewDomain : IViewDomain
         // page is not registered in the provider, so we invoke the page creation ourselves
         try
         {
-            page = (IPage)ActivatorUtilities.CreateInstance(scope.ServiceProvider, pageType);
+            page = (IPage)ActivatorUtilities.CreateInstance(serviceProvider, pageType);
         }
         catch (BusinessLayerErrorException e)
         {
