@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Kapok.Core\Kapok.Core.csproj" />
+    <ProjectReference Include="..\Kapok.Data.EntityFrameworkCore.UnitTest\Kapok.Data.EntityFrameworkCore.UnitTest.csproj" />
     <ProjectReference Include="..\Kapok.View\Kapok.View.csproj" />
   </ItemGroup>
 
