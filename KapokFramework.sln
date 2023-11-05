@@ -29,9 +29,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kapok.Report.SqlServer", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kapok.View", "src\Kapok.View\Kapok.View.csproj", "{9FB0DE42-672A-4D92-B5BA-023A0A4BE1DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kapok.View.UnitTest", "src\Kapok.View.UnitTest\Kapok.View.UnitTest.csproj", "{8D48D6BD-FDAB-4FA5-AFEF-1C96236D3C56}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kapok.View.UnitTest", "src\Kapok.View.UnitTest\Kapok.View.UnitTest.csproj", "{8D48D6BD-FDAB-4FA5-AFEF-1C96236D3C56}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kapok.Acl.UnitTest", "src\Kapok.Acl.UnitTest\Kapok.Acl.UnitTest.csproj", "{4199E3DC-AE49-4777-84C4-4FC592F58E3B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kapok.Acl.UnitTest", "src\Kapok.Acl.UnitTest\Kapok.Acl.UnitTest.csproj", "{4199E3DC-AE49-4777-84C4-4FC592F58E3B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projektmappenelemente", "Projektmappenelemente", "{72BAEA50-7BA9-4204-B181-3CCBD8FE13BC}"
+	ProjectSection(SolutionItems) = preProject
+		CHANGELOG.md = CHANGELOG.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

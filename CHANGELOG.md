@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.18 (2023-11-05)
+
+- :bug: *fix* ViewDomain passing ServiceProvider
+
+
+## 0.1.17 (2023-11-05)
+
+- :bug: make ViewDomain.ServiceProvider public
+
 ## 0.1.16 (2023-11-05)
 
 - :bug: fix memory leak in ListPage
