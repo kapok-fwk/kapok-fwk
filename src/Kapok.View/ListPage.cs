@@ -4,7 +4,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using Kapok.BusinessLayer;
 using Kapok.Data;
 using Kapok.Entity;
 using OfficeOpenXml;
@@ -150,12 +152,13 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
         get => _currentListView;
         set
         {
+            var oldCurrentListView = _currentListView;
             if (SetProperty(ref _currentListView, value))
-                OnCurrentListViewChanged();
+                OnCurrentListViewChanged(oldCurrentListView);
         }
     }
 
-    private void OnCurrentListViewChanged()
+    private void OnCurrentListViewChanged(DataSetListView? oldDataSetListView)
     {
         if (DataSet == null) return;
 
@@ -177,6 +180,12 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
             {
                 DataSet.Columns.AddRange(CurrentListView.Columns);
             }
+
+            if (oldDataSetListView != null && oldDataSetListView.Filter != null && oldDataSetListView.Filter.FilterExpression != null)
+                DataSet.Filter.Remove(new Filter<TEntry>((Expression<Func<TEntry, bool>>)oldDataSetListView.Filter.FilterExpression), layer: FilterLayer.Application);
+
+            if (CurrentListView.Filter != null)
+                DataSet.Filter.Add((IFilter<TEntry>)CurrentListView.Filter, FilterLayer.Application);
 
             DataSet.SortBy = CurrentListView.SortBy
                              ?? DataSet.GetDao().Model.PrimaryKeyProperties;
