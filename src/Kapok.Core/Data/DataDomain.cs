@@ -6,11 +6,12 @@ namespace Kapok.Data;
 
 public abstract class DataDomain : IDataDomain
 {
-    internal struct RegisteredEntity
+    internal record RegisteredEntity
     {
-        public RegisteredEntity(Type entityType, Type daoType, bool isReadOnly, bool isVirtual)
+        public RegisteredEntity(Type entityType, Type daoType, bool isReadOnly, bool isVirtual, Type? contractType = null)
         {
             EntityType = entityType;
+            ContractType = contractType;
             DaoType = daoType;
             IsReadOnly = isReadOnly;
             IsVirtual = isVirtual;
@@ -18,6 +19,7 @@ public abstract class DataDomain : IDataDomain
 
         // ReSharper disable once NotAccessedField.Local
         public readonly Type EntityType;
+        public readonly Type? ContractType;
         public readonly Type DaoType;
         public readonly bool IsReadOnly;
         // ReSharper disable once NotAccessedField.Local
@@ -89,6 +91,39 @@ public abstract class DataDomain : IDataDomain
                     daoType: typeof(TDao),
                     isReadOnly: false,
                     isVirtual: isVirtual));
+
+                return;
+            }
+        }
+
+        throw new NotSupportedException($"The dao type {typeof(TDao).FullName} has no public constructor with a list of supported parameters for initialization by this DataDomain.");
+    }
+
+    public static void RegisterEntity<TEntity, TService, TDao>(bool isVirtual = false)
+        where TEntity : class, new()
+        where TService : IReadOnlyDao<TEntity>
+        where TDao : IReadOnlyDao<TEntity>
+    {
+        var supportedParameterTypes = new List<Type>
+        {
+            typeof(IDataDomainScope),
+            typeof(IRepository<TEntity>)
+        };
+
+        if (!isVirtual)
+            DataEntities.Add(typeof(TEntity));
+
+        foreach (var constructorInfo in typeof(TDao).GetConstructors())
+        {
+            if (constructorInfo.GetParameters()
+                .Any(p => supportedParameterTypes.Contains(p.ParameterType) || p.HasDefaultValue))
+            {
+                _entities.Add(typeof(TEntity), new RegisteredEntity(
+                    entityType: typeof(TEntity),
+                    daoType: typeof(TDao),
+                    isReadOnly: false,
+                    isVirtual: isVirtual,
+                    contractType: typeof(TService)));
 
                 return;
             }

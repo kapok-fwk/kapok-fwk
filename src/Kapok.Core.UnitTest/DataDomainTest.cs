@@ -1,4 +1,5 @@
 ﻿using Kapok.BusinessLayer;
+using Kapok.Core.UnitTest.Contracts;
 using Kapok.Core.UnitTest.DataModel;
 using Kapok.Data;
 using Kapok.Data.InMemory;
@@ -40,5 +41,6 @@ public class DataDomainTest
 
         serviceProvider.GetRequiredService<IDao<ToDoItem>>();
         serviceProvider.GetRequiredService<IDao<ToDoList>>();
+        serviceProvider.GetRequiredService<IToDoItemDao>();
     }
 }
