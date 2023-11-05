@@ -34,6 +34,9 @@ public abstract class ViewDomain : IViewDomain
         Culture = Thread.CurrentThread.CurrentUICulture;
 
         Default ??= this;
+
+        if (serviceProvider != null)
+            ServiceProvider = serviceProvider;
     }
 
     /// <summary>
@@ -49,8 +52,6 @@ public abstract class ViewDomain : IViewDomain
     {
         var services = new ServiceCollection();
         services.AddSingleton<IViewDomain>(p => this);
-        services.AddSingleton<IDataDomain>(p => DataDomain.Default);
-        services.AddScoped<IDataDomainScope>(p => p.GetService<IDataDomain>()?.CreateScope());
         return services.BuildServiceProvider();
     }
 
