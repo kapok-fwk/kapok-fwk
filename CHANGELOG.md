@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.14 (2023-11-05)
+
+- :bug: *fix* apply filter from DataSetListView on ListPage
+- :bug: *fix* MetadataEngine use IFilterJsonConverter
+
 ## 0.1.13 (2032-11-05)
 
 - :tada: use when building models dependency injection
