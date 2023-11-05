@@ -125,6 +125,7 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
         {
             DataSet.CanSaveChanged -= DataSet_CanSaveChanged;
         }
+        ListViews.CollectionChanged -= ListViews_CollectionChanged;
         base.OnClosed();
     }
 
