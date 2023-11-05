@@ -27,12 +27,4 @@ public abstract class DataDialogPage : DialogPage
     protected IDataDomain DataDomain { get; }
 
     protected IDataDomainScope DataDomainScope => _dataDomainScope ??= DataDomain.CreateScope();
-
-    protected override void OnClosed()
-    {
-        base.OnClosed();
-
-        DataDomainScope.UnregisterUsage(this);
-        _dataDomainScope = null;
-    }
 }

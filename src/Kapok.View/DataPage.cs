@@ -252,8 +252,6 @@ public abstract class DataPage<TEntry> : InteractivePage, IDataPage<TEntry>
         if (!IsEditable && !AllowCreateNewEntry && !AllowDeleteEntry)
             SaveDataAction.IsVisible = false;
 
-        DataDomainScope.RegisterUsage(this);
-
         base.OnLoaded();
 
         _isLoaded = true;
@@ -331,9 +329,6 @@ public abstract class DataPage<TEntry> : InteractivePage, IDataPage<TEntry>
         {
             DisposeDataSet(BaseDataSet);
         }
-
-        DataDomainScope.UnregisterUsage(this);
-        _dataDomainScope = null;
     }
 
     #endregion
