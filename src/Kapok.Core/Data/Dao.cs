@@ -46,11 +46,6 @@ public class Dao<T> : DaoBase<T>
         }
     }
 
-    public Dao(IDataDomainScope dataDomainScope, bool isReadOnly = false)
-        : this(dataDomainScope, ((DataDomainScope)dataDomainScope).GetRepository<T>(), isReadOnly)
-    {
-    }
-
     // TODO: replace the IsReadOnly to a ForUpdate or IsTrackingActivated option with the tracking happing right here in the DAO before it is passed to the repository
     public override bool IsReadOnly
     {

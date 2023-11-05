@@ -10,7 +10,7 @@ public interface IReportDesignDao : IDao<ReportDesign>
 
 public class ReportDesignDao : Dao<ReportDesign>, IReportDesignDao
 {
-    public ReportDesignDao(IDataDomainScope dataDomainScope) : base(dataDomainScope)
+    public ReportDesignDao(IDataDomainScope dataDomainScope, IRepository<ReportDesign> repository) : base(dataDomainScope, repository)
     {
     }
 }

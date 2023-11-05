@@ -12,7 +12,7 @@ public interface IReportProcessorDao : IDao<ReportProcessor>
 
 public class ReportProcessorDao : Dao<ReportProcessor>, IReportProcessorDao
 {
-    public ReportProcessorDao(IDataDomainScope dataDomainScope) : base(dataDomainScope)
+    public ReportProcessorDao(IDataDomainScope dataDomainScope, IRepository<ReportProcessor> repository) : base(dataDomainScope, repository)
     {
     }
 

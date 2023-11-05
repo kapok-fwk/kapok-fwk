@@ -8,12 +8,18 @@ namespace Kapok.View.UnitTest;
 
 public class ViewDomainUnitTestBase
 {
-    public IServiceProvider ServiceProvider { get; }
+    private IServiceProvider? _serviceProvider;
+
+    public IServiceProvider ServiceProvider => _serviceProvider ??= BuildServiceProvider();
 
     public UnitTestViewDomain ViewDomain => (UnitTestViewDomain)ServiceProvider.GetRequiredService<IViewDomain>();
     public IDataDomain DataDomain => ServiceProvider.GetRequiredService<IDataDomain>();
 
-    public ViewDomainUnitTestBase()
+    protected virtual void ConfigureServices(IServiceCollection serviceCollection)
+    {
+    }
+
+    private IServiceProvider BuildServiceProvider()
     {
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddSingleton<IViewDomain, UnitTestViewDomain>();
@@ -22,6 +28,8 @@ public class ViewDomainUnitTestBase
         serviceCollection.TryAdd(ServiceDescriptor.Scoped<IDataDomainScope>(p => new InMemoryDataDomainScope(p.GetRequiredService<IDataDomain>(), p)));
         serviceCollection.TryAdd(ServiceDescriptor.Scoped(typeof(IRepository<>), typeof(InMemoryRepository<>)));
 
-        ServiceProvider = serviceCollection.BuildServiceProvider();
+        ConfigureServices(serviceCollection);
+
+        return serviceCollection.BuildServiceProvider();
     }
 }

@@ -6,8 +6,8 @@ namespace Kapok.Acl.BusinessLayer;
 
 public sealed class UserDao : Dao<User>, IUserDao
 {
-    public UserDao(IDataDomainScope dataDomainScope)
-        : base(dataDomainScope)
+    public UserDao(IDataDomainScope dataDomainScope, IRepository<User> repository, bool isReadOnly = false)
+        : base(dataDomainScope, repository, isReadOnly)
     {
     }
 }

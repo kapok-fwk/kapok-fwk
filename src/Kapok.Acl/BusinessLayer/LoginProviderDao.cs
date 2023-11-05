@@ -10,9 +10,4 @@ public sealed class LoginProviderDao : Dao<LoginProvider>, ILoginProviderDao
         : base(dataDomainScope, repository, isReadOnly)
     {
     }
-
-    public LoginProviderDao(IDataDomainScope dataDomainScope, bool isReadOnly = false)
-        : base(dataDomainScope, isReadOnly)
-    {
-    }
 }

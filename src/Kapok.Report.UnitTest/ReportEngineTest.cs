@@ -1,5 +1,6 @@
 ﻿using Kapok.Data.EntityFrameworkCore.UnitTest;
 using Kapok.Module;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Kapok.Report.UnitTest;
@@ -27,14 +28,21 @@ public class ReportEngineTest : DeferredDaoTestBase
 {
     protected override void InitiateModule()
     {
-        ModuleEngine.InitiateModule(typeof(Kapok.Report.ReportModule));
+        ModuleEngine.InitiateModule(typeof(ReportModule));
         ExcelReportPackageProcessor.Register();
+    }
+
+    protected override void ConfigureServices(IServiceCollection serviceCollection)
+    {
+        base.ConfigureServices(serviceCollection);
+
+        serviceCollection.AddSingleton<ReportEngine>();
     }
 
     [Fact]
     public void TestEmptyExcelReport()
     {
-        var reportEngine = new ReportEngine(DataDomain);
+        var reportEngine = ServiceProvider.GetRequiredService<ReportEngine>();
         var report = new TextExcelReport();
 
         var memoryStream = new MemoryStream();

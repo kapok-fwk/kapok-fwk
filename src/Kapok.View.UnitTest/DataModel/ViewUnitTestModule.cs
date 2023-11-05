@@ -1,4 +1,5 @@
-﻿using Kapok.Module;
+﻿using Kapok.Data;
+using Kapok.Module;
 
 namespace Kapok.View.UnitTest.DataModel;
 
@@ -11,6 +12,8 @@ public class ViewUnitTestModule : ModuleBase
     public override void Initiate()
     {
         base.Initiate();
-        Data.DataDomain.RegisterEntity<SampleEntity>();
+
+        // register DataModel
+        DataDomain.RegisterEntity<SampleEntity>();
     }
 }

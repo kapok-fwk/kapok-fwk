@@ -132,29 +132,6 @@ public abstract class DataDomain : IDataDomain
         throw new NotSupportedException($"The dao type {typeof(TDao).FullName} has no public constructor with a list of supported parameters for initialization by this DataDomain.");
     }
 
-    internal static IDao<T> ConstructNewDao<T>(IServiceProvider serviceProvider, IRepository<T> repository)
-        where T : class, new()
-    {
-        var entityType = typeof(T);
-
-        if (!_entities.ContainsKey(entityType))
-            throw new ArgumentException(
-                $"The passed generic type {typeof(T).FullName} is not registered as entity. The DAO object cannot be created.");
-
-        var dao = (IDao<T>?)serviceProvider.GetService(_entities[entityType].DaoType);
-        if (dao != null) return dao;
-
-        if (_entities[entityType].ContractType != null)
-        {
-            dao = (IDao<T>?)serviceProvider.GetService(_entities[entityType].ContractType);
-            if (dao != null) return dao;
-        }
-
-        dao = (IDao<T>)ActivatorUtilities.CreateInstance(serviceProvider, _entities[entityType].DaoType, repository);
-
-        return dao;
-    }
-
     #endregion
 
     #endregion

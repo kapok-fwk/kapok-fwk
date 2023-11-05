@@ -10,7 +10,7 @@ public interface IReportLayoutDao : IDao<ReportLayout>
 
 public class ReportLayoutDao : Dao<ReportLayout>, IReportLayoutDao
 {
-    public ReportLayoutDao(IDataDomainScope dataDomainScope) : base(dataDomainScope)
+    public ReportLayoutDao(IDataDomainScope dataDomainScope, IRepository<ReportLayout> repository) : base(dataDomainScope, repository)
     {
     }
 }

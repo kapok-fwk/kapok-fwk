@@ -317,17 +317,6 @@ public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
         _primaryKeyProperties = primaryKeys;
     }
 
-    public DeferredDao(IDataDomainScope dataDomainScope) : base(dataDomainScope)
-    {
-        var primaryKeys = EntityBase.GetEntityModel<T>().PrimaryKeyProperties;
-
-        if (primaryKeys == null)
-            throw new NotSupportedException(
-                $"You cannot use {nameof(DeferredDao<T>)} with a Type T which does not have a primary key. T = {typeof(T).FullName}");
-
-        _primaryKeyProperties = primaryKeys;
-    }
-
     public override IQueryable<T> AsQueryableForUpdate()
     {
         if (_primaryKeyProperties == null)

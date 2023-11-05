@@ -6,8 +6,8 @@ namespace Kapok.Acl.BusinessLayer;
 
 public sealed class RoleClaimDao : Dao<RoleClaim>, IRoleClaimDao
 {
-    public RoleClaimDao(IDataDomainScope dataDomainScope)
-        : base(dataDomainScope)
+    public RoleClaimDao(IDataDomainScope dataDomainScope, IRepository<RoleClaim> repository, bool isReadOnly = false)
+        : base(dataDomainScope, repository, isReadOnly)
     {
     }
 }

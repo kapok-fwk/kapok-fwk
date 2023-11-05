@@ -1,4 +1,5 @@
-﻿using System.Transactions;
+﻿using System;
+using System.Transactions;
 using Kapok.BusinessLayer;
 using Kapok.Data.InMemory;
 using Microsoft.Extensions.DependencyInjection;
@@ -178,7 +179,27 @@ public abstract class DataDomainScope : IDataDomainScope
     private IDao<T> InitializeDao<T>(IRepository<T> repository)
         where T : class, new()
     {
-        return Kapok.Data.DataDomain.ConstructNewDao(ServiceProvider, repository);
+        var entityType = typeof(T);
+
+        if (!Data.DataDomain.Entities.ContainsKey(entityType))
+            throw new ArgumentException(
+                $"The passed generic type {typeof(T).FullName} is not registered as entity. The DAO object cannot be created.");
+
+        var registeredEntity = Data.DataDomain.Entities[entityType];
+
+        var dao = (IDao<T>?)ServiceProvider.GetService(registeredEntity.DaoType);
+        if (dao != null) return dao;
+
+        if (registeredEntity.ContractType != null)
+        {
+            dao = (IDao<T>?)ServiceProvider.GetService(registeredEntity.ContractType);
+            if (dao != null) return dao;
+        }
+
+        dao = (IDao<T>)ActivatorUtilities.CreateInstance(ServiceProvider, registeredEntity.DaoType, 
+            this, repository);
+
+        return dao;
     }
 
     private void AddDaoInternal<T>(IDao<T> dao)

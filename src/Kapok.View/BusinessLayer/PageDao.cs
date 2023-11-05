@@ -12,7 +12,7 @@ public interface IPageDao : IDao<DataModel.Page>
 
 public class PageDao : Dao<DataModel.Page>, IPageDao
 {
-    public PageDao(IDataDomainScope dataDomainScope) : base(dataDomainScope)
+    public PageDao(IDataDomainScope dataDomainScope, IRepository<DataModel.Page> repository) : base(dataDomainScope, repository)
     {
     }
 

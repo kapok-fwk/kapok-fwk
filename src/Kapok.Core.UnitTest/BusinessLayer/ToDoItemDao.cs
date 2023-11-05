@@ -10,8 +10,4 @@ public class ToDoItemDao : Dao<ToDoItem>, IToDoItemDao
     public ToDoItemDao(IDataDomainScope dataDomainScope, IRepository<ToDoItem> repository, bool isReadOnly = false) : base(dataDomainScope, repository, isReadOnly)
     {
     }
-
-    public ToDoItemDao(IDataDomainScope dataDomainScope) : base(dataDomainScope, false)
-    {
-    }
 }

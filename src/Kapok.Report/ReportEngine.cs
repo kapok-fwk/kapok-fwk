@@ -2,10 +2,12 @@
 using System.Runtime.CompilerServices;
 using Kapok.BusinessLayer;
 using Kapok.Data;
+using Kapok.Data.InMemory;
 using Kapok.Report.BusinessLayer;
 using Kapok.Report.DataModel;
 using Kapok.View;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Kapok.Report;
 // TODO: implement status reporting from the ReportEngine class e.g. to the UI
@@ -124,12 +126,13 @@ public sealed class ReportEngine
     public ReportEngine(IDataDomain? dataDomain = default)
     {
         _dataDomain = dataDomain;
+        _serviceProvider = dataDomain?.ServiceProvider;
     }
 
     public ReportEngine(IDataDomain? dataDomain = default, IServiceProvider? serviceProvider = default)
         : this(dataDomain)
     {
-        _serviceProvider = serviceProvider;
+        _serviceProvider = serviceProvider ?? dataDomain?.ServiceProvider;
     }
 
     /// <summary>
@@ -146,7 +149,10 @@ public sealed class ReportEngine
         var services = new ServiceCollection();
         services.AddSingleton(this);
 #pragma warning disable CS8603 // Possible null reference return.
-        services.AddSingleton<IDataDomain>(p => _dataDomain);
+        services.AddSingleton<IDataDomain, InMemoryDataDomain>();
+        services.AddScoped<IDataDomainScope>(p => new InMemoryDataDomainScope(p.GetRequiredService<IDataDomain>(), p));
+        services.TryAdd(ServiceDescriptor.Scoped(typeof(IRepository<>), typeof(InMemoryRepository<>)));
+
 #pragma warning restore CS8603 // Possible null reference return.
         return services.BuildServiceProvider();
     }

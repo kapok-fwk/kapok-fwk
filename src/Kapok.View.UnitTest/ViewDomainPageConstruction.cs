@@ -2,8 +2,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Kapok.Data;
 using Kapok.Entity;
-using Kapok.Module;
-using Kapok.View.UnitTest.DataModel;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Kapok.View.UnitTest;
@@ -15,7 +14,14 @@ public class ViewDomainPageConstruction : ViewDomainUnitTestBase
 {
     static ViewDomainPageConstruction()
     {
-        ModuleEngine.InitiateModule(typeof(ViewUnitTestModule));
+        Data.DataDomain.RegisterEntity<ViewDomainPageConstruction.SampleEntity>();
+    }
+
+    protected override void ConfigureServices(IServiceCollection serviceCollection)
+    {
+        base.ConfigureServices(serviceCollection);
+
+        serviceCollection.AddDataModelServices();
     }
 
     public class SampleEntity : EditableEntityBase

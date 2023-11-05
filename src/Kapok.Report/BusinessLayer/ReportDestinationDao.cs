@@ -20,7 +20,7 @@ public interface IReportDestinationDao : IDao<ReportDestination>
 
 public class ReportDestinationDao : Dao<ReportDestination>, IReportDestinationDao
 {
-    public ReportDestinationDao(IDataDomainScope dataDomainScope) : base(dataDomainScope)
+    public ReportDestinationDao(IDataDomainScope dataDomainScope, IRepository<ReportDestination> repository) : base(dataDomainScope, repository)
     {
     }
 

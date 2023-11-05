@@ -12,7 +12,7 @@ public interface IReportModelDao : IDao<ReportModel>
 
 public class ReportModelDao : Dao<ReportModel>, IReportModelDao
 {
-    public ReportModelDao(IDataDomainScope dataDomainScope) : base(dataDomainScope)
+    public ReportModelDao(IDataDomainScope dataDomainScope, IRepository<ReportModel> repository) : base(dataDomainScope, repository)
     {
     }
 
