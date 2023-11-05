@@ -1,8 +1,10 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Security.Principal;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Kapok.Data;
 using Kapok.BusinessLayer;
+using Kapok.Core.UnitTest.Filter;
 using Kapok.View.DataModel;
 
 namespace Kapok.View;
@@ -112,6 +114,15 @@ public sealed class MetadataEngine
         if (_dataDomain == null)
             yield break;
 
+        var serializerOptions = new JsonSerializerOptions
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+            Converters =
+            {
+                new IFilterJsonConverter()
+            }
+        };
+
         using var dataDomainScope = _dataDomain.CreateScope();
         var pageDataModel = await GetOrCreateDataModelPage(pageType, dataDomainScope);
         var listViewsDao = dataDomainScope.GetDao<PageListView>();
@@ -122,7 +133,8 @@ public sealed class MetadataEngine
                                              lv.Data
                                          })
         {
-            yield return (DataSetListView)JsonSerializer.Deserialize(rawListViewData.Data, typeof(DataSetListView))!;
+            yield return (DataSetListView)JsonSerializer.Deserialize(rawListViewData.Data, typeof(DataSetListView),
+                serializerOptions)!;
         }
 
         // user list views
@@ -137,7 +149,8 @@ public sealed class MetadataEngine
                                                  lv.Data
                                              })
             {
-                yield return (DataSetListView)JsonSerializer.Deserialize(rawListViewData.Data, typeof(DataSetListView))!;
+                yield return (DataSetListView)JsonSerializer.Deserialize(rawListViewData.Data, typeof(DataSetListView),
+                    serializerOptions)!;
             }
         }
     }
