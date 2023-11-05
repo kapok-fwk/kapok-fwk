@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.13 (2032-11-05)
+
+- :tada: use when building models dependency injection
+- :tada: add `Filter` to `DataSetListView` with serialization support
+
 ## 0.1.12 (2023-10-29)
 
 ### Kapok.View
