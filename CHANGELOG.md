@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.15 (2023-11-05)
+
+- :rocket: drop DataDomainScopeUsageManager, let dependency injection take care of it
+- :bug: *fix* crash when accessing already disposed objects; unload DataDomainScope
+
 ## 0.1.14 (2023-11-05)
 
 - :bug: *fix* apply filter from DataSetListView on ListPage
