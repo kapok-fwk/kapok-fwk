@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.16 (2023-11-05)
+
+- :bug: fix memory leak in ListPage
+
 ## 0.1.15 (2023-11-05)
 
 - :rocket: drop DataDomainScopeUsageManager, let dependency injection take care of it
