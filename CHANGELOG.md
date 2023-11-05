@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.19 (2023-11-05)
+
+- :rocket: switch from IServiceScope to IServiceProvider for ConstructPage
+- :bug: fixing various dependency injection issues
+- :bug: support virtual entities with dependency injection
+
 ## 0.1.18 (2023-11-05)
 
 - :bug: *fix* ViewDomain passing ServiceProvider
