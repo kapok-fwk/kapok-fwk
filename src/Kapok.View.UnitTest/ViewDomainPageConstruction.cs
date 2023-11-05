@@ -15,11 +15,15 @@ public class ViewDomainPageConstruction
     public UnitTestViewDomain ViewDomain { get; }
     public IDataDomain DataDomain { get; }
 
+    static ViewDomainPageConstruction()
+    {
+        Data.DataDomain.RegisterEntity<SampleEntity>();
+    }
+
     public ViewDomainPageConstruction()
     {
         ViewDomain = new UnitTestViewDomain();
 
-        Data.DataDomain.RegisterEntity<SampleEntity>();
         DataDomain = new InMemoryDataDomain();
     }
 
