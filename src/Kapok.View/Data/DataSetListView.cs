@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Text.Json.Serialization;
+using Kapok.BusinessLayer;
 
 namespace Kapok.View;
 
@@ -104,6 +105,11 @@ public class DataSetListView : IDataSetListView
     /// direction is not explicitly defined ascending sorting is used.
     /// </summary>
     public SortDirection? SortDirection { get; set; }
+
+    /// <summary>
+    /// A standard filter to be added to the view.
+    /// </summary>
+    public IFilter? Filter { get; set; }
 
     public override string ToString()
     {

@@ -13,6 +13,10 @@ namespace Kapok.View;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class ColumnPropertyView : PropertyView
 {
+    public ColumnPropertyView()
+    {
+    }
+
     public ColumnPropertyView(PropertyInfo propertyInfo) : base(propertyInfo)
     {
     }

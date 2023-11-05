@@ -16,6 +16,10 @@ public class PropertyView
     private string? _propertyName;
     private PropertyInfo? _propertyInfo;
 
+    protected PropertyView()
+    {
+    }
+
     /// <summary>
     /// Constructs the <see cref="PropertyView"/> class based on a PropertyInfo.
     /// </summary>
@@ -162,7 +166,14 @@ public class PropertyView
     /// The name of the property.
     /// </summary>
 #pragma warning disable CS8603
-    public string Name => _propertyInfo?.Name ?? _propertyName;
+    public string Name
+    {
+        get { return _propertyInfo?.Name ?? _propertyName; }
+        init
+        {
+            _propertyName = value;
+        }
+    }
 #pragma warning restore CS8603
 
     [JsonIgnore]
