@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using Kapok.BusinessLayer;
+using Microsoft.Extensions.DependencyInjection;
 #if DEBUG
 using System.Diagnostics;
 #endif
@@ -17,16 +18,9 @@ public abstract class Page : ValidatableBindableObjectBase, IPage
     private string? _title;
     private bool _canClose;
 
-#pragma warning disable CS8618
-    protected Page(IViewDomain? viewDomain = null)
-#pragma warning restore CS8618
+    protected Page(IServiceProvider serviceProvider)
     {
-        if (viewDomain == null && View.ViewDomain.Default == null)
-            throw new NotSupportedException(
-                $"You have to first set Kapok.View.ViewDomain.Default before you can initiate a page without {nameof(viewDomain)} being provided");
-#pragma warning disable CS8601
-        ViewDomain = viewDomain ?? View.ViewDomain.Default;
-#pragma warning restore CS8601
+        ServiceProvider = serviceProvider;
         Title = GetType().ToString();
         _canClose = true;
 
@@ -37,7 +31,9 @@ public abstract class Page : ValidatableBindableObjectBase, IPage
 
     #region Properties
 
-    public IViewDomain ViewDomain { get; }
+    public IServiceProvider ServiceProvider { get; }
+
+    public IViewDomain ViewDomain => ServiceProvider.GetRequiredService<IViewDomain>();
 
     public string? Title
     {

@@ -35,7 +35,7 @@ public class UnitTestViewDomain : ViewDomain
 
     public override IDataSetView<TEntry> CreateDataSetView<TEntry>(IDataDomainScope dataDomainScope, IDao<TEntry>? repository = null)
     {
-        return new DataSetView<TEntry>(this, dataDomainScope, repository);
+        return new DataSetView<TEntry>(ServiceProvider, dataDomainScope, repository);
     }
 
     public override IHierarchyDataSetView<TEntry> CreateHierarchyDataSetView<TEntry>(IDataDomainScope dataDomainScope, IDao<TEntry>? repository = null)

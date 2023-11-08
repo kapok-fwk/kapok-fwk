@@ -1,6 +1,4 @@
-﻿using Kapok.Data;
-
-namespace Kapok.View;
+﻿namespace Kapok.View;
 
 /// <summary>
 /// A base class for a detail page showing a list.
@@ -11,13 +9,8 @@ public abstract class DetailListPage<TBaseEntry, TLinkedEntry> : LinkedDetailPag
     where TBaseEntry : class, new()
     where TLinkedEntry : class, new()
 {
-    protected DetailListPage(IDataSetView<TBaseEntry> sourceDataSet, IViewDomain? viewDomain = null, IDataDomain? dataDomain = null)
-        : base(sourceDataSet, viewDomain, dataDomain)
-    {
-    }
-
-    protected DetailListPage(IDataSetView<TBaseEntry> sourceDataSet, IViewDomain? viewDomain = null, IDataDomainScope? dataDomainScope = null)
-        : base(sourceDataSet, viewDomain, dataDomainScope)
+    protected DetailListPage(IServiceProvider serviceProvider, IDataSetView<TBaseEntry> sourceDataSet)
+        : base(serviceProvider, sourceDataSet)
     {
     }
 

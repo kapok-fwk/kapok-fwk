@@ -2,6 +2,8 @@
 
 public interface IPage
 {
+    IServiceProvider ServiceProvider { get; }
+
     IViewDomain ViewDomain { get; }
 
     string? Title { get; set; }

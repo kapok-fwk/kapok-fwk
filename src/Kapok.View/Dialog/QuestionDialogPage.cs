@@ -7,8 +7,8 @@ public class QuestionDialogPage : DialogPage
     private DialogButton? _dialogResultButton;
     private IList<DialogButton> _dialogButton = new List<DialogButton>();
         
-    public QuestionDialogPage(IViewDomain? viewDomain = null)
-        : base(viewDomain ?? View.ViewDomain.Default)
+    public QuestionDialogPage(IServiceProvider serviceProvider)
+        : base(serviceProvider)
     {
         DialogButtonAction = new UIAction<DialogButton>("DialogButton", DialogButtonExecute, CanDialogButtonExecute);
     }

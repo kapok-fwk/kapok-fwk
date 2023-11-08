@@ -4,9 +4,9 @@ namespace Kapok.View;
 
 public class UnsavedChangesDialogPage : QuestionDialogPage
 {
-    public static UnsavedChangesDialogResult ShowDialog(IViewDomain? viewDomain = null, bool allowCancel = true)
+    public static UnsavedChangesDialogResult ShowDialog(IServiceProvider serviceProvider, bool allowCancel = true)
     {
-        var questionWindow = new UnsavedChangesDialogPage(viewDomain, allowCancel);
+        var questionWindow = new UnsavedChangesDialogPage(serviceProvider, allowCancel);
         ((QuestionDialogPage)questionWindow).ShowDialog();
 
         if (questionWindow.DialogResultButton == null)
@@ -18,7 +18,7 @@ public class UnsavedChangesDialogPage : QuestionDialogPage
 
     public static UnsavedChangesDialogResult ShowDialog(IPage owner, bool allowCancel = true)
     {
-        var questionWindow = new UnsavedChangesDialogPage(owner.ViewDomain, allowCancel);
+        var questionWindow = new UnsavedChangesDialogPage(owner.ServiceProvider, allowCancel);
         ((QuestionDialogPage)questionWindow).ShowDialog(owner);
 
         if (questionWindow.DialogResultButton == null)
@@ -65,8 +65,8 @@ public class UnsavedChangesDialogPage : QuestionDialogPage
             // ReSharper restore PossiblyMissingIndexerInitializerComma
         };
 
-    private UnsavedChangesDialogPage(IViewDomain? viewDomain, bool allowCancel = true)
-        : base(viewDomain ?? View.ViewDomain.Default)
+    private UnsavedChangesDialogPage(IServiceProvider serviceProvider, bool allowCancel = true)
+        : base(serviceProvider)
     {
         Title = Res.Title;
         Message = Res.Message;

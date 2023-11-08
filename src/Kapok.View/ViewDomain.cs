@@ -93,9 +93,9 @@ public abstract class ViewDomain : IViewDomain
 
     public abstract Type GetPageControlType(Type pageType);
 
-    public IPage ConstructPage(Type pageType)
+    protected IPage ConstructPage(Type pageType, IServiceProvider serviceProvider, params object[] parameters)
     {
-        var page = (IPage?)ServiceProvider.GetService(pageType);
+        var page = (IPage?)serviceProvider.GetService(pageType);
 
         if (page != null)
             return page;
@@ -103,7 +103,7 @@ public abstract class ViewDomain : IViewDomain
         // page is not registered in the provider, so we invoke the page creation ourselves
         try
         {
-            page = (IPage)ActivatorUtilities.CreateInstance(ServiceProvider, pageType);
+            page = (IPage)ActivatorUtilities.CreateInstance(serviceProvider, pageType, parameters);
         }
         catch (BusinessLayerErrorException e)
         {
@@ -117,17 +117,33 @@ public abstract class ViewDomain : IViewDomain
         return page;
     }
 
+    public IPage ConstructPage(Type pageType)
+    {
+        return ConstructPage(pageType, ServiceProvider);
+    }
+
     public IPage ConstructPage(Type pageType, IServiceProvider serviceProvider)
+    {
+        return ConstructPage(pageType, serviceProvider, Array.Empty<object>());
+    }
+
+    public IPage ConstructPage<TEntity>(Type pageType, IServiceProvider serviceProvider, IDataSetView<TEntity> dataSet)
+        where TEntity : class, new()
     {
         var page = (IPage?)serviceProvider.GetService(pageType);
 
-        if(page != null)
+        var hasDataSetConstructor = pageType.GetConstructors().Any(c =>
+            c.GetParameters().Any(p => p.ParameterType == typeof(IDataSetView<TEntity>)));
+
+        if (page != null)
             return page;
 
         // page is not registered in the provider, so we invoke the page creation ourselves
         try
         {
-            page = (IPage)ActivatorUtilities.CreateInstance(serviceProvider, pageType);
+            page = (IPage)ActivatorUtilities.CreateInstance(serviceProvider, pageType,
+                hasDataSetConstructor ? new object[] { dataSet } : Array.Empty<object>()
+            );
         }
         catch (BusinessLayerErrorException e)
         {
@@ -141,50 +157,19 @@ public abstract class ViewDomain : IViewDomain
         return page;
     }
 
-    [Obsolete]
-    public IPage ConstructPage(Type pageType, Dictionary<Type, object?>? constructorParamValues)
-    {
-        IPage newPage;
-        try
-        {
-            newPage = (IPage)ActivatorUtilities.CreateInstance(ServiceProvider, pageType,
-                (object[]?)constructorParamValues?.Values.Where(v => v is not null).ToArray() ?? Array.Empty<object>());
-        }
-        catch (BusinessLayerErrorException e)
-        {
-            throw new PageConstructionException(pageType, innerException: e);
-        }
-        catch (Exception e)
-        {
-            throw new PageConstructionException(pageType, innerException: e);
-        }
-
-        return newPage;
-    }
-
-    [Obsolete]
-    public IPage ConstructPage(Type pageType, IDataDomainScope? dataDomainScope)
-    {
-        if (dataDomainScope == null)
-            return ConstructPage(pageType);
-
-        return ConstructPage(pageType, new Dictionary<Type, object?>
-        {
-            { typeof(IDataDomain), dataDomainScope?.DataDomain },
-            { typeof(IDataDomainScope), dataDomainScope }
-        });
-    }
-
-    [Obsolete]
-    public TPage ConstructPage<TPage>(IDataDomainScope? dataDomainScope = null)
+    public TPage ConstructPage<TPage>()
         where TPage : IPage
     {
-        dataDomainScope ??= ServiceProvider.GetService<IDataDomainScope>();
+        return ConstructPage<TPage>(ServiceProvider);
+    }
 
+    public TPage ConstructPage<TPage>(IServiceProvider serviceProvider)
+        where TPage : IPage
+    {
         TPage newPage;
         try
         {
-            newPage = ActivatorUtilities.CreateInstance<TPage>(ServiceProvider, dataDomainScope);
+            newPage = ActivatorUtilities.CreateInstance<TPage>(serviceProvider);
         }
         catch (BusinessLayerErrorException e)
         {
@@ -214,14 +199,14 @@ public abstract class ViewDomain : IViewDomain
         return CreatePropertyLookupView(lookupDefinition, dataDomain, () => dataSet.Current);
     }
 
-    public IPage ConstructEntityDefaultPage(Type entityType, IDataDomainScope? dataDomainScope = null)
+    public IPage ConstructEntityDefaultPage(Type entityType, IServiceProvider serviceProvider)
     {
         var pageType = GetEntityDefaultPageType(entityType);
         if (pageType == null)
             throw new ArgumentException($"For the entity type {entityType.FullName} is no default page defined.",
                 nameof(entityType));
 
-        return ConstructPage(pageType, dataDomainScope);
+        return ConstructPage(pageType, serviceProvider);
     }
 
     public abstract IDataSetView<TEntry> CreateDataSetView<TEntry>(IDataDomainScope dataDomainScope, IDao<TEntry>? repository = null)

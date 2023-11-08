@@ -7,19 +7,19 @@ public class DocumentPageCollectionPageTest : ViewDomainUnitTestBase
     [Fact]
     public void DocumentMenuLinkTest()
     {
-        var hostPage = new MockupDocumentPageCollectionPage(ViewDomain);
+        var hostPage = new MockupDocumentPageCollectionPage(ServiceProvider);
 
         Assert.Null(hostPage.CurrentDocumentPage);
         Assert.Single(hostPage.Menu[UIMenu.BaseMenuName].MenuItems);
         Assert.Empty(hostPage.Menu[UIMenu.BaseMenuName].MenuItems[0].SubMenuItems);
 
-        var page = new MockupPage(ViewDomain)
+        var page = new MockupPage(ServiceProvider)
         {
             Title = "EmptyPage"
         };
         hostPage.DocumentPages.Add(page);
 
-        var interactivePage1 = new MockupInteractivePage(ViewDomain)
+        var interactivePage1 = new MockupInteractivePage(ServiceProvider)
         {
             Title = "SimpleMenu1",
         };
@@ -27,7 +27,7 @@ public class DocumentPageCollectionPageTest : ViewDomainUnitTestBase
         interactivePage1.Menu[UIMenu.BaseMenuName].MenuItems[0].SubMenuItems.Add(new UIMenuItem("MenuItem1.2"));
         hostPage.DocumentPages.Add(interactivePage1);
 
-        var interactivePage2 = new MockupInteractivePage(ViewDomain)
+        var interactivePage2 = new MockupInteractivePage(ServiceProvider)
         {
             Title = "SimpleMenu2",
         };
@@ -65,17 +65,17 @@ public class DocumentPageCollectionPageTest : ViewDomainUnitTestBase
     [Fact]
     void MenuPatching()
     {
-        var hostPage = new MockupDocumentPageCollectionPage(ViewDomain);
+        var hostPage = new MockupDocumentPageCollectionPage(ServiceProvider);
 
         var openPageMenuItem =
-            new UIMenuItemAction(new UIOpenPageAction("OpenPageMenuItem1", typeof(Page), ViewDomain));
+            new UIMenuItemAction(new UIOpenPageAction("OpenPageMenuItem1", typeof(Page), ServiceProvider));
         Assert.NotNull(openPageMenuItem.Action);
         Assert.Null(((UIOpenPageAction)openPageMenuItem.Action).HostPage);
         hostPage.Menu[UIMenu.BaseMenuName].MenuItems.Add(openPageMenuItem);
 
         var openReferencedPageMenuItem =
             new UIMenuItemDataSetSelectionAction<SampleEntity>(new UIOpenReferencedPageAction<SampleEntity>("OpenReferencedPageMenuItem1",
-                typeof(DataPage<SampleEntity>), ViewDomain));
+                typeof(DataPage<SampleEntity>), ServiceProvider));
 
         Assert.NotNull(openReferencedPageMenuItem.Action);
         Assert.Null(((UIOpenReferencedPageAction<SampleEntity>)openReferencedPageMenuItem.Action).HostPage);
@@ -83,7 +83,7 @@ public class DocumentPageCollectionPageTest : ViewDomainUnitTestBase
 
         var openReferencedCardPageMenuItem =
             new UIMenuItemDataSetSelectionAction<SampleEntity>(new UIOpenReferencedCardPageAction<SampleEntity>("OpenReferencedCardPageMenuItem1",
-                typeof(CardPage<SampleEntity>), ViewDomain));
+                typeof(CardPage<SampleEntity>), ServiceProvider));
 
         Assert.NotNull(openReferencedCardPageMenuItem.Action);
         Assert.Null(((UIOpenReferencedCardPageAction<SampleEntity>)openReferencedCardPageMenuItem.Action).HostPage);
@@ -104,14 +104,14 @@ public class DocumentPageCollectionPageTest : ViewDomainUnitTestBase
     [Fact]
     void MenuPatchingOnDocumentAdding()
     {
-        var hostPage = new MockupDocumentPageCollectionPage(ViewDomain);
+        var hostPage = new MockupDocumentPageCollectionPage(ServiceProvider);
 
-        var interactivePage1 = new MockupInteractivePage(ViewDomain)
+        var interactivePage1 = new MockupInteractivePage(ServiceProvider)
         {
             Title = "SimpleMenu1",
         };
         var openPageMenuItem =
-            new UIMenuItemAction(new UIOpenPageAction("OpenPageMenuItem1", typeof(Page), ViewDomain));
+            new UIMenuItemAction(new UIOpenPageAction("OpenPageMenuItem1", typeof(Page), ServiceProvider));
         interactivePage1.Menu[UIMenu.BaseMenuName].MenuItems[0].SubMenuItems.Add(openPageMenuItem);
 
         Assert.NotNull(openPageMenuItem.Action);

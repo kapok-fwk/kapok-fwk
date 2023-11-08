@@ -1,6 +1,5 @@
 ﻿using System.Text.Json.Serialization;
 using System.Text.Json;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Kapok.View.UnitTest;
@@ -10,8 +9,7 @@ public class UIMenuTest : ViewDomainUnitTestBase
     [Fact]
     public void SerializeEmptyMenuTest()
     {
-        var viewDomain = ServiceProvider.GetRequiredService<IViewDomain>();
-        var page = new MockupInteractivePage(viewDomain);
+        var page = new MockupInteractivePage(ServiceProvider);
 
         var menu = new UIMenu(UIMenu.BaseMenuName, page);
 

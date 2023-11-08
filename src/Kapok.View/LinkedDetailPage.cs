@@ -1,6 +1,4 @@
-﻿using Kapok.Data;
-
-namespace Kapok.View;
+﻿namespace Kapok.View;
 
 /// <summary>
 /// A base class for a detail page which shows data referenced to a source data set (e.g. the main data set from the main page).
@@ -15,15 +13,8 @@ public abstract class LinkedDetailPage<TBaseEntry, TLinkedEntry> : DetailPage<TL
     // ReSharper disable once StaticMemberInGenericType
     public static string SourceDataSetName = "Source";
 
-    protected LinkedDetailPage(IDataSetView<TBaseEntry> sourceDataSet,  IViewDomain? viewDomain = null, IDataDomain? dataDomain = null)
-        : base(viewDomain, dataDomain)
-    {
-        SourceDataSet = sourceDataSet;
-        SourceDataSet.PropertyChanged += SourceDataSet_PropertyChanged;
-    }
-
-    protected LinkedDetailPage(IDataSetView<TBaseEntry> sourceDataSet, IViewDomain? viewDomain = null, IDataDomainScope? dataDomainScope = null)
-        : base(viewDomain, dataDomainScope)
+    protected LinkedDetailPage(IServiceProvider serviceProvider, IDataSetView<TBaseEntry> sourceDataSet)
+        : base(serviceProvider)
     {
         SourceDataSet = sourceDataSet;
         SourceDataSet.PropertyChanged += SourceDataSet_PropertyChanged;

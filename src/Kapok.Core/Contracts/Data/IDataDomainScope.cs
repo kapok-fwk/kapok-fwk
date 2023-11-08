@@ -5,6 +5,7 @@ namespace Kapok.Data;
 
 public interface IDataDomainScope : IDisposable
 {
+    IServiceProvider ServiceProvider { get; }
     IDataDomain DataDomain { get; }
 
     IReadOnlyDictionary<string, DataPartition> DataPartitions { get; }

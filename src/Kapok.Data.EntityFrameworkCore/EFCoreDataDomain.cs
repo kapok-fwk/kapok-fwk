@@ -11,6 +11,12 @@ public class EFCoreDataDomain : DataDomain, IEntityFrameworkCoreDataDomain
         DbContextOptions = dbContextOptions;
     }
 
+    public EFCoreDataDomain(DbContextOptions dbContextOptions, IServiceProvider serviceProvider)
+        : base(serviceProvider)
+    {
+        DbContextOptions = dbContextOptions;
+    }
+
     protected override void ConfigureServices(IServiceCollection serviceCollection)
     {
         base.ConfigureServices(serviceCollection);

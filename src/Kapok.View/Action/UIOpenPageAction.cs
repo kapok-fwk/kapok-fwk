@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Kapok.BusinessLayer;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Kapok.View;
 
@@ -12,10 +13,9 @@ public class UIOpenPageAction : UIAction, IOpenPageAction
     }
 
     private readonly Type? _pageType;
-    private readonly IViewDomain? _viewDomain;
+    private readonly IServiceProvider? _serviceProvider;
     private readonly IPage? _page;
     private DocumentPageCollectionPage? _hostPage;
-    protected readonly Dictionary<Type, object>? PageConstructorParamValues;
 
     public UIOpenPageAction(string name, IPage page, Func<bool>? canExecute = null)
         : base(name, DummyExecute, canExecute)
@@ -29,11 +29,11 @@ public class UIOpenPageAction : UIAction, IOpenPageAction
         _page = page;
     }
 
-    public UIOpenPageAction(string name, Type pageType, IViewDomain viewDomain, Func<bool>? canExecute = null)
+    public UIOpenPageAction(string name, Type pageType, IServiceProvider serviceProvider, Func<bool>? canExecute = null)
         : base(name, DummyExecute, canExecute)
     {
         ArgumentNullException.ThrowIfNull(pageType);
-        ArgumentNullException.ThrowIfNull(viewDomain);
+        ArgumentNullException.ThrowIfNull(serviceProvider);
 
         // internal override
         ExecuteFunc = OpenPage;
@@ -43,11 +43,7 @@ public class UIOpenPageAction : UIAction, IOpenPageAction
             throw new ArgumentException($"The pageType parameter must have a type which implements the interface {typeof(IPage).FullName}", nameof(pageType));
 
         _pageType = pageType;
-        _viewDomain = viewDomain;
-        PageConstructorParamValues = new Dictionary<Type, object>
-        {
-            { typeof(IViewDomain), _viewDomain }
-        };
+        _serviceProvider = serviceProvider;
     }
 
     public IPage GetOrConstructPage()
@@ -55,7 +51,7 @@ public class UIOpenPageAction : UIAction, IOpenPageAction
 #pragma warning disable CS8602
 #pragma warning disable CS8604
 #pragma warning disable CS8620
-        return _page ?? _viewDomain.ConstructPage(_pageType, PageConstructorParamValues);
+        return _page ?? _serviceProvider.GetRequiredService<IViewDomain>().ConstructPage(_pageType);
 #pragma warning restore CS8620
 #pragma warning restore CS8604
 #pragma warning restore CS8602
@@ -101,7 +97,8 @@ public class UIOpenPageAction : UIAction, IOpenPageAction
             Debugger.Break();
 #pragma warning disable CS8602
             // TODO: translation is missing
-            _viewDomain?.ShowErrorMessage($"An error occurred during opening of page type {_pageType.FullName}", exception: e);
+            _serviceProvider?.GetService<IViewDomain>()?
+                .ShowErrorMessage($"An error occurred during opening of page type {_pageType.FullName}", exception: e);
 #pragma warning restore CS8602
             return;
         }

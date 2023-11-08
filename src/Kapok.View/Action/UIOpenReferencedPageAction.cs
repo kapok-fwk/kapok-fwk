@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Kapok.BusinessLayer;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Kapok.View;
 
@@ -13,13 +14,12 @@ public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction
     }
 
     private readonly Type _pageType;
-    private readonly IViewDomain? _viewDomain;
+    private readonly IServiceProvider? _serviceProvider;
     private readonly IDataPage? _page;
     private DocumentPageCollectionPage? _hostPage;
-    protected readonly Dictionary<Type, object>? PageConstructorParamValues;
     private readonly IDataSetView<TEntry>? _baseDataSetView;
     private readonly Action<IFilterSet, TEntry, IReadOnlyDictionary<string, object?>>? _filter;
-    
+
     public UIOpenReferencedPageAction(string name, IDataPage page,
         IDataSetView<TEntry>? baseDataSetView = null,
         Action<IFilterSet, TEntry, IReadOnlyDictionary<string, object?>>? filter = null,
@@ -39,14 +39,14 @@ public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction
         ListViewName = listViewName;
     }
 
-    public UIOpenReferencedPageAction(string name, Type pageType, IViewDomain viewDomain,
+    public UIOpenReferencedPageAction(string name, Type pageType, IServiceProvider serviceProvider,
         IDataSetView<TEntry>? baseDataSetView = null,
         Action<IFilterSet, TEntry, IReadOnlyDictionary<string, object?>>? filter = null,
         Func<TEntry, bool>? canExecute = null, string? listViewName = null)
         : base(name, DummyExecute, canExecute)
     {
         ArgumentNullException.ThrowIfNull(pageType);
-        ArgumentNullException.ThrowIfNull(viewDomain);
+        ArgumentNullException.ThrowIfNull(serviceProvider);
 
         // internal override
         ExecuteFunc = OpenPage;
@@ -56,13 +56,7 @@ public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction
             throw new ArgumentException($"The pageType parameter must have a type which implements the interface {typeof(IDataPage<>).FullName}", nameof(pageType));
 
         _pageType = pageType;
-        _viewDomain = viewDomain;
-        PageConstructorParamValues = new Dictionary<Type, object>
-        {
-            { typeof(IViewDomain), _viewDomain }
-        };
-        if (baseDataSetView != null)
-            PageConstructorParamValues.Add(typeof(IDataSetView<TEntry>), baseDataSetView);
+        _serviceProvider = serviceProvider;
         _baseDataSetView = baseDataSetView;
         _filter = filter;
         ListViewName = listViewName;
@@ -95,13 +89,14 @@ public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction
 
     public IDataPage GetOrConstructPage()
     {
-#pragma warning disable CS8602
-#pragma warning disable CS8604
-#pragma warning disable CS8620
-        return (IDataPage)_viewDomain.ConstructPage(_pageType, PageConstructorParamValues);
-#pragma warning restore CS8620
-#pragma warning restore CS8604
-#pragma warning restore CS8602
+        Debug.Assert(_serviceProvider != null);
+
+        if (_baseDataSetView != null)
+        {
+            return (IDataPage)_serviceProvider.GetRequiredService<IViewDomain>().ConstructPage(_pageType, _serviceProvider, _baseDataSetView);
+        }
+
+        return (IDataPage)_serviceProvider.GetRequiredService<IViewDomain>().ConstructPage(_pageType, _serviceProvider);
     }
 
     /// <summary>
@@ -145,7 +140,7 @@ public class UIOpenReferencedPageAction<TEntry> : UIDataSetSingleSelectionAction
                 Debugger.Break();
                 // TODO: translation is missing
 #pragma warning disable CS8602
-                _viewDomain.ShowErrorMessage($"An error occurred during opening of page type {_pageType.FullName}", exception: e);
+                _serviceProvider?.GetService<IViewDomain>().ShowErrorMessage($"An error occurred during opening of page type {_pageType.FullName}", exception: e);
 #pragma warning restore CS8602
                 return;
             }

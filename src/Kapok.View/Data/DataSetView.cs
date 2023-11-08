@@ -10,6 +10,7 @@ using System.Runtime.CompilerServices;
 using Kapok.BusinessLayer;
 using Kapok.Data;
 using Kapok.Entity;
+using Microsoft.Extensions.DependencyInjection;
 using Res = Kapok.View.Resources.Data.DataSetView;
 
 namespace Kapok.View;
@@ -17,7 +18,7 @@ namespace Kapok.View;
 public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
     where TEntry : class, new()
 {
-    protected readonly IViewDomain ViewDomain;
+    protected readonly IServiceProvider ServiceProvider;
     protected readonly IDataDomainScope DataDomainScope;
     protected readonly IDao<TEntry> Dao;
     protected readonly ObservableCollection<TEntry> Collection = new();
@@ -39,12 +40,12 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
     private bool _refreshPropertyLookupsOnlyOnEntryDeferred;
     private PropertyInfo[]? _sortBy;
 
-    public DataSetView(IViewDomain viewDomain, IDataDomainScope dataDomainScope, IDao<TEntry>? dao = null)
+    public DataSetView(IServiceProvider serviceProvider, IDataDomainScope dataDomainScope, IDao<TEntry>? dao = null)
     {
-        ArgumentNullException.ThrowIfNull(viewDomain, nameof(viewDomain));
+        ArgumentNullException.ThrowIfNull(serviceProvider, nameof(serviceProvider));
         ArgumentNullException.ThrowIfNull(dataDomainScope, nameof(dataDomainScope));
 
-        ViewDomain = viewDomain;
+        ServiceProvider = serviceProvider;
         DataDomainScope = dataDomainScope;
 
         if (dao == null)
@@ -76,7 +77,7 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
             _deleteAllowed = false;
         }
 
-        Columns = new PropertyViewCollection<TEntry>(ViewDomain, DataDomainScope.DataDomain, Dao.Model, this);
+        Columns = new PropertyViewCollection<TEntry>(ServiceProvider, Dao.Model, this);
         Columns.CollectionChanged += Columns_CollectionChanged;
 
         CreateNewEntryAction = new UIAction("CreateNewEntry", CreateNewEntry, CanCreateNewEntry) {Image = "table-row-new"};
@@ -85,6 +86,8 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
         ClearUserFilterAction = new UIAction("ClearUserFilter", ClearUserFilter, CanClearUserFilter) {Image = "filter-cancel-2"};
         SelectAllAction = new UIAction("SelectAll", SelectAll);
     }
+
+    protected IViewDomain ViewDomain => ServiceProvider.GetRequiredService<IViewDomain>();
 
     private void Columns_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {

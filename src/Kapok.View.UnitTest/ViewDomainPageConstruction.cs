@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Kapok.Data;
@@ -33,24 +34,22 @@ public class ViewDomainPageConstruction : ViewDomainUnitTestBase
 
     public class SampleListPage : ListPage<SampleEntity>
     {
-        public SampleListPage(IViewDomain? viewDomain, IDataDomainScope? dataDomainScope = null)
-            : base(viewDomain, dataDomainScope)
+        public SampleListPage(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
             OpenCardPageAction =
-                new UIOpenReferencedCardPageAction<SampleEntity>("OpenCardPage", typeof(SampleCardPage), ViewDomain,
+                new UIOpenReferencedCardPageAction<SampleEntity>("OpenCardPage", typeof(SampleCardPage), ServiceProvider,
                     DataSet);
         }
     }
 
     public class SampleCardPage : CardPage<SampleEntity>
     {
-        public SampleCardPage(IDataSetView<SampleEntity> dataSet, IViewDomain viewDomain, IDataDomainScope dataDomainScope)
-            : base(dataSet, viewDomain, dataDomainScope)
+        public SampleCardPage(IServiceProvider serviceProvider, IDataSetView<SampleEntity> dataSet)
+            : base(serviceProvider, dataSet)
         {
-            Assert.NotNull(dataSet);
-            Assert.NotNull(viewDomain);
-            Assert.NotNull(dataDomainScope);
-        }
+            Assert.NotNull(serviceProvider);
+            Assert.NotNull(dataSet);}
     }
 
     [Fact]
@@ -58,10 +57,10 @@ public class ViewDomainPageConstruction : ViewDomainUnitTestBase
     {
         using var scope = DataDomain.CreateScope();
 
-        var page = ViewDomain.ConstructPage<SampleListPage>(null);
+        var page = ViewDomain.ConstructPage<SampleListPage>();
         Assert.NotNull(page);
 
-        page = ViewDomain.ConstructPage<SampleListPage>(scope);
+        page = ViewDomain.ConstructPage<SampleListPage>(scope.ServiceProvider);
         Assert.NotNull(page);
     }
 
@@ -70,7 +69,7 @@ public class ViewDomainPageConstruction : ViewDomainUnitTestBase
     {
         using var scope = DataDomain.CreateScope();
 
-        var listPage = new SampleListPage(ViewDomain, scope);
+        var listPage = new SampleListPage(ServiceProvider);
 
         var entity = new SampleEntity
         {

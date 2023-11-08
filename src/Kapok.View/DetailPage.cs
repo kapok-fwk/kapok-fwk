@@ -1,6 +1,4 @@
-﻿using Kapok.Data;
-
-namespace Kapok.View;
+﻿namespace Kapok.View;
 
 /// <summary>
 /// A base class for a detail page.
@@ -11,23 +9,13 @@ namespace Kapok.View;
 public abstract class DetailPage<TEntry> : DataPage<TEntry>, IDetailPage<TEntry>
     where TEntry : class, new()
 {
-    protected DetailPage(IDataSetView<TEntry> tableData, IViewDomain? viewDomain = null, IDataDomain? dataDomain = null)
-        : base(tableData, viewDomain, dataDomain)
+    protected DetailPage(IServiceProvider serviceProvider, IDataSetView<TEntry> tableData)
+        : base(serviceProvider, tableData)
     {
     }
 
-    protected DetailPage(IDataSetView<TEntry> tableData, IViewDomain? viewDomain = null, IDataDomainScope? dataDomainScope = null)
-        : base(tableData, viewDomain, dataDomainScope)
-    {
-    }
-
-    internal DetailPage(IViewDomain? viewDomain = null, IDataDomain? dataDomain = null)
-        : base(viewDomain, dataDomain)
-    {
-    }
-
-    internal DetailPage(IViewDomain? viewDomain = null, IDataDomainScope? dataDomainScope = null)
-        : base(viewDomain, dataDomainScope)
+    internal DetailPage(IServiceProvider serviceProvider)
+        : base(serviceProvider)
     {
     }
 

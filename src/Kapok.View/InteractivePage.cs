@@ -10,8 +10,8 @@ public abstract class InteractivePage : Page, IInteractivePage
 {
     private readonly Dictionary<string, UIMenu> _menu;
 
-    protected InteractivePage(IViewDomain? viewDomain = null)
-        : base(viewDomain)
+    protected InteractivePage(IServiceProvider serviceProvider)
+        : base(serviceProvider)
     {
         _menu = new Dictionary<string, UIMenu>();
 

@@ -1,4 +1,5 @@
 ﻿using Kapok.Data;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Kapok.View;
 
@@ -9,22 +10,12 @@ public abstract class DataDialogPage : DialogPage
 {
     private IDataDomainScope? _dataDomainScope;
 
-    protected DataDialogPage(IViewDomain? viewDomain = null, IDataDomain? dataDomain = null)
-        : base(viewDomain)
+    protected DataDialogPage(IServiceProvider serviceProvider)
+        : base(serviceProvider)
     {
-        DataDomain = dataDomain
-                     ?? Data.DataDomain.Default
-                     ?? throw new NotSupportedException(
-                         $"You have to first set Kapok.Core.DataDomain.Default before you can initiate a page without {nameof(dataDomain)} being provided");
     }
 
-    protected DataDialogPage(IViewDomain? viewDomain = null, IDataDomainScope? dataDomainScope = null)
-        : this(viewDomain, dataDomainScope?.DataDomain)
-    {
-        _dataDomainScope = dataDomainScope;
-    }
+    protected IDataDomain DataDomain => ServiceProvider.GetRequiredService<IDataDomain>();
 
-    protected IDataDomain DataDomain { get; }
-
-    protected IDataDomainScope DataDomainScope => _dataDomainScope ??= DataDomain.CreateScope();
+    protected IDataDomainScope DataDomainScope => _dataDomainScope ??= ServiceProvider.GetService<IDataDomainScope>() ?? DataDomain.CreateScope();
 }

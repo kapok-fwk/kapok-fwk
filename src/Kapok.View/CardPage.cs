@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using Kapok.Data;
 using Kapok.Entity;
 
 namespace Kapok.View;
@@ -13,13 +12,8 @@ public abstract class CardPage<TEntry> : DataPage<TEntry>, ICardPage, ICardPage<
 {
     private PropertyViewCollection<TEntry>? _propertyViewDefinitions;
 
-    protected CardPage(IDataSetView<TEntry> tableData, IViewDomain? viewDomain = null, IDataDomain? dataDomain = null)
-        : base(tableData, viewDomain, dataDomain)
-    {
-    }
-
-    protected CardPage(IDataSetView<TEntry> tableData, IViewDomain? viewDomain = null, IDataDomainScope? dataDomainScope = null)
-        : base(tableData, viewDomain, dataDomainScope)
+    protected CardPage(IServiceProvider serviceProvider, IDataSetView<TEntry> tableData)
+        : base(serviceProvider, tableData)
     {
     }
 
@@ -51,7 +45,7 @@ public abstract class CardPage<TEntry> : DataPage<TEntry>, ICardPage, ICardPage<
     /// Contains the properties which are shown in the view.
     /// </summary>
     public PropertyViewCollection<TEntry> PropertyViewDefinitions =>
-        _propertyViewDefinitions ??= new PropertyViewCollection<TEntry>(ViewDomain, DataDomainScope.DataDomain,
+        _propertyViewDefinitions ??= new PropertyViewCollection<TEntry>(ServiceProvider,
             EntityBase.GetEntityModel<TEntry>(), DataSet);
 
     protected override void DeleteEntry(IList<TEntry?>? selectedEntries)

@@ -1,8 +1,10 @@
-﻿namespace Kapok.View.UnitTest;
+﻿using System;
+
+namespace Kapok.View.UnitTest;
 
 public class MockupPage : Page
 {
-    public MockupPage(IViewDomain viewDomain) : base(viewDomain)
+    public MockupPage(IServiceProvider serviceProvider) : base(serviceProvider)
     {
     }
 }

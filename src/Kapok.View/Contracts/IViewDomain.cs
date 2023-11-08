@@ -10,6 +10,8 @@ public interface IViewDomain
 {
     CultureInfo Culture { get; }
 
+    IServiceProvider ServiceProvider { get; }
+
     /// <summary>
     /// A action which must be defined my the main assembly which shuts down the application
     /// with a defined exit code.
@@ -25,12 +27,16 @@ public interface IViewDomain
 
     IPage ConstructPage(Type pageType);
     IPage ConstructPage(Type pageType, IServiceProvider serviceProvider);
-    [Obsolete]
-    IPage ConstructPage(Type pageType, Dictionary<Type, object?>? constructorParamValues);
-    [Obsolete]
-    TPage ConstructPage<TPage>(IDataDomainScope? dataDomainScope = null)
+    IPage ConstructPage<TEntity>(Type pageType, IServiceProvider serviceProvider, IDataSetView<TEntity> dataSet)
+        where TEntity : class, new();
+
+    TPage ConstructPage<TPage>()
         where TPage : IPage;
-    IPage ConstructEntityDefaultPage(Type entityType, IDataDomainScope? dataDomainScope);
+
+    TPage ConstructPage<TPage>(IServiceProvider serviceProvider)
+        where TPage : IPage;
+
+    IPage ConstructEntityDefaultPage(Type entityType, IServiceProvider serviceProvider);
 
     IQueryableView<TEntity> CreateQueryableView<TEntity>(IQueryable<TEntity> queryable)
         where TEntity : class;

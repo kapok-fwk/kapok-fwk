@@ -12,6 +12,15 @@ public class InMemoryDataDomain : DataDomain
     // holds the in memory cache of the entities.
     private readonly Dictionary<Type, IList> _inMemoryData = new();
 
+    public InMemoryDataDomain()
+    {
+    }
+
+    public InMemoryDataDomain(IServiceProvider serviceProvider)
+        : base(serviceProvider)
+    {
+    }
+
     protected override void ConfigureServices(IServiceCollection serviceCollection)
     {
         base.ConfigureServices(serviceCollection);

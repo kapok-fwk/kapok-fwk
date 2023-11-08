@@ -5,8 +5,8 @@
 /// </summary>
 public abstract class DialogPage : Page, IDialogPage
 {
-    protected DialogPage(IViewDomain? viewDomain = null)
-        : base(viewDomain)
+    protected DialogPage(IServiceProvider serviceProvider)
+        : base(serviceProvider)
     {
         DefaultAction = new UIAction("DialogDefaultAction", Action, CanAction);
         CancelAction = new UIAction("CancelDialog", Cancel);

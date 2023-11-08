@@ -5,6 +5,7 @@ using System.Diagnostics;
 using Kapok.Data;
 using Kapok.Entity;
 using Kapok.Entity.Model;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Kapok.View;
 
@@ -12,9 +13,8 @@ namespace Kapok.View;
 public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>
     where TEntity : class, new()
 {
-    private readonly IViewDomain _viewDomain;
+    private readonly IServiceProvider _serviceProvider;
     private readonly IEntityModel _entityModel;
-    private readonly IDataDomain _dataDomain;
     private readonly IDataSetView<TEntity>? _dataSet;
     private readonly Func<TEntity?>? _currentSelector;
         
@@ -23,26 +23,22 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>
     private readonly Dictionary<string, IPropertyLookupView> _lookupViews = new();
     private readonly Dictionary<string, IDataSetSelectionAction<TEntity>> _drillDown = new();
 
-    public PropertyViewCollection(IViewDomain viewDomain, IDataDomain dataDomain,
+    public PropertyViewCollection(IServiceProvider serviceProvider,
         IEntityModel entityModel, Func<TEntity?>? currentSelector = null)
     {
-        ArgumentNullException.ThrowIfNull(viewDomain);
-        ArgumentNullException.ThrowIfNull(dataDomain);
+        ArgumentNullException.ThrowIfNull(serviceProvider);
         ArgumentNullException.ThrowIfNull(entityModel);
-        _viewDomain = viewDomain;
-        _dataDomain = dataDomain;
+        _serviceProvider = serviceProvider;
         _entityModel = entityModel;
         _currentSelector = currentSelector;
     }
-    
-    public PropertyViewCollection(IViewDomain viewDomain, IDataDomain dataDomain,
+
+    public PropertyViewCollection(IServiceProvider serviceProvider,
         IEntityModel entityModel, IDataSetView<TEntity>? baseDataSet = null)
     {
-        ArgumentNullException.ThrowIfNull(viewDomain);
-        ArgumentNullException.ThrowIfNull(dataDomain);
+        ArgumentNullException.ThrowIfNull(serviceProvider);
         ArgumentNullException.ThrowIfNull(entityModel);
-        _viewDomain = viewDomain;
-        _dataDomain = dataDomain;
+        _serviceProvider = serviceProvider;
         _entityModel = entityModel;
         _currentSelector = () => baseDataSet?.Current;
         _dataSet = baseDataSet;
@@ -76,6 +72,8 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>
 
     protected virtual void OnAdd(PropertyView item)
     {
+        var viewDomain = _serviceProvider.GetRequiredService<IViewDomain>();
+
         // NOTE: move this maybe into the PropertyView constructor?
         item.LookupDefinition ??= _entityModel.Properties
             .FirstOrDefault(p => p.PropertyName == item.Name)?.LookupDefinition;
@@ -85,7 +83,7 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>
             // NOTE: here we make sure that when a property is used twice we just load it once... TODO maybe something to improve/change? e.g. with a dedicated 'Name' property in the PropertyView class
             if (!_lookupViews.ContainsKey(item.Name))
             {
-                var lookupView = _viewDomain.CreatePropertyLookupView(item.LookupDefinition, _dataDomain, _currentSelector);
+                var lookupView = viewDomain.CreatePropertyLookupView(item.LookupDefinition, _serviceProvider.GetRequiredService<IDataDomain>(), _currentSelector);
                 if (lookupView != null)
                     _lookupViews.Add(item.Name, lookupView);
             }
@@ -117,7 +115,7 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>
                 {
                     // it is an entity type --> let's get the default IPage object for the type
 
-                    pageType = _viewDomain.GetEntityDefaultPageType(pageType);
+                    pageType = viewDomain.GetEntityDefaultPageType(pageType);
 
                     if (pageType == null)
                         throw new NotSupportedException(
@@ -133,7 +131,7 @@ public class PropertyViewCollection<TEntity> : IPropertyViewCollection<TEntity>
                 drillDownAction = new UIOpenReferencedPageAction<TEntity>(
                     drillDownActionName,
                     pageType,
-                    _viewDomain,
+                    _serviceProvider,
                     _dataSet,
                     item.DrillDownDefinition.Filter);
             }

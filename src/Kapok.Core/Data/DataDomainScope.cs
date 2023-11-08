@@ -1,5 +1,4 @@
-﻿using System;
-using System.Transactions;
+﻿using System.Transactions;
 using Kapok.BusinessLayer;
 using Kapok.Data.InMemory;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,7 +8,7 @@ namespace Kapok.Data;
 
 public abstract class DataDomainScope : IDataDomainScope
 {
-    private IServiceProvider ServiceProvider { get; }
+    public IServiceProvider ServiceProvider { get; }
     private readonly List<TransactionScope> _transactionScopes = new();
     private readonly Dictionary<Type, object> _daos = new();
     private readonly Dictionary<Type, object> _repositories = new();

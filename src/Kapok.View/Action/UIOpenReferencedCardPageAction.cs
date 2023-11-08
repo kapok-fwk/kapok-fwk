@@ -1,6 +1,4 @@
-﻿using Kapok.Data;
-
-namespace Kapok.View;
+﻿namespace Kapok.View;
 
 // ReSharper disable once InconsistentNaming
 public class UIOpenReferencedCardPageAction<TEntry> : UIOpenReferencedPageAction<TEntry>
@@ -12,19 +10,13 @@ public class UIOpenReferencedCardPageAction<TEntry> : UIOpenReferencedPageAction
     {
     }
 
-    public UIOpenReferencedCardPageAction(string name, Type pageType, IViewDomain viewDomain,
+    public UIOpenReferencedCardPageAction(string name, Type pageType, IServiceProvider serviceProvider,
         IDataSetView<TEntry>? baseDataSetView = null,
-        Func<TEntry, bool>? canExecute = null,
-        IDataDomainScope? dataDomainScope = null)
-        : base(name, pageType, viewDomain, baseDataSetView, canExecute: canExecute)
+        Func<TEntry, bool>? canExecute = null)
+        : base(name, pageType, serviceProvider, baseDataSetView, canExecute: canExecute)
     {
         // main constructor code
         if (!typeof(ICardPage).IsAssignableFrom(pageType))
             throw new ArgumentException($"The {nameof(pageType)} parameter must have a type which implements the interface {typeof(ICardPage<>).FullName}", nameof(pageType));
-
-        if (dataDomainScope != null)
-#pragma warning disable CS8602
-            PageConstructorParamValues.Add(typeof(IDataDomainScope), dataDomainScope);
-#pragma warning restore CS8602
     }
 }

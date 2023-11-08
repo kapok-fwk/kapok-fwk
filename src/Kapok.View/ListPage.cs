@@ -7,7 +7,6 @@ using System.Globalization;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using Kapok.BusinessLayer;
-using Kapok.Data;
 using Kapok.Entity;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
@@ -27,8 +26,8 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
     private DataSetListView? _currentListView;
     private IDataSetSelectionAction<TEntry>? _openCardPageAction;
 
-    public ListPage(IViewDomain? viewDomain = null, IDataDomain? dataDomain = null)
-        : base(viewDomain, dataDomain)
+    public ListPage(IServiceProvider serviceProvider)
+        : base(serviceProvider)
     {
         EditEntryAction = new UIDataSetSelectionAction<TEntry>("EditEntry", EditEntry, CanEditEntry) {Image = "tool-pencil", ImageIsBig = false };
         if (typeof(ISortableEntity).IsAssignableFrom(typeof(TEntry)))
@@ -39,24 +38,6 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
         ExportAsExcelSheetAction = new UIAction("ExportAsExcelSheet", ExportAsExcelSheet) {Image = "export-to-excel"};
         ToggleFilterVisibleAction = new UIToggleAction("ToggleFilterVisible", ToggleFilterVisible, CanToggleFilterVisible) {Image = "filter", ImageIsBig = false, IsVisible = false};
         ClearUserFilterAction = new UIAction("ClearUserFilter", ClearUserFilter, CanClearUserFilter) {Image = "filter-cancel-2", ImageIsBig = false};
-
-        ListViews.CollectionChanged += ListViews_CollectionChanged;
-
-        Title = typeof(TEntry).GetDisplayAttributeNameOrDefault() ?? typeof(TEntry).FullName;
-    }
-
-    public ListPage(IViewDomain? viewDomain = null, IDataDomainScope? dataDomainScope = null)
-        : base(viewDomain, dataDomainScope)
-    {
-        EditEntryAction = new UIDataSetSelectionAction<TEntry>("EditEntry", EditEntry, CanEditEntry) { Image = "tool-pencil", ImageIsBig = false };
-        if (typeof(ISortableEntity).IsAssignableFrom(typeof(TEntry)))
-        {
-            SortUpEntryAction = new UIAction("SortUpEntry", SortUpEntry, CanSortUpEntry) { Image = "table-row-up" };
-            SortDownEntryAction = new UIAction("SortDownEntry", SortDownEntry, CanSortDownEntry) { Image = "table-row-down" };
-        }
-        ExportAsExcelSheetAction = new UIAction("ExportAsExcelSheet", ExportAsExcelSheet) { Image = "export-to-excel" };
-        ToggleFilterVisibleAction = new UIToggleAction("ToggleFilterVisible", ToggleFilterVisible, CanToggleFilterVisible) { Image = "filter", ImageIsBig = false, IsVisible = false };
-        ClearUserFilterAction = new UIAction("ClearUserFilter", ClearUserFilter, CanClearUserFilter) { Image = "filter-cancel-2", ImageIsBig = false };
 
         ListViews.CollectionChanged += ListViews_CollectionChanged;
 

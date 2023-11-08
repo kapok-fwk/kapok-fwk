@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Kapok.Data;
 using Kapok.Entity;
 using Res = Kapok.View.Resources.DataPage;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Kapok.View;
 
@@ -29,14 +30,9 @@ public abstract class DataPage<TEntry> : InteractivePage, IDataPage<TEntry>
 
     private readonly Dictionary<string, IDataSetView> _dataSets = new();
 
-    protected DataPage(IViewDomain? viewDomain = null, IDataDomain? dataDomain = null)
-        : base(viewDomain)
+    protected DataPage(IServiceProvider serviceProvider)
+        : base(serviceProvider)
     {
-        DataDomain = dataDomain
-                     ?? Data.DataDomain.Default
-                     ?? throw new NotSupportedException(
-                         $"You have to first set Kapok.Core.DataDomain.Default before you can initiate a page without {nameof(dataDomain)} being provided");
-
         // init actions
         RefreshAction = new UIAction("RefreshPage", RefreshActionCall) { Image = "symbol-refresh" };
         SaveDataAction = new UIAction("SaveDataOnPage", () => SaveData(), CanSaveData) { Image = "save", ImageIsBig = false };
@@ -45,29 +41,17 @@ public abstract class DataPage<TEntry> : InteractivePage, IDataPage<TEntry>
         ToggleEditModeAction = new UIToggleAction("ToggleEditMode", ToggleEditMode, CanToggleEditMode) { Image = "tool-pencil", ImageIsBig = false, IsVisible = false };
     }
 
-    protected DataPage(IViewDomain? viewDomain = null, IDataDomainScope? dataDomainScope = null)
-        : this(viewDomain, dataDomainScope?.DataDomain)
-    {
-        _dataDomainScope = dataDomainScope;
-    }
-
-    protected DataPage(IDataSetView<TEntry> dataSet, IViewDomain? viewDomain = null, IDataDomain? dataDomain = null)
-        : this(viewDomain, dataDomain)
+    protected DataPage(IServiceProvider serviceProvider, IDataSetView<TEntry> dataSet)
+        : this(serviceProvider)
     {
         _tableDataPassedOnConstruction = true;
 
         AddDataSet(BaseDataSet, dataSet);
     }
 
-    protected DataPage(IDataSetView<TEntry> dataSet, IViewDomain? viewDomain = null, IDataDomainScope? dataDomainScope = null)
-        : this(dataSet, viewDomain, dataDomainScope?.DataDomain)
-    {
-        _dataDomainScope = dataDomainScope;
-    }
+    protected IDataDomain DataDomain => ServiceProvider.GetRequiredService<IDataDomain>();
 
-    protected IDataDomain DataDomain { get; }
-
-    protected IDataDomainScope DataDomainScope => _dataDomainScope ??= DataDomain.CreateScope();
+    protected IDataDomainScope DataDomainScope => _dataDomainScope ??= ServiceProvider?.GetService<IDataDomainScope>() ?? DataDomain.CreateScope();
 
     public IDataSetView<TEntry>? DataSet
     {
@@ -308,7 +292,7 @@ public abstract class DataPage<TEntry> : InteractivePage, IDataPage<TEntry>
         };
 
         // TODO: would be nice to show at least one of the validation errors in this dialog, with entry primary key
-        var dialog = new QuestionDialogPage(ViewDomain);
+        var dialog = new QuestionDialogPage(ServiceProvider);
         dialog.Title = Res.AskRevertChangesDueToValidationErrorsDialog_Title;
         dialog.Message = Res.AskRevertChangesDueToValidationErrorsDialog_Message;
         dialog.DialogButtons.AddRange(new []
