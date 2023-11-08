@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.20 (2023-11-08)
+
+- refactoring dependency injection, enforcing always use of `IServiceProvider`
+
 ## 0.1.19 (2023-11-05)
 
 - :rocket: switch from IServiceScope to IServiceProvider for ConstructPage
