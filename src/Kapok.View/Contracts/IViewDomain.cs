@@ -100,11 +100,10 @@ public interface IViewDomain
     /// Opens an dialog for an report for the given model and layout
     /// </summary>
     /// <param name="model"></param>
-    /// <param name="dataDomain"></param>
     /// <param name="reportLayout"></param>
     /// <param name="ownerPage"></param>
     // TODO: type definition currently not possible for 'model' and 'layout'
-    bool OpenReportDialog(object model, IDataDomain dataDomain, object? reportLayout = null, IPage? ownerPage = null);
+    bool OpenReportDialog(object model, object? reportLayout = null, IPage? ownerPage = null);
 
     /// <summary>
     /// Opens a file with the default application for it.

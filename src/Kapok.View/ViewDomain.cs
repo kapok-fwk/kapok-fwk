@@ -237,7 +237,7 @@ public abstract class ViewDomain : IViewDomain
     public abstract string? OpenOpenFileDialog(string title, string fileMask, IPage? ownerPage = null);
     public abstract string? OpenSaveFileDialog(string title, string fileMask, IPage? ownerPage = null);
 
-    public abstract bool OpenReportDialog(object model, IDataDomain dataDomain, object? reportLayout = null, IPage? ownerPage = null);
+    public abstract bool OpenReportDialog(object model, object? reportLayout = null, IPage? ownerPage = null);
 
     public abstract void OpenFile(string filename);
 

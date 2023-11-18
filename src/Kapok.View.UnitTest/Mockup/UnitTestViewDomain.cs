@@ -172,7 +172,7 @@ public class UnitTestViewDomain : ViewDomain
         throw new NotSupportedException();
     }
 
-    public override bool OpenReportDialog(object model, IDataDomain dataDomain, object? reportLayout = null, IPage? ownerPage = null)
+    public override bool OpenReportDialog(object model, object? reportLayout = null, IPage? ownerPage = null)
     {
         throw new NotSupportedException();
     }
