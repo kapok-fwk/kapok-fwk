@@ -10,6 +10,7 @@ public class DeferredDaoSampleModelTests : DeferredDaoTestBase
 {
     protected override void InitiateModule()
     {
+        Kapok.Data.DataDomain.DefaultDaoType = typeof(DeferredDao<>);
         ModuleEngine.InitiateModule(typeof(SampleModelModule));
     }
 
