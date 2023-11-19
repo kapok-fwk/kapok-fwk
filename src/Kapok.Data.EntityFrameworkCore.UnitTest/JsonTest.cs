@@ -12,6 +12,7 @@ public class JsonTest : DeferredDaoTestBase
 {
     protected override void InitiateModule()
     {
+        Data.DataDomain.DefaultDaoType = typeof(DeferredDao<>);
         ModuleEngine.InitiateModule(typeof(SampleModelModule));
     }
 
