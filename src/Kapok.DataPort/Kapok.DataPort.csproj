@@ -17,9 +17,11 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <!-- Package reference not required anymore after net8.0 -->
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
+
 
   <ItemGroup>
     <ProjectReference Include="..\Kapok.Core\Kapok.Core.csproj" />
