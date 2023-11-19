@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.21 (2023-11-18)
+
+- :tada: upgrade to support .Net 8.0
+- :bug: simplify IViewDomain.OpenReportDialog dropping parameter `IDataDomain`
+- :bug: security fix upgrade System.Linq.Dynamic.Core to 1.3.5
+
 ## 0.1.20 (2023-11-08)
 
 - refactoring dependency injection, enforcing always use of `IServiceProvider`
