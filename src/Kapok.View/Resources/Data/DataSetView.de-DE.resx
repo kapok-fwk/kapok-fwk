@@ -158,8 +158,8 @@
     <value>Die Methode {0} wird für in-memory Tabellen nicht unterstützt.</value>
     <comment>0 = Name of the method of the class TableDataViewModel</comment>
   </data>
-  <data name="ParameterDaoNotDetermined" xml:space="preserve">
-    <value>Konnte Parameter dao nicht ermitteln, weder vom übergebenen Parameter noch von der Data-Domain. DataSetView: {0}</value>
+  <data name="ParameterEntityServiceNotDetermined" xml:space="preserve">
+    <value>Konnte Parameter entityService nicht ermitteln, weder vom übergebenen Parameter noch von der Data-Domain. DataSetView: {0}</value>
     <comment>0 = nameof(DataSetView&lt;TEntry&gt;)</comment>
   </data>
   <data name="ParameterMustBeOfType" xml:space="preserve">

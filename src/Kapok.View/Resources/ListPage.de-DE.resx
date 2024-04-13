@@ -117,32 +117,26 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ClearUserFilterCommand_Description" xml:space="preserve">
+  <data name="ClearUserFilterAction_Description" xml:space="preserve">
     <value />
   </data>
-  <data name="ClearUserFilterCommand_Name" xml:space="preserve">
+  <data name="ClearUserFilterAction_Name" xml:space="preserve">
     <value>Filter löschen</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Löschen</value>
   </data>
-  <data name="EditEntryCommand_Description" xml:space="preserve">
+  <data name="EditEntryAction_Description" xml:space="preserve">
     <value>Aktuell ausgewählte Zeile bearbeiten.</value>
   </data>
-  <data name="EditEntryCommand_Name" xml:space="preserve">
+  <data name="EditEntryAction_Name" xml:space="preserve">
     <value>Bearbeiten</value>
   </data>
-  <data name="ExportAsExcelSheetCommand_Description" xml:space="preserve">
+  <data name="ExportAsExcelSheetAction_Description" xml:space="preserve">
     <value />
   </data>
-  <data name="ExportAsExcelSheetCommand_Name" xml:space="preserve">
+  <data name="ExportAsExcelSheetAction_Name" xml:space="preserve">
     <value>Export nach Excel</value>
-  </data>
-  <data name="FilterVisibleToggleCommand_Description" xml:space="preserve">
-    <value />
-  </data>
-  <data name="FilterVisibleToggleCommand_Name" xml:space="preserve">
-    <value>Filter</value>
   </data>
   <data name="General" xml:space="preserve">
     <value>Allgemein</value>
@@ -165,16 +159,22 @@
   <data name="SendTo" xml:space="preserve">
     <value>Senden an</value>
   </data>
-  <data name="SortDownEntryCommand_Description" xml:space="preserve">
+  <data name="SortDownEntryAction_Description" xml:space="preserve">
     <value>Sortiere den aktuellen Eintrag nach unten</value>
   </data>
-  <data name="SortDownEntryCommand_Name" xml:space="preserve">
+  <data name="SortDownEntryAction_Name" xml:space="preserve">
     <value>Nach unten</value>
   </data>
-  <data name="SortUpEntryCommand_Description" xml:space="preserve">
+  <data name="SortUpEntryAction_Description" xml:space="preserve">
     <value>Sortiere den aktuellen Eintrag nach oben</value>
   </data>
-  <data name="SortUpEntryCommand_Name" xml:space="preserve">
+  <data name="SortUpEntryAction_Name" xml:space="preserve">
     <value>Nach oben</value>
+  </data>
+  <data name="ToggleFilterVisibleAction_Description" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ToggleFilterVisibleAction_Name" xml:space="preserve">
+    <value>Filter</value>
   </data>
 </root>

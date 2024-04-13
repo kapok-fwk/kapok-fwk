@@ -4,9 +4,9 @@ using Kapok.Data;
 
 namespace Kapok.Acl.BusinessLayer;
 
-public sealed class UserDao : Dao<User>, IUserDao
+public sealed class UserService : EntityService<User>, IUserService
 {
-    public UserDao(IDataDomainScope dataDomainScope, IRepository<User> repository, bool isReadOnly = false)
+    public UserService(IDataDomainScope dataDomainScope, IRepository<User> repository, bool isReadOnly = false)
         : base(dataDomainScope, repository, isReadOnly)
     {
     }

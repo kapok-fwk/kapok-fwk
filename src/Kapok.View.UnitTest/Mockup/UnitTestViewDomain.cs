@@ -33,12 +33,12 @@ public class UnitTestViewDomain : ViewDomain
         throw new NotImplementedException();
     }
 
-    public override IDataSetView<TEntry> CreateDataSetView<TEntry>(IDataDomainScope dataDomainScope, IDao<TEntry>? repository = null)
+    public override IDataSetView<TEntry> CreateDataSetView<TEntry>(IDataDomainScope dataDomainScope, IEntityService<TEntry>? repository = null)
     {
         return new DataSetView<TEntry>(ServiceProvider, dataDomainScope, repository);
     }
 
-    public override IHierarchyDataSetView<TEntry> CreateHierarchyDataSetView<TEntry>(IDataDomainScope dataDomainScope, IDao<TEntry>? repository = null)
+    public override IHierarchyDataSetView<TEntry> CreateHierarchyDataSetView<TEntry>(IDataDomainScope dataDomainScope, IEntityService<TEntry>? repository = null)
     {
         throw new NotImplementedException();
     }

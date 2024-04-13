@@ -4,7 +4,7 @@ using Kapok.Report.DataModel;
 
 namespace Kapok.Report.BusinessLayer;
 
-public interface IReportDestinationDao : IDao<ReportDestination>
+public interface IReportDestinationService : IEntityService<ReportDestination>
 {
     /// <summary>
     /// Creates an stream which can be used to write into the destination.
@@ -18,9 +18,9 @@ public interface IReportDestinationDao : IDao<ReportDestination>
     Stream CreateStreamInstance(ReportDestination entity);
 }
 
-public class ReportDestinationDao : Dao<ReportDestination>, IReportDestinationDao
+public class ReportDestinationService : EntityService<ReportDestination>, IReportDestinationService
 {
-    public ReportDestinationDao(IDataDomainScope dataDomainScope, IRepository<ReportDestination> repository) : base(dataDomainScope, repository)
+    public ReportDestinationService(IDataDomainScope dataDomainScope, IRepository<ReportDestination> repository) : base(dataDomainScope, repository)
     {
     }
 

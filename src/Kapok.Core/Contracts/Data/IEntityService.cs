@@ -1,6 +1,6 @@
 ﻿namespace Kapok.BusinessLayer;
 
-public interface IDao<T> : IBusinessLayerService, IReadOnlyDao<T>
+public interface IEntityService<T> : IBusinessLayerService, IEntityReadOnlyService<T>
     where T : class, new()
 {
     void Create(T entity);

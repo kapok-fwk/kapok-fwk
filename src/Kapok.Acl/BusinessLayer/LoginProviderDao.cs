@@ -4,9 +4,9 @@ using Kapok.Data;
 
 namespace Kapok.Acl.BusinessLayer;
 
-public sealed class LoginProviderDao : Dao<LoginProvider>, ILoginProviderDao
+public sealed class LoginProviderService : EntityService<LoginProvider>, ILoginProviderService
 {
-    public LoginProviderDao(IDataDomainScope dataDomainScope, IRepository<LoginProvider> repository, bool isReadOnly = false)
+    public LoginProviderService(IDataDomainScope dataDomainScope, IRepository<LoginProvider> repository, bool isReadOnly = false)
         : base(dataDomainScope, repository, isReadOnly)
     {
     }

@@ -16,11 +16,11 @@ public sealed class AclModule : ModuleBase
         base.Initiate();
 
         // register DataModel
-        DataDomain.RegisterEntity<LoginProvider, LoginProviderDao>();
-        DataDomain.RegisterEntity<RoleClaim, RoleClaimDao>();
-        DataDomain.RegisterEntity<Role, RoleDao>();
-        DataDomain.RegisterEntity<UserLogin, UserLoginDao>();
-        DataDomain.RegisterEntity<User, UserDao>();
-        DataDomain.RegisterEntity<UserRole, UserRoleDao>();
+        DataDomain.RegisterEntity<LoginProvider, LoginProviderService>();
+        DataDomain.RegisterEntity<RoleClaim, RoleClaimService>();
+        DataDomain.RegisterEntity<Role, RoleService>();
+        DataDomain.RegisterEntity<UserLogin, UserLoginService>();
+        DataDomain.RegisterEntity<User, UserService>();
+        DataDomain.RegisterEntity<UserRole, UserRoleService>();
     }
 }

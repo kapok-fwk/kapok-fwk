@@ -61,11 +61,11 @@ namespace Kapok.Resources.Data {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Could not add dao to DataDomainScope since a DAO for the entity {0} has already been added ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Could not add entity service to DataDomainScope since a entity service for the entity {0} has already been added ähnelt.
         /// </summary>
-        internal static string DaoAlreadyAdded {
+        internal static string EntityServiceAlreadyAdded {
             get {
-                return ResourceManager.GetString("DaoAlreadyAdded", resourceCulture);
+                return ResourceManager.GetString("EntityServiceAlreadyAdded", resourceCulture);
             }
         }
         

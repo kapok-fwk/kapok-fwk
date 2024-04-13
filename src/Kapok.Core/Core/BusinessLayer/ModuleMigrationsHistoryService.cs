@@ -4,9 +4,9 @@ using Kapok.Data;
 
 namespace Kapok.Core.BusinessLayer;
 
-public class ModuleMigrationsHistoryDao : Dao<ModuleMigrationsHistory>, IModuleMigrationsHistoryDao
+public class ModuleMigrationsHistoryService : EntityService<ModuleMigrationsHistory>, IModuleMigrationsHistoryService
 {
-    public ModuleMigrationsHistoryDao(IDataDomainScope dataDomainScope, IRepository<ModuleMigrationsHistory> repository) : base(dataDomainScope, repository)
+    public ModuleMigrationsHistoryService(IDataDomainScope dataDomainScope, IRepository<ModuleMigrationsHistory> repository) : base(dataDomainScope, repository)
     {
     }
 

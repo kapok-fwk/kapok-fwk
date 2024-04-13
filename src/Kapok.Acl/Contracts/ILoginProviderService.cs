@@ -3,6 +3,6 @@ using Kapok.BusinessLayer;
 
 namespace Kapok.Acl;
 
-public interface IUserRoleDao : IDao<UserRole>
+public interface ILoginProviderService : IEntityService<LoginProvider>
 {
 }

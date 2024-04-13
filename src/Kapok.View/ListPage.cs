@@ -170,7 +170,7 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
                 DataSet.Filter.Add((IFilter<TEntry>)CurrentListView.Filter, FilterLayer.Application);
 
             DataSet.SortBy = CurrentListView.SortBy
-                             ?? DataSet.GetDao().Model.PrimaryKeyProperties;
+                             ?? DataSet.GetEntityService().Model.PrimaryKeyProperties;
             DataSet.SortDirection = CurrentListView.SortDirection ?? SortDirection.Ascending;
         }
 
@@ -184,7 +184,7 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
 
     // ReSharper disable UnusedAutoPropertyAccessor.Global
     // ReSharper disable MemberCanBePrivate.Global
-    [MenuItem, Display(Name = "OpenCardPageAction_Name", Description = "OpenCardPageAction_Description", GroupName = "Manage", Order = 2, ResourceType = typeof(Res))]
+    [MenuItem, Display(Name = $"{nameof(OpenCardPageAction)}_Name", Description = $"{nameof(OpenCardPageAction)}_Description", GroupName = "Manage", Order = 2, ResourceType = typeof(Res))]
     public IDataSetSelectionAction<TEntry>? OpenCardPageAction
     {
         get => _openCardPageAction;
@@ -197,22 +197,22 @@ public class ListPage<TEntry> : DataPage<TEntry>, IListPage<TEntry>
         }
     }
 
-    [MenuItem, Display(Name = "EditEntryCommand_Name", Description = "EditEntryCommand_Description", GroupName = "Manage", Order = 3, ResourceType = typeof(Res))]
+    [MenuItem, Display(Name = $"{nameof(EditEntryAction)}_Name", Description = $"{nameof(EditEntryAction)}_Description", GroupName = "Manage", Order = 3, ResourceType = typeof(Res))]
     public IDataSetSelectionAction<TEntry> EditEntryAction { get; }
 
-    [MenuItem, Display(Name = "SortUpEntryCommand_Name", Description = "SortUpEntryCommand_Description", GroupName = "General", ResourceType = typeof(Res))]
+    [MenuItem, Display(Name = $"{nameof(SortUpEntryAction)}_Name", Description = $"{nameof(SortUpEntryAction)}_Description", GroupName = "General", ResourceType = typeof(Res))]
     public IAction? SortUpEntryAction { get; }
 
-    [MenuItem, Display(Name = "SortDownEntryCommand_Name", Description = "SortDownEntryCommand_Description", GroupName = "General", ResourceType = typeof(Res))]
+    [MenuItem, Display(Name = $"{nameof(SortDownEntryAction)}_Name", Description = $"{nameof(SortDownEntryAction)}_Description", GroupName = "General", ResourceType = typeof(Res))]
     public IAction? SortDownEntryAction { get; }
 
-    [MenuItem, Display(Name = "ExportAsExcelSheetCommand_Name", Description = "ExportAsExcelSheetCommand_Description", GroupName = "SendTo", Order = 1, ResourceType = typeof(Res))]
+    [MenuItem, Display(Name = $"{nameof(ExportAsExcelSheetAction)}_Name", Description = $"{nameof(ExportAsExcelSheetAction)}_Description", GroupName = "SendTo", Order = 1, ResourceType = typeof(Res))]
     public IAction ExportAsExcelSheetAction { get; }
 
-    [MenuItem, Display(Name = "FilterVisibleToggleCommand_Name", Description = "FilterVisibleToggleCommand_Description", GroupName = "Page", Order = 100, ResourceType = typeof(Res))]
+    [MenuItem, Display(Name = $"{nameof(ToggleFilterVisibleAction)}_Name", Description = $"{nameof(ToggleFilterVisibleAction)}_Description", GroupName = "Page", Order = 100, ResourceType = typeof(Res))]
     public IToggleAction ToggleFilterVisibleAction { get; }
 
-    [MenuItem, Display(Name = "ClearUserFilterCommand_Name", Description = "ClearUserFilterCommand_Description", GroupName = "Page", Order = 100, ResourceType = typeof(Res))]
+    [MenuItem, Display(Name = $"{nameof(ClearUserFilterAction)}_Name", Description = $"{nameof(ClearUserFilterAction)}_Description", GroupName = "Page", Order = 100, ResourceType = typeof(Res))]
     public IAction ClearUserFilterAction { get; }
 
     // ReSharper restore MemberCanBePrivate.Global

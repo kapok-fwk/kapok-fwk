@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Kapok.Data.EntityFrameworkCore.UnitTest;
 
-public abstract class DeferredDaoTestBase : EFUnitTestBase, IDisposable
+public abstract class DeferredEntityServiceTestBase : EFUnitTestBase, IDisposable
 {
     private readonly IDataDomain _dataDomain;
 
@@ -18,9 +18,9 @@ public abstract class DeferredDaoTestBase : EFUnitTestBase, IDisposable
     private readonly IDbConnection _cacheDbConnection;
     private readonly EFCoreDataDomainScope _cacheScope;
 
-    public DeferredDaoTestBase(IDataDomain? dataDomain = null)
+    public DeferredEntityServiceTestBase(IDataDomain? dataDomain = null)
     {
-        Kapok.Data.DataDomain.DefaultDaoType = typeof(DeferredDao<>);
+        Kapok.Data.DataDomain.DefaultEntityServiceType = typeof(EntityDeferredCommitService<>);
         _dataDomain = dataDomain ?? InitializeDataDomain();
 
         // oping a connection to SQLite

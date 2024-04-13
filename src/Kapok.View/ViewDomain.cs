@@ -209,9 +209,9 @@ public abstract class ViewDomain : IViewDomain
         return ConstructPage(pageType, serviceProvider);
     }
 
-    public abstract IDataSetView<TEntry> CreateDataSetView<TEntry>(IDataDomainScope dataDomainScope, IDao<TEntry>? repository = null)
+    public abstract IDataSetView<TEntry> CreateDataSetView<TEntry>(IDataDomainScope dataDomainScope, IEntityService<TEntry>? repository = null)
         where TEntry : class, new();
-    public abstract IHierarchyDataSetView<TEntry> CreateHierarchyDataSetView<TEntry>(IDataDomainScope dataDomainScope, IDao<TEntry>? repository = null)
+    public abstract IHierarchyDataSetView<TEntry> CreateHierarchyDataSetView<TEntry>(IDataDomainScope dataDomainScope, IEntityService<TEntry>? repository = null)
         where TEntry : class, IHierarchyEntry<TEntry>, new();
 
     [Obsolete]

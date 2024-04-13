@@ -63,18 +63,18 @@ namespace Kapok.View.Resources {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
         /// </summary>
-        public static string ClearUserFilterCommand_Description {
+        public static string ClearUserFilterAction_Description {
             get {
-                return ResourceManager.GetString("ClearUserFilterCommand_Description", resourceCulture);
+                return ResourceManager.GetString("ClearUserFilterAction_Description", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Clear filter ähnelt.
         /// </summary>
-        public static string ClearUserFilterCommand_Name {
+        public static string ClearUserFilterAction_Name {
             get {
-                return ResourceManager.GetString("ClearUserFilterCommand_Name", resourceCulture);
+                return ResourceManager.GetString("ClearUserFilterAction_Name", resourceCulture);
             }
         }
         
@@ -90,54 +90,36 @@ namespace Kapok.View.Resources {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Edit the selected entry. ähnelt.
         /// </summary>
-        public static string EditEntryCommand_Description {
+        public static string EditEntryAction_Description {
             get {
-                return ResourceManager.GetString("EditEntryCommand_Description", resourceCulture);
+                return ResourceManager.GetString("EditEntryAction_Description", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Edit ähnelt.
         /// </summary>
-        public static string EditEntryCommand_Name {
+        public static string EditEntryAction_Name {
             get {
-                return ResourceManager.GetString("EditEntryCommand_Name", resourceCulture);
+                return ResourceManager.GetString("EditEntryAction_Name", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
         /// </summary>
-        public static string ExportAsExcelSheetCommand_Description {
+        public static string ExportAsExcelSheetAction_Description {
             get {
-                return ResourceManager.GetString("ExportAsExcelSheetCommand_Description", resourceCulture);
+                return ResourceManager.GetString("ExportAsExcelSheetAction_Description", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Export to Excel ähnelt.
         /// </summary>
-        public static string ExportAsExcelSheetCommand_Name {
+        public static string ExportAsExcelSheetAction_Name {
             get {
-                return ResourceManager.GetString("ExportAsExcelSheetCommand_Name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
-        /// </summary>
-        public static string FilterVisibleToggleCommand_Description {
-            get {
-                return ResourceManager.GetString("FilterVisibleToggleCommand_Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Filter ähnelt.
-        /// </summary>
-        public static string FilterVisibleToggleCommand_Name {
-            get {
-                return ResourceManager.GetString("FilterVisibleToggleCommand_Name", resourceCulture);
+                return ResourceManager.GetString("ExportAsExcelSheetAction_Name", resourceCulture);
             }
         }
         
@@ -207,36 +189,54 @@ namespace Kapok.View.Resources {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Move the current entry one position down ähnelt.
         /// </summary>
-        public static string SortDownEntryCommand_Description {
+        public static string SortDownEntryAction_Description {
             get {
-                return ResourceManager.GetString("SortDownEntryCommand_Description", resourceCulture);
+                return ResourceManager.GetString("SortDownEntryAction_Description", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Down ähnelt.
         /// </summary>
-        public static string SortDownEntryCommand_Name {
+        public static string SortDownEntryAction_Name {
             get {
-                return ResourceManager.GetString("SortDownEntryCommand_Name", resourceCulture);
+                return ResourceManager.GetString("SortDownEntryAction_Name", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Move the current entry one position up ähnelt.
         /// </summary>
-        public static string SortUpEntryCommand_Description {
+        public static string SortUpEntryAction_Description {
             get {
-                return ResourceManager.GetString("SortUpEntryCommand_Description", resourceCulture);
+                return ResourceManager.GetString("SortUpEntryAction_Description", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Up ähnelt.
         /// </summary>
-        public static string SortUpEntryCommand_Name {
+        public static string SortUpEntryAction_Name {
             get {
-                return ResourceManager.GetString("SortUpEntryCommand_Name", resourceCulture);
+                return ResourceManager.GetString("SortUpEntryAction_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die  ähnelt.
+        /// </summary>
+        public static string ToggleFilterVisibleAction_Description {
+            get {
+                return ResourceManager.GetString("ToggleFilterVisibleAction_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Filter ähnelt.
+        /// </summary>
+        public static string ToggleFilterVisibleAction_Name {
+            get {
+                return ResourceManager.GetString("ToggleFilterVisibleAction_Name", resourceCulture);
             }
         }
     }

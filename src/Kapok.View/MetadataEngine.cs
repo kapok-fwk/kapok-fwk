@@ -56,13 +56,13 @@ public sealed class MetadataEngine
 
     private async Task<DataModel.Page?> FindDataModelPage(Type pageType, IDataDomainScope dataDomainScope)
     {
-        return await dataDomainScope.GetDao<DataModel.Page, BusinessLayer.IPageDao>()
+        return await dataDomainScope.GetEntityService<DataModel.Page, BusinessLayer.IPageEntityService>()
             .FindFromType(pageType);
     }
 
     private async Task<DataModel.Page> GetOrCreateDataModelPage(Type pageType, IDataDomainScope dataDomainScope)
     {
-        return await dataDomainScope.GetDao<DataModel.Page, BusinessLayer.IPageDao>()
+        return await dataDomainScope.GetEntityService<DataModel.Page, BusinessLayer.IPageEntityService>()
             .GetOrCreateFromType(pageType);
     }
 
@@ -78,7 +78,7 @@ public sealed class MetadataEngine
         var pageDataModel = await FindDataModelPage(pageType, dataDomainScope);
         if (pageDataModel == null)
             return null;
-        var pageUserMetadata = await dataDomainScope.GetDao<UserPageMetadata>().FindByKeyAsync(CurrentUserId, pageDataModel.PageId);
+        var pageUserMetadata = await dataDomainScope.GetEntityService<UserPageMetadata>().FindByKeyAsync(CurrentUserId, pageDataModel.PageId);
         await dataDomainScope.SaveAsync();
         return pageUserMetadata?.Data;
     }
@@ -91,20 +91,20 @@ public sealed class MetadataEngine
         using var dataDomainScope = _dataDomain.CreateScope();
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
         var pageDataModel = await GetOrCreateDataModelPage(pageType, dataDomainScope);
-        var userPageMetadataDao = dataDomainScope.GetDao<UserPageMetadata>();
-        var pageUserMetadata = userPageMetadataDao.FindByKeyForUpdate(CurrentUserId, pageDataModel.PageId);
+        var userPageMetadataService = dataDomainScope.GetEntityService<UserPageMetadata>();
+        var pageUserMetadata = userPageMetadataService.FindByKeyForUpdate(CurrentUserId, pageDataModel.PageId);
         if (pageUserMetadata != null)
         {
             pageUserMetadata.Data = metadata;
         }
         else
         {
-            pageUserMetadata = userPageMetadataDao.New();
+            pageUserMetadata = userPageMetadataService.New();
 #pragma warning disable CS8629 // Nullable value type may be null.
             pageUserMetadata.UserId = CurrentUserId.Value;
 #pragma warning restore CS8629 // Nullable value type may be null.
             pageUserMetadata.PageId = pageDataModel.PageId;
-            await userPageMetadataDao.CreateAsync(pageUserMetadata);
+            await userPageMetadataService.CreateAsync(pageUserMetadata);
         }
         await dataDomainScope.SaveAsync();
     }
@@ -125,8 +125,8 @@ public sealed class MetadataEngine
 
         using var dataDomainScope = _dataDomain.CreateScope();
         var pageDataModel = await GetOrCreateDataModelPage(pageType, dataDomainScope);
-        var listViewsDao = dataDomainScope.GetDao<PageListView>();
-        foreach (var rawListViewData in from lv in listViewsDao.AsQueryable()
+        var listViewsSerivce = dataDomainScope.GetEntityService<PageListView>();
+        foreach (var rawListViewData in from lv in listViewsSerivce.AsQueryable()
                                          where lv.PageId == pageDataModel.PageId
                                          select new
                                          {
@@ -140,8 +140,8 @@ public sealed class MetadataEngine
         // user list views
         if (CurrentUserId.HasValue)
         {
-            var userListViewsDao = dataDomainScope.GetDao<UserPageListView>();
-            foreach (var rawListViewData in from lv in userListViewsDao.AsQueryable()
+            var userListViewsService = dataDomainScope.GetEntityService<UserPageListView>();
+            foreach (var rawListViewData in from lv in userListViewsService.AsQueryable()
                                              where lv.PageId == pageDataModel.PageId &&
                                                    lv.UserId == CurrentUserId.Value
                                              select new
@@ -181,8 +181,8 @@ public sealed class MetadataEngine
 
         if (userSpecific)
         {
-            var dao = dataDomainScope.GetDao<UserPageListView>();
-            var lv = await dao.FindByKeyAsync(CurrentUserId.Value, pageDataModel.PageId, dataSetListView.Name);
+            var service = dataDomainScope.GetEntityService<UserPageListView>();
+            var lv = await service.FindByKeyAsync(CurrentUserId.Value, pageDataModel.PageId, dataSetListView.Name);
             if (lv == null)
             {
                 lv.Data = jsonData;
@@ -190,29 +190,29 @@ public sealed class MetadataEngine
                 return;
             }
 
-            lv = dao.New();
+            lv = service.New();
             lv.UserId = CurrentUserId.Value;
             lv.PageId = pageDataModel.PageId;
             lv.Name = dataSetListView.Name;
             lv.Data = jsonData;
-            await dao.CreateAsync(lv);
+            await service.CreateAsync(lv);
             await dataDomainScope.SaveAsync();
         }
         else
         {
-            var dao = dataDomainScope.GetDao<PageListView>();
-            var lv = await dao.FindByKeyAsync(pageDataModel.PageId, dataSetListView.Name);
+            var service = dataDomainScope.GetEntityService<PageListView>();
+            var lv = await service.FindByKeyAsync(pageDataModel.PageId, dataSetListView.Name);
             if (lv == null)
             {
                 lv.Data = jsonData;
                 await dataDomainScope.SaveAsync();
                 return;
             }
-            lv = dao.New();
+            lv = service.New();
             lv.PageId = pageDataModel.PageId;
             lv.Name = dataSetListView.Name;
             lv.Data = jsonData;
-            await dao.CreateAsync(lv);
+            await service.CreateAsync(lv);
             await dataDomainScope.SaveAsync();
         }
     }

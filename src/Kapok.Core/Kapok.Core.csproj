@@ -37,20 +37,20 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
-    <Compile Update="Resources\Data\DaoBase.Designer.cs">
+    <Compile Update="Resources\Data\EntityServiceBase.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>DaoBase.resx</DependentUpon>
+      <DependentUpon>EntityServiceBase.resx</DependentUpon>
     </Compile>
     <Compile Update="Resources\Data\DataDomainScope.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>DataDomainScope.resx</DependentUpon>
     </Compile>
-    <Compile Update="Resources\Data\DeferredDao.Designer.cs">
+    <Compile Update="Resources\Data\EntityDeferredCommitService.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>DeferredDao.resx</DependentUpon>
+      <DependentUpon>EntityDeferredCommitService.resx</DependentUpon>
     </Compile>
     <Compile Update="Resources\Entity\EntityExtension.Designer.cs">
       <DependentUpon>EntityExtension.resx</DependentUpon>
@@ -69,17 +69,17 @@
       <LastGenOutput>MessageSeverity.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Data\DaoBase.resx">
+    <EmbeddedResource Update="Resources\Data\EntityServiceBase.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>DaoBase.Designer.cs</LastGenOutput>
+      <LastGenOutput>EntityServiceBase.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="Resources\Data\DataDomainScope.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>DataDomainScope.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Data\DeferredDao.resx">
+    <EmbeddedResource Update="Resources\Data\EntityDeferredCommitService.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>DeferredDao.Designer.cs</LastGenOutput>
+      <LastGenOutput>EntityDeferredCommitService.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="Resources\Entity\EntityExtension.resx">
       <LastGenOutput>EntityExtension.Designer.cs</LastGenOutput>

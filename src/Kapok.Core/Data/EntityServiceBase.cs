@@ -4,14 +4,14 @@ using System.Reflection;
 using Kapok.Data;
 using Kapok.Entity;
 using Kapok.Entity.Model;
-using Res = Kapok.Resources.Data.DaoBase;
+using Res = Kapok.Resources.Data.EntityServiceBase;
 
 namespace Kapok.BusinessLayer;
 
-public abstract class DaoBase<T> : IDao<T>
+public abstract class EntityServiceBase<T> : IEntityService<T>
     where T : class, new()
 {
-    protected DaoBase(IDataDomainScope dataDomainScope)
+    protected EntityServiceBase(IDataDomainScope dataDomainScope)
     {
         DataDomainScope = dataDomainScope;
     }
@@ -164,7 +164,7 @@ public abstract class DaoBase<T> : IDao<T>
     {
         // ReSharper disable once PossibleNullReferenceException
 #pragma warning disable CS8602
-        return GetType().GetMethod(nameof(OnCreate), BindingFlags.Instance | BindingFlags.NonPublic).DeclaringType != typeof(DaoBase<T>);
+        return GetType().GetMethod(nameof(OnCreate), BindingFlags.Instance | BindingFlags.NonPublic).DeclaringType != typeof(EntityServiceBase<T>);
 #pragma warning restore CS8602
     }
 
@@ -176,7 +176,7 @@ public abstract class DaoBase<T> : IDao<T>
     {
         // ReSharper disable once PossibleNullReferenceException
 #pragma warning disable CS8602
-        return GetType().GetMethod(nameof(OnUpdate), BindingFlags.Instance | BindingFlags.NonPublic).DeclaringType != typeof(DaoBase<T>);
+        return GetType().GetMethod(nameof(OnUpdate), BindingFlags.Instance | BindingFlags.NonPublic).DeclaringType != typeof(EntityServiceBase<T>);
 #pragma warning restore CS8602
     }
 
@@ -188,7 +188,7 @@ public abstract class DaoBase<T> : IDao<T>
     {
         // ReSharper disable once PossibleNullReferenceException
 #pragma warning disable CS8602
-        return GetType().GetMethod(nameof(OnDelete), BindingFlags.Instance | BindingFlags.NonPublic).DeclaringType != typeof(DaoBase<T>);
+        return GetType().GetMethod(nameof(OnDelete), BindingFlags.Instance | BindingFlags.NonPublic).DeclaringType != typeof(EntityServiceBase<T>);
 #pragma warning restore CS8602
     }
 
@@ -209,9 +209,9 @@ public abstract class DaoBase<T> : IDao<T>
 
     #endregion
 
-    #region IReadOnlyDao<T>
+    #region IEntityReadOnlyService<T>
 
-    IFilterSet<T> IReadOnlyDao<T>.Filter => Filter;
+    IFilterSet<T> IEntityReadOnlyService<T>.Filter => Filter;
 
     #endregion
 

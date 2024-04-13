@@ -16,10 +16,10 @@ public sealed class ReportModule : ModuleBase
         base.Initiate();
 
         // register DataModel
-        DataDomain.RegisterEntity<ReportDesign, ReportDesignDao>();
-        DataDomain.RegisterEntity<ReportDestination, ReportDestinationDao>();
-        DataDomain.RegisterEntity<ReportLayout, ReportLayoutDao>();
-        DataDomain.RegisterEntity<ReportModel, ReportModelDao>();
-        DataDomain.RegisterEntity<ReportProcessor, ReportProcessorDao>();
+        DataDomain.RegisterEntity<ReportDesign, ReportDesignService>();
+        DataDomain.RegisterEntity<ReportDestination, ReportDestinationService>();
+        DataDomain.RegisterEntity<ReportLayout, ReportLayoutService>();
+        DataDomain.RegisterEntity<ReportModel, ReportModelService>();
+        DataDomain.RegisterEntity<ReportProcessor, ReportProcessorService>();
     }
 }

@@ -20,7 +20,7 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
 {
     protected readonly IServiceProvider ServiceProvider;
     protected readonly IDataDomainScope DataDomainScope;
-    protected readonly IDao<TEntry> Dao;
+    protected readonly IEntityService<TEntry> EntityService;
     protected readonly ObservableCollection<TEntry> Collection = new();
     private bool _insertAllowed = true;
     private bool _modifyAllowed = true;
@@ -40,7 +40,7 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
     private bool _refreshPropertyLookupsOnlyOnEntryDeferred;
     private PropertyInfo[]? _sortBy;
 
-    public DataSetView(IServiceProvider serviceProvider, IDataDomainScope dataDomainScope, IDao<TEntry>? dao = null)
+    public DataSetView(IServiceProvider serviceProvider, IDataDomainScope dataDomainScope, IEntityService<TEntry>? entityService = null)
     {
         ArgumentNullException.ThrowIfNull(serviceProvider, nameof(serviceProvider));
         ArgumentNullException.ThrowIfNull(dataDomainScope, nameof(dataDomainScope));
@@ -48,36 +48,36 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
         ServiceProvider = serviceProvider;
         DataDomainScope = dataDomainScope;
 
-        if (dao == null)
+        if (entityService == null)
         {
-            dao = dataDomainScope.GetDao<TEntry>();
-            if (dao == null)
+            entityService = dataDomainScope.GetEntityService<TEntry>();
+            if (entityService == null)
             {
-                throw new ArgumentException(string.Format(Res.ParameterDaoNotDetermined, nameof(DataSetView<TEntry>)), nameof(dao));
+                throw new ArgumentException(string.Format(Res.ParameterEntityServiceNotDetermined, nameof(DataSetView<TEntry>)), nameof(entityService));
             }
         }
-        Dao = dao;
+        EntityService = entityService;
 
         // TODO: this logic doesn't sound right and we might need to change this in the future
-        IsDeferredSaveActive = typeof(IDeferredCommitDao).IsAssignableFrom(Dao.GetType());
+        IsDeferredSaveActive = typeof(IEntityDeferredCommitService).IsAssignableFrom(EntityService.GetType());
 
         Filter = new FilterSet<TEntry>();
         Filter.FilterChanged += Filter_FilterChanged;
 
         CollectionSubscribeEvents();
 
-        SortBy = Dao.Model.PrimaryKeyProperties;
+        SortBy = EntityService.Model.PrimaryKeyProperties;
         SortAscendingAction = new UIAction("SortAscending", SortAscending, CanSortAscending) { Image = "sort-az" };
         SortDescendingAction = new UIAction("SortDescending", SortDescending, CanSortDescending) { Image = "sort-za" };
 
-        if (Dao.IsReadOnly)
+        if (EntityService.IsReadOnly)
         {
             _insertAllowed = false;
             _modifyAllowed = false;
             _deleteAllowed = false;
         }
 
-        Columns = new PropertyViewCollection<TEntry>(ServiceProvider, Dao.Model, this);
+        Columns = new PropertyViewCollection<TEntry>(ServiceProvider, EntityService.Model, this);
         Columns.CollectionChanged += Columns_CollectionChanged;
 
         CreateNewEntryAction = new UIAction("CreateNewEntry", CreateNewEntry, CanCreateNewEntry) {Image = "table-row-new"};
@@ -175,13 +175,13 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
 
     public bool InsertAllowed
     {
-        get => _insertAllowed && !Dao.IsReadOnly;
+        get => _insertAllowed && !EntityService.IsReadOnly;
         set => SetProperty(ref _insertAllowed, value);
     }
 
     public bool ModifyAllowed
     {
-        get => _modifyAllowed && !Dao.IsReadOnly;
+        get => _modifyAllowed && !EntityService.IsReadOnly;
         set
         {
             if (!SetProperty(ref _modifyAllowed, value)) return;
@@ -193,7 +193,7 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
 
     public bool DeleteAllowed
     {
-        get => _deleteAllowed && !Dao.IsReadOnly;
+        get => _deleteAllowed && !EntityService.IsReadOnly;
         set => SetProperty(ref _deleteAllowed, value);
     }
 
@@ -296,7 +296,7 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
                 else if (NewEntry != null)
                 {
                     // ignore validation errors, throw away the record
-                    Dao.Create(NewEntry);
+                    EntityService.Create(NewEntry);
                 }
             }
             IsNewEntry = value != null;
@@ -305,14 +305,14 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
         }
     }
 
-    public IDao<TEntry> GetDao()
+    public IEntityService<TEntry> GetEntityService()
     {
-        return Dao;
+        return EntityService;
     }
-    public TDao GetDao<TDao>()
-        where TDao : IDao<TEntry>
+    public TService GetEntityService<TService>()
+        where TService : IEntityService<TEntry>
     {
-        return (TDao)Dao;
+        return (TService)EntityService;
     }
 
     /// <summary>
@@ -336,7 +336,7 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
             if (IsNewEntry && NewEntry != value)
             {
                 if (!LastEditCancelled)
-                    // this call will save the new entry to the Dao; we don't do this when the creation has been cancelled;
+                    // this call will save the new entry to the entity service; we don't do this when the creation has been cancelled;
                     NewEntry = null;
             }
 
@@ -486,18 +486,18 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
             }
             else
             {
-                // required so that the dao starts tracking the deletion
+                // required so that the entity service starts tracking the deletion
                 if (e.OldItems.Count == 1)
                 {
 #pragma warning disable CS8604
 #pragma warning disable CS8600
-                    Dao.Delete((TEntry)e.OldItems[0]);
+                    EntityService.Delete((TEntry)e.OldItems[0]);
 #pragma warning restore CS8600
 #pragma warning restore CS8604
                 }
                 else
                 {
-                    Dao.DeleteRange(e.OldItems.Cast<TEntry>());
+                    EntityService.DeleteRange(e.OldItems.Cast<TEntry>());
                 }
             }
         }
@@ -514,7 +514,7 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
                 //    continue;
 
                 InitNewEntry(newEntry);
-                NewEntry = newEntry; // note: the logic to add new entries to the DAO is behind the 'NewEntry' property
+                NewEntry = newEntry; // note: the logic to add new entries to the entity service is behind the 'NewEntry' property
                 RaiseAddingNewEntry(newEntry);
                 _current = newEntry;
                 OnPropertyChanged(nameof(Current));
@@ -555,8 +555,8 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
         var filterExpression = Filter.FilterExpression;
 
         return filterExpression == null
-            ? Dao.AsQueryable()
-            : Dao.AsQueryable().Where(filterExpression);
+            ? EntityService.AsQueryable()
+            : EntityService.AsQueryable().Where(filterExpression);
     }
 
     public virtual IQueryable<TEntry> AsQueryableForUpdate()
@@ -564,8 +564,8 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
         var filterExpression = Filter.FilterExpression;
 
         return filterExpression == null
-            ? Dao.AsQueryableForUpdate()
-            : Dao.AsQueryableForUpdate().Where(filterExpression);
+            ? EntityService.AsQueryableForUpdate()
+            : EntityService.AsQueryableForUpdate().Where(filterExpression);
     }
 
     /// <summary>
@@ -582,7 +582,7 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
 
     public virtual void Load()
     {
-        var queryable = (!Dao.IsReadOnly && (InsertAllowed || ModifyAllowed || DeleteAllowed))
+        var queryable = (!EntityService.IsReadOnly && (InsertAllowed || ModifyAllowed || DeleteAllowed))
             ? AsQueryableForUpdate()
             : AsQueryable();
 
@@ -763,7 +763,7 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
     /// </param>
     public virtual void InitNewEntry(TEntry entry)
     {
-        Dao.Init(entry);
+        EntityService.Init(entry);
 
         // init entry fields from filter predicate
 
@@ -794,15 +794,15 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
         if (IsNewEntry)
             return true;
 
-        if (Dao is IDeferredCommitDao deferredCommitDao)
+        if (EntityService is IEntityDeferredCommitService deferredCommitService)
         {
-            if (deferredCommitDao.CanSave())
+            if (deferredCommitService.CanSave())
                 return true;
         }
         else if (DataDomainScope.GetType().Name == "EFCoreDataDomainScope")
         {
             // Hacky code:
-            // If the DAO does not implement IDeferredCommitDao, it will write directly to the
+            // If the entity service does not implement IEntityDeferredCommitService, it will write directly to the
             // EF Core change tracker. For such cases, we always return 'true' to allow the user
             // to execute `dbContext.SaveChanges()`.
             return true;
@@ -826,9 +826,9 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
 
     public virtual void RejectChanges()
     {
-        if (Dao is IDeferredCommitDao deferredCommitDao)
+        if (EntityService is IEntityDeferredCommitService deferredCommitService)
         {
-            deferredCommitDao.RejectChanges();
+            deferredCommitService.RejectChanges();
             Refresh();
         }
         else
@@ -1023,13 +1023,13 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
     protected virtual void OnEntryPropertyChanging(TEntry entry, string? propertyName)
     {
         if (!typeof(TEntry).IsSubclassOf(typeof(EditableEntityBase)))
-            Dao.OnPropertyChanging(entry, propertyName);
+            EntityService.OnPropertyChanging(entry, propertyName);
     }
 
     protected virtual void OnEntryPropertyChanged(TEntry entry, string? propertyName)
     {
         if (!typeof(TEntry).IsSubclassOf(typeof(EditableEntityBase)))
-            Dao.OnPropertyChanged(entry, propertyName);
+            EntityService.OnPropertyChanged(entry, propertyName);
 
         if (entry == Current)
         {
@@ -1141,7 +1141,7 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
             {
                 if (basedOnEditableEntityViewModelBase)
 #pragma warning disable CS8604
-                    EditableEntityBase.SetBusinessLayerService(entry as EditableEntityBase, Dao);
+                    EditableEntityBase.SetBusinessLayerService(entry as EditableEntityBase, EntityService);
 #pragma warning restore CS8604
                 if (implementsINotifyPropertyChanging)
                     ((INotifyPropertyChanging)entry).PropertyChanging += Entry_PropertyChanging;
@@ -1193,7 +1193,7 @@ public class DataSetView<TEntry> : BindableObjectBase, IDataSetView<TEntry>
     private void EntrySubscribeEvents(TEntry entry)
     {
         if (entry is EditableEntityBase entryViewModel)
-            EditableEntityBase.SetBusinessLayerService(entryViewModel, Dao);
+            EditableEntityBase.SetBusinessLayerService(entryViewModel, EntityService);
         if (entry is INotifyPropertyChanging newEntryNotifyPropertyChanging)
             newEntryNotifyPropertyChanging.PropertyChanging += Entry_PropertyChanging;
         if (entry is INotifyPropertyChanged newEntryNotifyPropertyChanged)

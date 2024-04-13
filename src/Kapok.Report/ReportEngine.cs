@@ -166,7 +166,7 @@ public sealed class ReportEngine
     private ReportModel GetOrCreateReportModel(Model.Report model, IDataDomainScope dataDomainScope)
     {
         var reportModelType = model.GetType();
-        return dataDomainScope.GetDao<ReportModel, IReportModelDao>()
+        return dataDomainScope.GetEntityService<ReportModel, IReportModelService>()
             .GetOrCreateFromType(reportModelType);
     }
 
@@ -178,7 +178,7 @@ public sealed class ReportEngine
 
         if (reportModel.DefaultLayoutId != null)
         {
-            layout = dataDomainScope.GetDao<ReportLayout, IReportLayoutDao>()
+            layout = dataDomainScope.GetEntityService<ReportLayout, IReportLayoutService>()
                 .FindByKey(reportModel.DefaultLayoutId);
             if (layout == null)
                 throw new NotSupportedException("Referenced default layout does not exist.");
@@ -192,14 +192,14 @@ public sealed class ReportEngine
                 ReportModelId = reportModel.ReportModelId,
                 ReportModel = reportModel
             };
-            dataDomainScope.GetDao<ReportLayout, IReportLayoutDao>()
+            dataDomainScope.GetEntityService<ReportLayout, IReportLayoutService>()
                 .Create(layout);
 
             dataDomainScope.Save(); // note a bit dirty, but needs to be done to do not create circulating references during insert
 
             reportModel.DefaultLayoutId = layout.ReportLayoutId;
             reportModel.DefaultLayout = layout;
-            dataDomainScope.GetDao<ReportModel, IReportModelDao>()
+            dataDomainScope.GetEntityService<ReportModel, IReportModelService>()
                 .Update(reportModel);
         }
 
@@ -212,7 +212,7 @@ public sealed class ReportEngine
         if (design != null)
             return design;
 
-        var reportDesignRepo = dataDomainScope.GetDao<ReportDesign, IReportDesignDao>();
+        var reportDesignRepo = dataDomainScope.GetEntityService<ReportDesign, IReportDesignService>();
 
         if (layout.ActiveDesignVersion.HasValue)
         {
@@ -246,7 +246,7 @@ public sealed class ReportEngine
 
             layout.ActiveDesignVersion = design.VersionNum;
             layout.ActiveDesign = design;
-            dataDomainScope.GetDao<ReportLayout, IReportLayoutDao>()
+            dataDomainScope.GetEntityService<ReportLayout, IReportLayoutService>()
                 .Update(layout);
         }
 
@@ -260,7 +260,7 @@ public sealed class ReportEngine
         if (destination != null)
             return destination;
 
-        var destinationRepo = dataDomainScope.GetDao<ReportDestination, IReportDestinationDao>();
+        var destinationRepo = dataDomainScope.GetEntityService<ReportDestination, IReportDestinationService>();
 
         if (layout.DefaultDestinationId.HasValue)
         {
@@ -287,7 +287,7 @@ public sealed class ReportEngine
 
     private ReportDesign SaveNewDesign(IDesignableReportProcessor reportProcessor, ReportLayout reportLayout, IDataDomainScope dataDomainScope)
     {
-        var processorRepo = dataDomainScope.GetDao<ReportProcessor, IReportProcessorDao>();
+        var processorRepo = dataDomainScope.GetEntityService<ReportProcessor, IReportProcessorService>();
 
         Type processorBasisType = reportProcessor.GetType();
         if (processorBasisType.IsGenericType && !processorBasisType.IsGenericTypeDefinition)
@@ -295,7 +295,7 @@ public sealed class ReportEngine
 
         var processorEntity = processorRepo.GetOrCreateFromType(processorBasisType).Result;
 
-        var designRepo = dataDomainScope.GetDao<ReportDesign, IReportDesignDao>();
+        var designRepo = dataDomainScope.GetEntityService<ReportDesign, IReportDesignService>();
         var lastVersion = (
             from d in designRepo.AsQueryable()
             where d.ReportLayoutId == reportLayout.ReportLayoutId
@@ -369,8 +369,8 @@ public sealed class ReportEngine
         var registeredProcessor = GetRegisteredReportProcessor(model);
         layout = GetOrCreateReportLayout(layout, reportModel, model, dataDomainScope);
             
-        var reportProcessorDao = dataDomainScope.GetDao<ReportProcessor, IReportProcessorDao>();
-        ReportProcessor? reportProcessor = reportProcessorDao.GetOrCreateFromType(registeredProcessor.ReportProcessorType).Result;
+        var reportProcessorService = dataDomainScope.GetEntityService<ReportProcessor, IReportProcessorService>();
+        ReportProcessor? reportProcessor = reportProcessorService.GetOrCreateFromType(registeredProcessor.ReportProcessorType).Result;
         Type reportProcessorType = registeredProcessor.ReportProcessorType;
         if (registeredProcessor.IsDesignable)
         {
@@ -379,11 +379,11 @@ public sealed class ReportEngine
             {
                 Debug.WriteLine($"{nameof(ReportEngine)}: Design report processor {reportProcessorType.FullName} is different as the registered report processor {registeredProcessor.ReportProcessorType.FullName}.");
 
-                reportProcessor = reportProcessorDao.FindByKey(design.ReportProcessorId);
+                reportProcessor = reportProcessorService.FindByKey(design.ReportProcessorId);
                 if (reportProcessor == null)
                     throw new NotSupportedException("Could not find report processor by id: " + design.ReportProcessorId);
 
-                reportProcessorType = reportProcessorDao.GetType(reportProcessor);
+                reportProcessorType = reportProcessorService.GetType(reportProcessor);
 
                 // check; this should never happen!
                 bool isDesignable = reportProcessorType.GetInterfaces().Contains(typeof(IDesignableReportProcessor));
@@ -492,7 +492,7 @@ public sealed class ReportEngine
 
         reportProcessor.ParameterValues = parameterValues;
 
-        var destinationRepo = dataDomainScope.GetDao<ReportDestination, IReportDestinationDao>();
+        var destinationRepo = dataDomainScope.GetEntityService<ReportDestination, IReportDestinationService>();
 
         using (var stream = destinationRepo.CreateStreamInstance(destination))
         {
@@ -553,7 +553,7 @@ public sealed class ReportEngine
                 layoutCurrent.ActiveDesignVersion.Value == designCurrent?.VersionNum)
             {
                 layoutCurrent.ActiveDesignVersion = designNew.VersionNum;
-                dataDomainScope.GetDao<ReportLayout, IReportLayoutDao>()
+                dataDomainScope.GetEntityService<ReportLayout, IReportLayoutService>()
                     .Update(layoutCurrent);
             }
         }

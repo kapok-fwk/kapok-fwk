@@ -44,9 +44,9 @@ public interface IViewDomain
     IPropertyLookupView? CreatePropertyLookupView(ILookupDefinition lookupDefinition, IDataDomain dataDomain, Func<object?>? currentSelector = null);
     [Obsolete("Please use CreatePropertyLookupView(ILookupDefinition, IDataDomain, Func<object?>?) instead")]
     IPropertyLookupView? CreatePropertyLookupView(ILookupDefinition lookupDefinition, IDataDomain dataDomain, IDataSetView? dataSet = null);
-    IDataSetView<TEntry> CreateDataSetView<TEntry>(IDataDomainScope dataDomainScope, IDao<TEntry>? dao = null)
+    IDataSetView<TEntry> CreateDataSetView<TEntry>(IDataDomainScope dataDomainScope, IEntityService<TEntry>? entityService = null)
         where TEntry : class, new();
-    IHierarchyDataSetView<TEntry> CreateHierarchyDataSetView<TEntry>(IDataDomainScope dataDomainScope, IDao<TEntry>? dao = null)
+    IHierarchyDataSetView<TEntry> CreateHierarchyDataSetView<TEntry>(IDataDomainScope dataDomainScope, IEntityService<TEntry>? entityService = null)
         where TEntry : class, IHierarchyEntry<TEntry>, new();
 
     /// <summary>

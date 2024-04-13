@@ -16,25 +16,25 @@ public interface IDataDomainScope : IDisposable
     void RejectChanges();
 
     /// <summary>
-    /// Adds a DAO for an entity. If an DAO for the entity is already added, the
+    /// Adds a service for an entity. If an entity service for the entity is already added, the
     /// method will through an ArgumentE exception.
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    /// <param name="dao"></param>
-    void AddDao<TEntity>(IDao<TEntity> dao)
+    /// <param name="entityService"></param>
+    void AddEntityService<TEntity>(IEntityService<TEntity> entityService)
         where TEntity : class, new();
 
     /// <summary>
-    /// Gets a DAO from the data domain scope. If not added, use the default initialization for the entity.
+    /// Gets an entity service from the data domain scope. If not added, use the default initialization for the entity.
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     /// <returns></returns>
-    IDao<TEntity> GetDao<TEntity>()
+    IEntityService<TEntity> GetEntityService<TEntity>()
         where TEntity : class, new();
 
-    TService GetDao<TEntity, TService>()
+    TService GetEntityService<TEntity, TService>()
         where TEntity : class, new()
-        where TService : IDao<TEntity>;
+        where TService : IEntityService<TEntity>;
 
     ITransactionScope BeginTransaction()
         => BeginTransaction(IsolationLevel.ReadUncommitted);

@@ -4,12 +4,12 @@ using Kapok.Entity.Model;
 
 namespace Kapok.BusinessLayer;
 
-public class LinqQueryDao<T> : IDao<T>
+public class EntityLinqQueryService<T> : IEntityService<T>
     where T : class, new()
 {
     public IQueryable<T>? Query { get; set; }
 
-    public LinqQueryDao(IQueryable<T>? query = null)
+    public EntityLinqQueryService(IQueryable<T>? query = null)
     {
         Query = query;
     }
@@ -43,103 +43,103 @@ public class LinqQueryDao<T> : IDao<T>
 
     #endregion
 
-    #region IReadOnlyDao<T>
+    #region IEntityReadOnlyService<T>
 
-    IFilterSet<T> IReadOnlyDao<T>.Filter => Filter;
-    IQueryable<TNested> IReadOnlyDao<T>.GetNestedAsQueryable<TNested>(T entity, string? referenceName) => throw new NotSupportedException($"{nameof(LinqQueryDao<T>)} does not support working with nested entities.");
+    IFilterSet<T> IEntityReadOnlyService<T>.Filter => Filter;
+    IQueryable<TNested> IEntityReadOnlyService<T>.GetNestedAsQueryable<TNested>(T entity, string? referenceName) => throw new NotSupportedException($"{nameof(EntityLinqQueryService<T>)} does not support working with nested entities.");
 
     #endregion
 
-    #region IDao<T>
+    #region IEntityService<T>
 
-    bool IDao<T>.IsReadOnly => true;
+    bool IEntityService<T>.IsReadOnly => true;
 
-    T IDao<T>.New()
+    T IEntityService<T>.New()
     {
         throw new NotSupportedException();
     }
 
-    void IDao<T>.Init(T entry)
+    void IEntityService<T>.Init(T entry)
     {
     }
 
-    void IDao<T>.OnPropertyChanging(T entry, string? propertyName)
+    void IEntityService<T>.OnPropertyChanging(T entry, string? propertyName)
     {
     }
 
-    void IDao<T>.OnPropertyChanged(T entry, string? propertyName)
+    void IEntityService<T>.OnPropertyChanged(T entry, string? propertyName)
     {
     }
 
-    bool IDao<T>.ValidateProperty(T entry, string propertyName, object? value, out ICollection<string>? validationErrors)
+    bool IEntityService<T>.ValidateProperty(T entry, string propertyName, object? value, out ICollection<string>? validationErrors)
     {
         validationErrors = null;
         return true;
     }
 
-    IQueryable<T> IDao<T>.AsQueryableForUpdate()
+    IQueryable<T> IEntityService<T>.AsQueryableForUpdate()
     {
         throw new NotSupportedException();
     }
 
     #endregion
 
-    #region IReadOnlyDao<T>
+    #region IEntityReadOnlyService<T>
 
-    ICollection<string>? IReadOnlyDao<T>.IncludeNestedData => null;
+    ICollection<string>? IEntityReadOnlyService<T>.IncludeNestedData => null;
 
-    IDataDomainScope? IReadOnlyDao<T>.DataDomainScope => null;
+    IDataDomainScope? IEntityReadOnlyService<T>.DataDomainScope => null;
 
     #endregion
 
-    #region IDao<T>
-        
-    void IDao<T>.Create(T entity)
+    #region IEntityService<T>
+
+    void IEntityService<T>.Create(T entity)
     {
         throw new NotSupportedException();
     }
 
-    void IDao<T>.Update(T entry)
+    void IEntityService<T>.Update(T entry)
     {
         throw new NotSupportedException();
     }
 
-    void IDao<T>.Delete(T entity)
+    void IEntityService<T>.Delete(T entity)
     {
         throw new NotSupportedException();
     }
 
-    void IDao<T>.CreateRange(IEnumerable<T> entities)
+    void IEntityService<T>.CreateRange(IEnumerable<T> entities)
     {
         throw new NotSupportedException();
     }
 
-    void IDao<T>.DeleteRange(IEnumerable<T> entities)
+    void IEntityService<T>.DeleteRange(IEnumerable<T> entities)
     {
         throw new NotSupportedException();
     }
 
-    Task IDao<T>.CreateAsync(T entity)
+    Task IEntityService<T>.CreateAsync(T entity)
     {
         throw new NotSupportedException();
     }
 
-    Task IDao<T>.UpdateAsync(T entity)
+    Task IEntityService<T>.UpdateAsync(T entity)
     {
         throw new NotSupportedException();
     }
 
-    Task IDao<T>.DeleteAsync(T entity)
+    Task IEntityService<T>.DeleteAsync(T entity)
     {
         throw new NotSupportedException();
     }
 
-    Task IDao<T>.CreateRangeAsync(IEnumerable<T> entities)
+    Task IEntityService<T>.CreateRangeAsync(IEnumerable<T> entities)
     {
         throw new NotSupportedException();
     }
 
-    Task IDao<T>.DeleteRangeAsync(IEnumerable<T> entities)
+    Task IEntityService<T>.DeleteRangeAsync(IEnumerable<T> entities)
     {
         throw new NotSupportedException();
     }

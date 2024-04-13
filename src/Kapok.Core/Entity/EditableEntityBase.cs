@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Kapok.BusinessLayer;
 using Newtonsoft.Json;
-using DaoBaseRes = Kapok.Resources.Data.DaoBase;
+using EntityServiceBaseRes = Kapok.Resources.Data.EntityServiceBase;
 
 namespace Kapok.Entity;
 
@@ -243,7 +243,7 @@ public abstract class EditableEntityBase : EntityBase, IEditableObject, INotifyD
         if (validationErrors == null)
         {
             Debug.WriteLine("ERROR: validation error list was not set by business layer service!");
-            validationErrors = new List<string> { string.Format(DaoBaseRes.ValidationError, propertyName) };
+            validationErrors = new List<string> { string.Format(EntityServiceBaseRes.ValidationError, propertyName) };
         }
         else
         {

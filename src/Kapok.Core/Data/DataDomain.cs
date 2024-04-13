@@ -8,11 +8,11 @@ public abstract class DataDomain : IDataDomain
 {
     internal record RegisteredEntity
     {
-        public RegisteredEntity(Type entityType, Type daoType, bool isReadOnly, bool isVirtual, Type? contractType = null)
+        public RegisteredEntity(Type entityType, Type entityServiceType, bool isReadOnly, bool isVirtual, Type? contractType = null)
         {
             EntityType = entityType;
             ContractType = contractType;
-            DaoType = daoType;
+            EntityServiceType = entityServiceType;
             IsReadOnly = isReadOnly;
             IsVirtual = isVirtual;
         }
@@ -20,7 +20,7 @@ public abstract class DataDomain : IDataDomain
         // ReSharper disable once NotAccessedField.Local
         public readonly Type EntityType;
         public readonly Type? ContractType;
-        public readonly Type DaoType;
+        public readonly Type EntityServiceType;
         public readonly bool IsReadOnly;
         // ReSharper disable once NotAccessedField.Local
         public readonly bool IsVirtual;
@@ -39,17 +39,17 @@ public abstract class DataDomain : IDataDomain
 
     public static IDataDomain? Default { get; set; }
 
-    private static Type _defaultDaoType = typeof(Dao<>);
-    public static Type DefaultDaoType
+    private static Type _defaultEntityServiceType = typeof(EntityService<>);
+    public static Type DefaultEntityServiceType
     {
-        get => _defaultDaoType;
+        get => _defaultEntityServiceType;
         set
         {
-            if (_defaultDaoType == value)
+            if (_defaultEntityServiceType == value)
                 return;
 
             ArgumentNullException.ThrowIfNull(value, nameof(value));
-            _defaultDaoType = value;
+            _defaultEntityServiceType = value;
         }
     }
 
@@ -63,14 +63,14 @@ public abstract class DataDomain : IDataDomain
 
         _entities.Add(typeof(T), new RegisteredEntity(
             entityType: typeof(T),
-            daoType: DefaultDaoType.MakeGenericType(typeof(T)),
+            entityServiceType: DefaultEntityServiceType.MakeGenericType(typeof(T)),
             isReadOnly: isReadOnly,
             isVirtual: isVirtual));
     }
 
-    public static void RegisterEntity<TEntity, TDao>(bool isVirtual = false)
+    public static void RegisterEntity<TEntity, TService>(bool isVirtual = false)
         where TEntity : class, new()
-        where TDao : IReadOnlyDao<TEntity>
+        where TService : IEntityReadOnlyService<TEntity>
     {
         var supportedParameterTypes = new List<Type>
         {
@@ -81,14 +81,14 @@ public abstract class DataDomain : IDataDomain
         if (!isVirtual)
             DataEntities.Add(typeof(TEntity));
 
-        foreach (var constructorInfo in typeof(TDao).GetConstructors())
+        foreach (var constructorInfo in typeof(TService).GetConstructors())
         {
             if (constructorInfo.GetParameters()
                 .Any(p => supportedParameterTypes.Contains(p.ParameterType) || p.HasDefaultValue))
             {
                 _entities.Add(typeof(TEntity), new RegisteredEntity(
                     entityType: typeof(TEntity),
-                    daoType: typeof(TDao),
+                    entityServiceType: typeof(TService),
                     isReadOnly: false,
                     isVirtual: isVirtual));
 
@@ -96,13 +96,13 @@ public abstract class DataDomain : IDataDomain
             }
         }
 
-        throw new NotSupportedException($"The dao type {typeof(TDao).FullName} has no public constructor with a list of supported parameters for initialization by this DataDomain.");
+        throw new NotSupportedException($"The entity service type {typeof(TService).FullName} has no public constructor with a list of supported parameters for initialization by this DataDomain.");
     }
 
-    public static void RegisterEntity<TEntity, TService, TDao>(bool isVirtual = false)
+    public static void RegisterEntity<TEntity, TInterface, TService>(bool isVirtual = false)
         where TEntity : class, new()
-        where TService : IReadOnlyDao<TEntity>
-        where TDao : IReadOnlyDao<TEntity>
+        where TInterface : IEntityReadOnlyService<TEntity>
+        where TService : IEntityReadOnlyService<TEntity>
     {
         var supportedParameterTypes = new List<Type>
         {
@@ -113,23 +113,23 @@ public abstract class DataDomain : IDataDomain
         if (!isVirtual)
             DataEntities.Add(typeof(TEntity));
 
-        foreach (var constructorInfo in typeof(TDao).GetConstructors())
+        foreach (var constructorInfo in typeof(TService).GetConstructors())
         {
             if (constructorInfo.GetParameters()
                 .Any(p => supportedParameterTypes.Contains(p.ParameterType) || p.HasDefaultValue))
             {
                 _entities.Add(typeof(TEntity), new RegisteredEntity(
                     entityType: typeof(TEntity),
-                    daoType: typeof(TDao),
+                    entityServiceType: typeof(TService),
                     isReadOnly: false,
                     isVirtual: isVirtual,
-                    contractType: typeof(TService)));
+                    contractType: typeof(TInterface)));
 
                 return;
             }
         }
 
-        throw new NotSupportedException($"The dao type {typeof(TDao).FullName} has no public constructor with a list of supported parameters for initialization by this DataDomain.");
+        throw new NotSupportedException($"The entity service type {typeof(TService).FullName} has no public constructor with a list of supported parameters for initialization by this DataDomain.");
     }
 
     #endregion

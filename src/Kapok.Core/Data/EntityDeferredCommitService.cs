@@ -6,11 +6,11 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Kapok.Data;
 using Kapok.Entity;
-using Res = Kapok.Resources.Data.DeferredDao;
+using Res = Kapok.Resources.Data.EntityDeferredCommitService;
 
 namespace Kapok.BusinessLayer;
 
-public static class DeferredDaoIQueryable
+public static class EntityDeferredCommitServiceIQueryable
 {
     public static IQueryable NotForUpdate<T>(this IQueryable source, IQueryable newSource)
         where T : class, new()
@@ -289,7 +289,7 @@ internal class QueryTranslatorExpressionVisitor : ExpressionVisitor
     #endregion
 }
 
-public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
+public class EntityDeferredCommitService<T> : EntityService<T>, IEntityDeferredCommitService
     where T : class, new()
 {
     private readonly ChangeTracker _changeTracker = new();
@@ -305,14 +305,14 @@ public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
     // value = entity object
     private readonly Dictionary<int, object> _primaryKeyIndex = new();
 
-    public DeferredDao(IDataDomainScope dataDomainScope, IRepository<T> repository)
+    public EntityDeferredCommitService(IDataDomainScope dataDomainScope, IRepository<T> repository)
         : base(dataDomainScope, repository)
     {
         var primaryKeys = EntityBase.GetEntityModel<T>().PrimaryKeyProperties;
 
         if (primaryKeys == null)
             throw new NotSupportedException(
-                $"You cannot use {nameof(DeferredDao<T>)} with a Type T which does not have a primary key. T = {typeof(T).FullName}");
+                $"You cannot use {nameof(EntityDeferredCommitService<T>)} with a Type T which does not have a primary key. T = {typeof(T).FullName}");
 
         _primaryKeyProperties = primaryKeys;
     }
@@ -549,7 +549,7 @@ public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
         }
     }
 
-    #region IDeferredCommitDao
+    #region IEntityDeferredCommitService
 
     public bool CanSave()
     {
@@ -633,7 +633,7 @@ public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
             .FirstOrDefault(p => p.CanRead && p.GetCustomAttribute<TimestampAttribute>() != null);
 
         IDataDomainScope? scope = null;
-        IDao<T>? scopeDao = null;
+        IEntityService<T>? scopeEntityService = null;
 
         try
         {
@@ -657,7 +657,7 @@ public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
                     if (scope == null)
                     {
                         scope = DataDomainScope.DataDomain.CreateScope();
-                        scopeDao = scope.GetDao<T>();
+                        scopeEntityService = scope.GetEntityService<T>();
                     }
 
                     var entity = trackingObject.Entity;
@@ -666,7 +666,7 @@ public class DeferredDao<T> : Dao<T>, IDeferredCommitDao
                     {
                         // TODO: here we get the whole item but we should change it so that we just get the scalar value "RowVersion" to reduce db traffic!
 #pragma warning disable CS8604
-                        var newEntry = scopeDao.FindByKey(entity.GetPrimaryKeyValues());
+                        var newEntry = scopeEntityService.FindByKey(entity.GetPrimaryKeyValues());
 #pragma warning restore CS8604
 
                         if (newEntry != null)

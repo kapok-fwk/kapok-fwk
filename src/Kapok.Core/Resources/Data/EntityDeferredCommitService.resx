@@ -123,10 +123,10 @@
 1 = primary key of entity</comment>
   </data>
   <data name="EntityTypeHasNoPrimaryKey" xml:space="preserve">
-    <value>DeferredDao&lt;{0}&gt;: The method {1} can only be called for entity types which have a primary key</value>
+    <value>EntityDeferredCommitService&lt;{0}&gt;: The method {1} can only be called for entity types which have a primary key</value>
   </data>
   <data name="PrimaryKeyCacheInconsistencyError" xml:space="preserve">
-    <value>Inconsistency in primary key cache behind DeferredDao: The primary key cache has already tracked the entry of type {0} with primary key {1} which can not be found in the change tracker. Error occured in method {2}</value>
+    <value>Inconsistency in primary key cache behind EntityDeferredCommitService: The primary key cache has already tracked the entry of type {0} with primary key {1} which can not be found in the change tracker. Error occured in method {2}</value>
     <comment>0 = full name of entity type
 1 = primary key of entity where the inconsistency occured
 2 = method name</comment>

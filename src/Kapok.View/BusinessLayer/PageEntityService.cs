@@ -3,16 +3,16 @@ using Kapok.Data;
 
 namespace Kapok.View.BusinessLayer;
 
-public interface IPageDao : IDao<DataModel.Page>
+public interface IPageEntityService : IEntityService<DataModel.Page>
 {
     Task<DataModel.Page?> FindFromType(string? pageTypeFullName);
     async Task<DataModel.Page?> FindFromType(Type pageType) => await FindFromType(pageType.FullName);
     Task<DataModel.Page> GetOrCreateFromType(Type pageType);
 }
 
-public class PageDao : Dao<DataModel.Page>, IPageDao
+public class PageEntityService : EntityService<DataModel.Page>, IPageEntityService
 {
-    public PageDao(IDataDomainScope dataDomainScope, IRepository<DataModel.Page> repository) : base(dataDomainScope, repository)
+    public PageEntityService(IDataDomainScope dataDomainScope, IRepository<DataModel.Page> repository) : base(dataDomainScope, repository)
     {
     }
 

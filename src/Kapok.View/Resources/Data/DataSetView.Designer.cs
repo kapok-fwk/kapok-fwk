@@ -178,11 +178,11 @@ namespace Kapok.View.Resources.Data {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Could not determine parameter dao neither by parameter nor from the data domain. DataSetView: {0} ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Could not determine parameter entityService neither by parameter nor from the data domain. DataSetView: {0} ähnelt.
         /// </summary>
-        public static string ParameterDaoNotDetermined {
+        public static string ParameterEntityServiceNotDetermined {
             get {
-                return ResourceManager.GetString("ParameterDaoNotDetermined", resourceCulture);
+                return ResourceManager.GetString("ParameterEntityServiceNotDetermined", resourceCulture);
             }
         }
         

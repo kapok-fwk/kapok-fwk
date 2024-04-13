@@ -24,7 +24,7 @@ public class TextExcelReport : ExcelReportPackage
     }
 }
 
-public class ReportEngineTest : DeferredDaoTestBase
+public class ReportEngineTest : DeferredEntityServiceTestBase
 {
     protected override void InitiateModule()
     {

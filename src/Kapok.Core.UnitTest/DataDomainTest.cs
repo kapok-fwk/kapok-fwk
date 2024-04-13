@@ -12,15 +12,15 @@ namespace Kapok.Core.UnitTest;
 public class DataDomainTest
 {
     [Fact]
-    public void ConstructNewDaoTest()
+    public void ConstructNewEntityServiceTest()
     {
         ModuleEngine.InitiateModule(typeof(ToDoModule));
 
         var dataDomain = new InMemoryDataDomain();
         using var scope = dataDomain.CreateScope();
 
-        var dao = scope.GetDao<ToDoItem>();
-        Assert.NotNull(dao);
+        var entityService = scope.GetEntityService<ToDoItem>();
+        Assert.NotNull(entityService);
     }
 
     /// <summary>
@@ -39,8 +39,8 @@ public class DataDomainTest
         services.AddDataModelServices();
         var serviceProvider = services.BuildServiceProvider();
 
-        serviceProvider.GetRequiredService<IDao<ToDoItem>>();
-        serviceProvider.GetRequiredService<IDao<ToDoList>>();
-        serviceProvider.GetRequiredService<IToDoItemDao>();
+        serviceProvider.GetRequiredService<IEntityService<ToDoItem>>();
+        serviceProvider.GetRequiredService<IEntityService<ToDoList>>();
+        serviceProvider.GetRequiredService<IToDoItemService>();
     }
 }

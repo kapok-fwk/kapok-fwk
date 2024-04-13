@@ -40,9 +40,9 @@ public interface IDataSetReadonlyView : INotifyPropertyChanged
 public interface IDataSetReadonlyView<TEntry> : IDataSetReadonlyView
     where TEntry : class, new()
 {
-    IDao<TEntry> GetDao();
-    TDao GetDao<TDao>()
-        where TDao : IDao<TEntry>;
+    IEntityService<TEntry> GetEntityService();
+    TService GetEntityService<TService>()
+        where TService : IEntityService<TEntry>;
 
     new IPropertyViewCollection<TEntry> Columns { get; }
     new TEntry? Current { get; set; }

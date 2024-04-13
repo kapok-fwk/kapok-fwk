@@ -4,15 +4,15 @@ using Kapok.Report.DataModel;
 
 namespace Kapok.Report.BusinessLayer;
 
-public interface IReportProcessorDao : IDao<ReportProcessor>
+public interface IReportProcessorService : IEntityService<ReportProcessor>
 {
     Task<ReportProcessor> GetOrCreateFromType(Type reportProcessorType);
     Type GetType(ReportProcessor entity);
 }
 
-public class ReportProcessorDao : Dao<ReportProcessor>, IReportProcessorDao
+public class ReportProcessorService : EntityService<ReportProcessor>, IReportProcessorService
 {
-    public ReportProcessorDao(IDataDomainScope dataDomainScope, IRepository<ReportProcessor> repository) : base(dataDomainScope, repository)
+    public ReportProcessorService(IDataDomainScope dataDomainScope, IRepository<ReportProcessor> repository) : base(dataDomainScope, repository)
     {
     }
 

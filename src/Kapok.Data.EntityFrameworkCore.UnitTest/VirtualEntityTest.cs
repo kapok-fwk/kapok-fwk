@@ -29,18 +29,18 @@ public class VirtualEntityTest : EFUnitTestBase
     {
         var scope = DataDomain.CreateScope();
 
-        var studentDao = scope.GetDao<Student>();
-        var studentRepository = typeof(Dao<Student>)
+        var studentService = scope.GetEntityService<Student>();
+        var studentRepository = typeof(EntityService<Student>)
             .GetField("Repository", BindingFlags.GetProperty | BindingFlags.Instance | BindingFlags.NonPublic)
-            .GetValue(studentDao);
+            .GetValue(studentService);
 
         Assert.NotNull(studentRepository);
         Assert.Equal(typeof(EFCoreRepository<Student>), studentRepository.GetType());
 
-        var studentVirtualDao = scope.GetDao<StudentVirtual>();
-        var studentVirtualRepository = typeof(Dao<StudentVirtual>)
+        var studentVirtualService = scope.GetEntityService<StudentVirtual>();
+        var studentVirtualRepository = typeof(EntityService<StudentVirtual>)
             .GetField("Repository", BindingFlags.GetProperty | BindingFlags.Instance | BindingFlags.NonPublic)
-            .GetValue(studentVirtualDao);
+            .GetValue(studentVirtualService);
 
         Assert.NotNull(studentRepository);
         Assert.Equal(typeof(InMemoryRepository<StudentVirtual>), studentVirtualRepository.GetType());

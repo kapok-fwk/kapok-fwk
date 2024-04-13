@@ -22,14 +22,14 @@ namespace Kapok.Resources.Data {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class DeferredDao {
+    internal class EntityDeferredCommitService {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal DeferredDao() {
+        internal EntityDeferredCommitService() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Kapok.Resources.Data {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Kapok.Resources.Data.DeferredDao", typeof(DeferredDao).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Kapok.Resources.Data.EntityDeferredCommitService", typeof(EntityDeferredCommitService).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -70,7 +70,7 @@ namespace Kapok.Resources.Data {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die DeferredDao&lt;{0}&gt;: The method {1} can only be called for entity types which have a primary key ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die EntityDeferredCommitService&lt;{0}&gt;: The method {1} can only be called for entity types which have a primary key ähnelt.
         /// </summary>
         internal static string EntityTypeHasNoPrimaryKey {
             get {
@@ -79,7 +79,7 @@ namespace Kapok.Resources.Data {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Inconsistency in primary key cache behind DeferredDao: The primary key cache has already tracked the entry of type {0} with primary key {1} which can not be found in the change tracker. Error occured in method {2} ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Inconsistency in primary key cache behind EntityDeferredCommitService: The primary key cache has already tracked the entry of type {0} with primary key {1} which can not be found in the change tracker. Error occured in method {2} ähnelt.
         /// </summary>
         internal static string PrimaryKeyCacheInconsistencyError {
             get {

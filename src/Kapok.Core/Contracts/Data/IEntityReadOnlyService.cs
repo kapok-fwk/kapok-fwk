@@ -3,11 +3,11 @@ using Kapok.Entity.Model;
 
 namespace Kapok.BusinessLayer;
 
-public interface IReadOnlyDao<T>
+public interface IEntityReadOnlyService<T>
     where T : class
 {
     /// <summary>
-    /// The data domain scope this dao object belongs to.
+    /// The data domain scope this entity service object belongs to.
     /// </summary>
     IDataDomainScope? DataDomainScope { get; }
 

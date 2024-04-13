@@ -3,7 +3,7 @@ using Kapok.Core.DataModel;
 
 namespace Kapok.Core.BusinessLayer;
 
-public interface IModuleMigrationsHistoryDao : IDao<ModuleMigrationsHistory>
+public interface IModuleMigrationsHistoryService : IEntityService<ModuleMigrationsHistory>
 {
     ModuleMigrationsHistory New(string moduleName, Module.Migration migration);
 

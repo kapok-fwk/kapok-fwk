@@ -3,9 +3,9 @@
 namespace Kapok.BusinessLayer;
 
 /// <summary>
-/// A dao which commits/saves the changes only on request.
+/// A entity service which commits/saves the changes only on request.
 /// </summary>
-public interface IDeferredCommitDao
+public interface IEntityDeferredCommitService
 {
     IEntityModel Model { get; }
 

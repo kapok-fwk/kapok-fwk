@@ -66,8 +66,8 @@ public static class ModuleEngine
                     ModuleMigrationsHistory? dbMigration;
                     using (var scope = dataDomain.CreateScope())
                     {
-                        var migrationHistoryDao = scope.GetDao<ModuleMigrationsHistory, IModuleMigrationsHistoryDao>();
-                        dbMigration = migrationHistoryDao.Find(module.Name, migration);
+                        var migrationHistoryService = scope.GetEntityService<ModuleMigrationsHistory, IModuleMigrationsHistoryService>();
+                        dbMigration = migrationHistoryService.Find(module.Name, migration);
                     }
 
                     if (dbMigration == null)
@@ -89,9 +89,9 @@ public static class ModuleEngine
         {
             using var scope = dataDomain.CreateScope();
             using var trans = scope.BeginTransaction();
-            var migrationHistoryDao = scope.GetDao<ModuleMigrationsHistory, IModuleMigrationsHistoryDao>();
-            var dbMigration = migrationHistoryDao.New(module.Name, migration);
-            migrationHistoryDao.Create(dbMigration);
+            var migrationHistoryService = scope.GetEntityService<ModuleMigrationsHistory, IModuleMigrationsHistoryService>();
+            var dbMigration = migrationHistoryService.New(module.Name, migration);
+            migrationHistoryService.Create(dbMigration);
 
             // call migration script
             migration.ExecuteUp(scope);

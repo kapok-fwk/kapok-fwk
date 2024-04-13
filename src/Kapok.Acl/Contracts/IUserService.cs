@@ -3,6 +3,6 @@ using Kapok.BusinessLayer;
 
 namespace Kapok.Acl;
 
-public interface IUserDao : IDao<User>
+public interface IUserService : IEntityService<User>
 {
 }

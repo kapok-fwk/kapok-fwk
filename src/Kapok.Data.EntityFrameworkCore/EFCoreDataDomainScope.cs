@@ -35,7 +35,7 @@ public sealed class EFCoreDataDomainScope : DataDomainScope
         if (IsDisposed)
             return false;
 
-        if (CanSaveAnyDeferredCommitDao())
+        if (CanSaveAnyDeferredCommit())
             return true;
 
         return false;
@@ -47,7 +47,7 @@ public sealed class EFCoreDataDomainScope : DataDomainScope
 
         lock (_dbContextLockObject)
         {
-            SaveDeferredCommitDao();
+            SaveDeferredCommit();
 
             if (_dbContext == null) // when nothing was saved to the repositories, the DbContext will not be initialized
                 return;
@@ -58,7 +58,7 @@ public sealed class EFCoreDataDomainScope : DataDomainScope
             _dbContext.Dispose();
             _dbContext = null;
 
-            PostSaveDeferredCommitDao();
+            PostSaveDeferredCommit();
         }
     }
 
@@ -70,7 +70,7 @@ public sealed class EFCoreDataDomainScope : DataDomainScope
 
         lock (_dbContextLockObject)
         {
-            SaveDeferredCommitDao();
+            SaveDeferredCommit();
 
             if (_dbContext == null) // when nothing was saved to the repositories, the DbContext will not be initialized
                 return;
@@ -83,7 +83,7 @@ public sealed class EFCoreDataDomainScope : DataDomainScope
             task = _dbContext.DisposeAsync();
             _dbContext = null;
 
-            PostSaveDeferredCommitDao();
+            PostSaveDeferredCommit();
         }
 
         await task;
@@ -104,7 +104,7 @@ public sealed class EFCoreDataDomainScope : DataDomainScope
                 _dbContext = null;
             }
 
-            RejectChangesDeferredCommitDao();
+            RejectChangesDeferredCommitService();
         }
     }
 

@@ -6,17 +6,17 @@ using Kapok.Entity.Model;
 
 namespace Kapok.BusinessLayer;
 
-public class Dao<T> : DaoBase<T>
+public class EntityService<T> : EntityServiceBase<T>
     where T : class, new()
 {
     /// <summary>
-    /// The repository the DAO is bound to.
+    /// The repository the entity service is bound to.
     /// </summary>
     protected readonly IRepository<T> Repository;
 
     private bool _isReadOnly;
 
-    public Dao(IDataDomainScope dataDomainScope, IRepository<T> repository, bool isReadOnly = false)
+    public EntityService(IDataDomainScope dataDomainScope, IRepository<T> repository, bool isReadOnly = false)
         : base(dataDomainScope)
     {
         Repository = repository;
@@ -46,7 +46,7 @@ public class Dao<T> : DaoBase<T>
         }
     }
 
-    // TODO: replace the IsReadOnly to a ForUpdate or IsTrackingActivated option with the tracking happing right here in the DAO before it is passed to the repository
+    // TODO: replace the IsReadOnly to a ForUpdate or IsTrackingActivated option with the tracking happing right here in the entity service before it is passed to the repository
     public override bool IsReadOnly
     {
         get => _isReadOnly;
@@ -152,7 +152,7 @@ public class Dao<T> : DaoBase<T>
             throw new Exception("Inconsistency in entity model: Multiple references exist");
         }
 
-        var nestedDao = DataDomainScope.GetDao<TNested>();
+        var nestedEntityService = DataDomainScope.GetEntityService<TNested>();
 
         var reference = references.First();
 
@@ -160,14 +160,14 @@ public class Dao<T> : DaoBase<T>
             throw new NotSupportedException(
                 $"The reference {reference.Name} has no foreign key properties defined. Please check your definition again. You can't use this reference with the method {nameof(GetNestedAsQueryable)}");
 
-        if (reference.PrincipalKeyProperties == null && nestedDao.Model.PrimaryKeyProperties == null)
+        if (reference.PrincipalKeyProperties == null && nestedEntityService.Model.PrimaryKeyProperties == null)
             throw new NotSupportedException(
                 $"The reference {reference.Name} has no principal key and primary key properties defined. Please check your definition again. You can't use this reference with the method {nameof(GetNestedAsQueryable)}");
 
         var foreignKeyProperties = reference.ForeignKeyProperties.ToList();
         var principalKeyProperties =
 #pragma warning disable CS8604
-            (reference.PrincipalKeyProperties ?? nestedDao.Model.PrimaryKeyProperties).ToList();
+            (reference.PrincipalKeyProperties ?? nestedEntityService.Model.PrimaryKeyProperties).ToList();
 #pragma warning restore CS8604
             
         var nestedEntityParameter = Expression.Parameter(typeof(TNested), "nested");
@@ -201,7 +201,7 @@ public class Dao<T> : DaoBase<T>
             whereBodyExpression,
             nestedEntityParameter);
 
-        return nestedDao.AsQueryable().Where(whereExpression);
+        return nestedEntityService.AsQueryable().Where(whereExpression);
     }
 
     #region Data partition handling

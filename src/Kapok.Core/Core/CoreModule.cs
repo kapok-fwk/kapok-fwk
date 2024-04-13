@@ -16,6 +16,6 @@ public sealed class CoreModule : ModuleBase
         base.Initiate();
 
         // register entities
-        DataDomain.RegisterEntity<ModuleMigrationsHistory, ModuleMigrationsHistoryDao>();
+        DataDomain.RegisterEntity<ModuleMigrationsHistory, ModuleMigrationsHistoryService>();
     }
 }

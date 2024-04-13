@@ -22,14 +22,14 @@ namespace Kapok.Resources.Data {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class DaoBase {
+    internal class EntityServiceBase {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal DaoBase() {
+        internal EntityServiceBase() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Kapok.Resources.Data {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Kapok.Resources.Data.DaoBase", typeof(DaoBase).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Kapok.Resources.Data.EntityServiceBase", typeof(EntityServiceBase).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

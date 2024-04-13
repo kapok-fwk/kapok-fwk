@@ -10,9 +10,9 @@ public abstract class DataDomainScope : IDataDomainScope
 {
     public IServiceProvider ServiceProvider { get; }
     private readonly List<TransactionScope> _transactionScopes = new();
-    private readonly Dictionary<Type, object> _daos = new();
+    private readonly Dictionary<Type, object> _entityServices = new();
     private readonly Dictionary<Type, object> _repositories = new();
-    private readonly List<IDeferredCommitDao> _deferredCommitDao = new();
+    private readonly List<IEntityDeferredCommitService> _entityDeferredCommitServices = new();
 
     protected DataDomainScope(IDataDomain dataDomain, IServiceProvider serviceProvider)
     {
@@ -22,36 +22,36 @@ public abstract class DataDomainScope : IDataDomainScope
         ServiceProvider = serviceProvider;
     }
 
-    #region Deferred commit Dao handling
+    #region Deferred commit entity service handling
 
-    protected bool CanSaveAnyDeferredCommitDao()
+    protected bool CanSaveAnyDeferredCommit()
     {
-        return _deferredCommitDao.Any(r => r.CanSave());
+        return _entityDeferredCommitServices.Any(r => r.CanSave());
     }
 
-    protected void SaveDeferredCommitDao()
+    protected void SaveDeferredCommit()
     {
-        foreach (var dao in _deferredCommitDao)
+        foreach (var entityService in _entityDeferredCommitServices)
         {
-            if (dao.CanSave())
-                dao.Save();
+            if (entityService.CanSave())
+                entityService.Save();
         }
     }
 
-    protected void RejectChangesDeferredCommitDao()
+    protected void RejectChangesDeferredCommitService()
     {
-        foreach (var dao in _deferredCommitDao)
+        foreach (var entityService in _entityDeferredCommitServices)
         {
-            if (dao.CanSave())
-                dao.RejectChanges();
+            if (entityService.CanSave())
+                entityService.RejectChanges();
         }
     }
 
-    protected void PostSaveDeferredCommitDao()
+    protected void PostSaveDeferredCommit()
     {
-        foreach (var dao in _deferredCommitDao)
+        foreach (var entityService in _entityDeferredCommitServices)
         {
-            dao.PostSave();
+            entityService.PostSave();
         }
     }
 
@@ -142,9 +142,9 @@ public abstract class DataDomainScope : IDataDomainScope
             transactionScope.Dispose();
         }
 
-        _daos.Clear(); // maybe not necessary;
+        _entityServices.Clear(); // maybe not necessary;
         _repositories.Clear(); // maybe not necessary;
-        _deferredCommitDao.Clear(); // maybe not necessary;
+        _entityDeferredCommitServices.Clear(); // maybe not necessary;
         OnDispose();
 
         IsDisposed = true;
@@ -175,72 +175,72 @@ public abstract class DataDomainScope : IDataDomainScope
         return ServiceProvider.GetRequiredService<IRepository<T>>();
     }
 
-    private IDao<T> InitializeDao<T>(IRepository<T> repository)
+    private IEntityService<T> InitializeEntityService<T>(IRepository<T> repository)
         where T : class, new()
     {
         var entityType = typeof(T);
 
         if (!Data.DataDomain.Entities.ContainsKey(entityType))
             throw new ArgumentException(
-                $"The passed generic type {typeof(T).FullName} is not registered as entity. The DAO object cannot be created.");
+                $"The passed generic type {typeof(T).FullName} is not registered as entity. The entity service object cannot be created.");
 
         var registeredEntity = Data.DataDomain.Entities[entityType];
 
-        var dao = (IDao<T>?)ServiceProvider.GetService(registeredEntity.DaoType);
-        if (dao != null) return dao;
+        var entityService = (IEntityService<T>?)ServiceProvider.GetService(registeredEntity.EntityServiceType);
+        if (entityService != null) return entityService;
 
         if (registeredEntity.ContractType != null)
         {
-            dao = (IDao<T>?)ServiceProvider.GetService(registeredEntity.ContractType);
-            if (dao != null) return dao;
+            entityService = (IEntityService<T>?)ServiceProvider.GetService(registeredEntity.ContractType);
+            if (entityService != null) return entityService;
         }
 
-        dao = (IDao<T>)ActivatorUtilities.CreateInstance(ServiceProvider, registeredEntity.DaoType, 
+        entityService = (IEntityService<T>)ActivatorUtilities.CreateInstance(ServiceProvider, registeredEntity.EntityServiceType, 
             this, repository);
 
-        return dao;
+        return entityService;
     }
 
-    private void AddDaoInternal<T>(IDao<T> dao)
+    private void AddEntityServiceInternal<T>(IEntityService<T> entityService)
         where T : class, new()
     {
-        _daos.Add(typeof(T), dao);
-        if (dao is IDeferredCommitDao deferredCommitDao)
-            _deferredCommitDao.Add(deferredCommitDao);
+        _entityServices.Add(typeof(T), entityService);
+        if (entityService is IEntityDeferredCommitService deferredCommitService)
+            _entityDeferredCommitServices.Add(deferredCommitService);
     }
 
-    public void AddDao<T>(IDao<T> dao)
+    public void AddEntityService<T>(IEntityService<T> entityService)
         where T : class, new()
     {
-        ArgumentNullException.ThrowIfNull(dao, nameof(dao));
+        ArgumentNullException.ThrowIfNull(entityService, nameof(entityService));
         CheckIsDisposed();
         var entityType = typeof(T);
 
-        if (_daos.ContainsKey(entityType))
-            throw new ArgumentException(string.Format(Res.DaoAlreadyAdded, entityType.FullName));
+        if (_entityServices.ContainsKey(entityType))
+            throw new ArgumentException(string.Format(Res.EntityServiceAlreadyAdded, entityType.FullName));
 
-        AddDaoInternal(dao);
+        AddEntityServiceInternal(entityService);
     }
 
-    public IDao<T> GetDao<T>()
+    public IEntityService<T> GetEntityService<T>()
         where T : class, new()
     {
         CheckIsDisposed();
         var entityType = typeof(T);
 
-        if (_daos.TryGetValue(entityType, out var dao))
-            return (IDao<T>)dao;
+        if (_entityServices.TryGetValue(entityType, out var entityService))
+            return (IEntityService<T>)entityService;
 
-        IDao<T> newDao = InitializeDao(GetRepository<T>());
-        AddDaoInternal(newDao);
-        return newDao;
+        IEntityService<T> newEntityService = InitializeEntityService(GetRepository<T>());
+        AddEntityServiceInternal(newEntityService);
+        return newEntityService;
     }
 
-    public TRepository GetDao<TEntity, TRepository>()
+    public TRepository GetEntityService<TEntity, TRepository>()
         where TEntity : class, new()
-        where TRepository : IDao<TEntity>
+        where TRepository : IEntityService<TEntity>
     {
-        return (TRepository) GetDao<TEntity>();
+        return (TRepository) GetEntityService<TEntity>();
     }
 
     #region IDataDomainScope not implemented methods

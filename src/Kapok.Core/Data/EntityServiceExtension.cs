@@ -3,9 +3,9 @@ using System.Reflection;
 
 namespace Kapok.BusinessLayer;
 
-public static class DaoExtension
+public static class EntityServiceExtension
 {
-    public static T GetByKey<T>(this IReadOnlyDao<T> @this, params object?[] keyValues)
+    public static T GetByKey<T>(this IEntityReadOnlyService<T> @this, params object?[] keyValues)
         where T : class, new()
     {
         var entity = FindByKey(@this, keyValues);
@@ -27,19 +27,19 @@ public static class DaoExtension
         throw new EntityNotFoundByKeyException(typeof(T),  primaryKeyValues);
     }
 
-    public static T? FindByKey<T>(this IReadOnlyDao<T> @this, params object?[] keyValues)
+    public static T? FindByKey<T>(this IEntityReadOnlyService<T> @this, params object?[] keyValues)
         where T : class, new()
     {
         return InternalFindByKey(@this, forUpdate: false, keyValues: keyValues);
     }
 
-    public static T? FindByKeyForUpdate<T>(this IDao<T> @this, params object?[] keyValues)
+    public static T? FindByKeyForUpdate<T>(this IEntityService<T> @this, params object?[] keyValues)
         where T : class, new()
     {
         return InternalFindByKey(@this, forUpdate: true, keyValues: keyValues);
     }
 
-    private static T? InternalFindByKey<T>(IReadOnlyDao<T> @this, bool forUpdate, params object?[] keyValues)
+    private static T? InternalFindByKey<T>(IEntityReadOnlyService<T> @this, bool forUpdate, params object?[] keyValues)
         where T : class, new()
     {
         ArgumentNullException.ThrowIfNull(@this, nameof(@this));
@@ -51,7 +51,7 @@ public static class DaoExtension
         if (@this.Model.PrimaryKeyProperties.Length != keyValues.Length)
             throw new NotSupportedException($"The type {typeof(T).FullName} has {@this.Model.PrimaryKeyProperties.Length} primary key properties, {keyValues.Length} where given");
         if (@this.DataDomainScope == null)
-            throw new ArgumentException("The DAO has the DataDomainScope not initialized.", nameof(@this));
+            throw new ArgumentException("The entity service has the DataDomainScope not initialized.", nameof(@this));
 
         var param = Expression.Parameter(typeof(T));
         Expression? whereExpression = null;
@@ -69,7 +69,7 @@ public static class DaoExtension
                 whereExpression = Expression.And(whereExpression, expr);
         }
 
-        var query = forUpdate ? ((IDao<T>)@this).AsQueryableForUpdate() : @this.AsQueryable();
+        var query = forUpdate ? ((IEntityService<T>)@this).AsQueryableForUpdate() : @this.AsQueryable();
 
         int primaryKeyPropertyId = 0;
 
@@ -103,7 +103,7 @@ public static class DaoExtension
 #pragma warning restore CS8604
     }
 
-    public static async Task<T> GetByKeyAsync<T>(this IReadOnlyDao<T> @this, params object?[] keyValues)
+    public static async Task<T> GetByKeyAsync<T>(this IEntityReadOnlyService<T> @this, params object?[] keyValues)
         where T : class, new()
     {
         var entity = await FindByKeyAsync(@this, keyValues);
@@ -127,7 +127,7 @@ public static class DaoExtension
         return entity;
     }
 
-    public static Task<T?> FindByKeyAsync<T>(this IReadOnlyDao<T> @this, params object?[] keyValues)
+    public static Task<T?> FindByKeyAsync<T>(this IEntityReadOnlyService<T> @this, params object?[] keyValues)
         where T : class, new()
     {
         ArgumentNullException.ThrowIfNull(@this, nameof(@this));
@@ -139,7 +139,7 @@ public static class DaoExtension
         if (@this.Model.PrimaryKeyProperties.Length != keyValues.Length)
             throw new NotSupportedException($"The type {typeof(T).FullName} has {@this.Model.PrimaryKeyProperties.Length} primary key properties, {keyValues.Length} where given");
         if (@this.DataDomainScope == null)
-            throw new ArgumentException("The DAO has the DataDomainScope not initialized.", nameof(@this));
+            throw new ArgumentException("The entity service has the DataDomainScope not initialized.", nameof(@this));
 
         var param = Expression.Parameter(typeof(T));
         Expression? whereExpression = null;

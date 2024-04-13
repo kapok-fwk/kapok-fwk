@@ -122,7 +122,7 @@ public class ReferenceModelBuilder<T, TDestinationType>
         {
             // simple lookup expression
             Func<IDataDomainScope, IQueryable<TDestinationType>> lookupFunc =
-                dds => dds.GetDao<TDestinationType>().AsQueryable();
+                dds => dds.GetEntityService<TDestinationType>().AsQueryable();
             lookup = lookupFunc;
 
             addLookupMethod = (
@@ -144,11 +144,11 @@ public class ReferenceModelBuilder<T, TDestinationType>
         {
             var currentParameter = Expression.Parameter(typeof(T), "current");
             var ddsParameter = Expression.Parameter(typeof(IDataDomainScope), "dds");
-            var daoMethod = typeof(IDataDomainScope).GetMethod(nameof(IDataDomainScope.GetDao), 1, Type.EmptyTypes)
+            var getEntityServiceMethod = typeof(IDataDomainScope).GetMethod(nameof(IDataDomainScope.GetEntityService), 1, Type.EmptyTypes)
                 ?.MakeGenericMethod(typeof(TDestinationType));
-            Debug.Assert(daoMethod != null);
-            var asQueryableMethod = typeof(IReadOnlyDao<>).MakeGenericType(typeof(TDestinationType))
-                .GetMethod(nameof(IReadOnlyDao<object>.AsQueryable));
+            Debug.Assert(getEntityServiceMethod != null);
+            var asQueryableMethod = typeof(IEntityReadOnlyService<>).MakeGenericType(typeof(TDestinationType))
+                .GetMethod(nameof(IEntityReadOnlyService<object>.AsQueryable));
             Debug.Assert(asQueryableMethod != null);
             var whereLinqMethodInfo = (
                     from m in typeof(Queryable).GetMethods(BindingFlags.Public | BindingFlags.Static)
@@ -167,14 +167,14 @@ public class ReferenceModelBuilder<T, TDestinationType>
             if (whereLambdaExpression == null)
                 throw new Exception($"Could not generate where expression for entity reference {_entityReference.Name}");
 
-            // create dds => dds.GetDao<TDestinationType>().AsQueryable().Where(.. condition for fields ..)
+            // create dds => dds.GetEntityService<TDestinationType>().AsQueryable().Where(.. condition for fields ..)
             LambdaExpression lookupExpression =
                 Expression.Lambda(
                     Expression.Call(
                         null,
                         whereLinqMethodInfo,
                         Expression.Call(
-                            Expression.Call(ddsParameter, daoMethod)
+                            Expression.Call(ddsParameter, getEntityServiceMethod)
                             , asQueryableMethod
                         ),
                         whereLambdaExpression

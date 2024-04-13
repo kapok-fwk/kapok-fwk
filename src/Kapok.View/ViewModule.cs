@@ -17,7 +17,7 @@ public sealed class ViewMetadataModule : ModuleBase
         base.Initiate();
 
         // register DataModel
-        DataDomain.RegisterEntity<DataModel.Page, BusinessLayer.PageDao>();
+        DataDomain.RegisterEntity<DataModel.Page, BusinessLayer.PageEntityService>();
         DataDomain.RegisterEntity<DataModel.PageListView>();
         DataDomain.RegisterEntity<DataModel.PageReportLayout>();
         DataDomain.RegisterEntity<DataModel.UserPageListView>();

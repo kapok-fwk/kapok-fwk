@@ -117,32 +117,26 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ClearUserFilterCommand_Description" xml:space="preserve">
+  <data name="ClearUserFilterAction_Description" xml:space="preserve">
     <value />
   </data>
-  <data name="ClearUserFilterCommand_Name" xml:space="preserve">
+  <data name="ClearUserFilterAction_Name" xml:space="preserve">
     <value>Clear filter</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
   </data>
-  <data name="EditEntryCommand_Description" xml:space="preserve">
+  <data name="EditEntryAction_Description" xml:space="preserve">
     <value>Edit the selected entry.</value>
   </data>
-  <data name="EditEntryCommand_Name" xml:space="preserve">
+  <data name="EditEntryAction_Name" xml:space="preserve">
     <value>Edit</value>
   </data>
-  <data name="ExportAsExcelSheetCommand_Description" xml:space="preserve">
+  <data name="ExportAsExcelSheetAction_Description" xml:space="preserve">
     <value />
   </data>
-  <data name="ExportAsExcelSheetCommand_Name" xml:space="preserve">
+  <data name="ExportAsExcelSheetAction_Name" xml:space="preserve">
     <value>Export to Excel</value>
-  </data>
-  <data name="FilterVisibleToggleCommand_Description" xml:space="preserve">
-    <value />
-  </data>
-  <data name="FilterVisibleToggleCommand_Name" xml:space="preserve">
-    <value>Filter</value>
   </data>
   <data name="General" xml:space="preserve">
     <value>General</value>
@@ -165,16 +159,22 @@
   <data name="SendTo" xml:space="preserve">
     <value>Send to</value>
   </data>
-  <data name="SortDownEntryCommand_Description" xml:space="preserve">
+  <data name="SortDownEntryAction_Description" xml:space="preserve">
     <value>Move the current entry one position down</value>
   </data>
-  <data name="SortDownEntryCommand_Name" xml:space="preserve">
+  <data name="SortDownEntryAction_Name" xml:space="preserve">
     <value>Down</value>
   </data>
-  <data name="SortUpEntryCommand_Description" xml:space="preserve">
+  <data name="SortUpEntryAction_Description" xml:space="preserve">
     <value>Move the current entry one position up</value>
   </data>
-  <data name="SortUpEntryCommand_Name" xml:space="preserve">
+  <data name="SortUpEntryAction_Name" xml:space="preserve">
     <value>Up</value>
+  </data>
+  <data name="ToggleFilterVisibleAction_Description" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ToggleFilterVisibleAction_Name" xml:space="preserve">
+    <value>Filter</value>
   </data>
 </root>

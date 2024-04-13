@@ -8,7 +8,7 @@ using Kapok.Module;
 
 namespace Kapok.Acl.UnitTest;
 
-public class SerializationTest : DeferredDaoTestBase
+public class SerializationTest : DeferredEntityServiceTestBase
 {
     protected override void InitiateModule()
     {
@@ -18,40 +18,40 @@ public class SerializationTest : DeferredDaoTestBase
     private static async Task SeedUser(IDataDomain dataDomain)
     {
         using var scope = dataDomain.CreateScope();
-        var userDao = scope.GetDao<User>();
+        var userService = scope.GetEntityService<User>();
 
-        var newUser = userDao.New();
+        var newUser = userService.New();
         newUser.Id = new Guid("8abcd652-cc76-442d-97b7-05e23b164e63");
         newUser.UserName = "John Doe";
-        await userDao.CreateAsync(newUser);
+        await userService.CreateAsync(newUser);
 
         await scope.SaveAsync();
 
-        Assert.Equal(1, userDao.AsQueryable().Count());
+        Assert.Equal(1, userService.AsQueryable().Count());
     }
 
     private static async Task SeedUserLogin(IDataDomain dataDomain)
     {
         using var scope = dataDomain.CreateScope();
-        var userLoginDao = scope.GetDao<UserLogin>();
+        var userLoginService = scope.GetEntityService<UserLogin>();
 
-        var newUserLogin = userLoginDao.New();
+        var newUserLogin = userLoginService.New();
         newUserLogin.UserId = new Guid("8abcd652-cc76-442d-97b7-05e23b164e63");
         newUserLogin.LoginProvider = "TestProvider";
         newUserLogin.ProviderKey = "abcdef123456";
-        await userLoginDao.CreateAsync(newUserLogin);
+        await userLoginService.CreateAsync(newUserLogin);
 
         await scope.SaveAsync();
 
-        Assert.Equal(1, userLoginDao.AsQueryable().Count());
+        Assert.Equal(1, userLoginService.AsQueryable().Count());
     }
 
     private static async Task SeedLoginProvider(IDataDomain dataDomain)
     {
         using var scope = dataDomain.CreateScope();
-        var loginProviderDao = scope.GetDao<LoginProvider>();
+        var loginProviderService = scope.GetEntityService<LoginProvider>();
 
-        var newLoginProvider = loginProviderDao.New();
+        var newLoginProvider = loginProviderService.New();
         newLoginProvider.Id = new Guid("ef794e82-20dc-4ea0-a7f2-abf7675e3aef");
         newLoginProvider.Name = "MSAL";
         newLoginProvider.AuthenticationServiceClass = "<tbd>";
@@ -61,10 +61,10 @@ public class SerializationTest : DeferredDaoTestBase
             { "ClientId", "" },
             { "TenantId", "common" }
         };
-        await loginProviderDao.CreateAsync(newLoginProvider);
+        await loginProviderService.CreateAsync(newLoginProvider);
         await scope.SaveAsync();
 
-        Assert.Equal(1, loginProviderDao.AsQueryable().Count());
+        Assert.Equal(1, loginProviderService.AsQueryable().Count());
     }
 
     [Fact]
@@ -73,10 +73,10 @@ public class SerializationTest : DeferredDaoTestBase
         await SeedLoginProvider(DataDomain);
         
         using var scope = DataDomain.CreateScope();
-        var loginProviderDao = scope.GetDao<LoginProvider>();
+        var loginProviderService = scope.GetEntityService<LoginProvider>();
 
         // text json serialization of a user
-        var loginProvider = loginProviderDao.AsQueryable().First();
+        var loginProvider = loginProviderService.AsQueryable().First();
 
         var serialized = JsonSerializer.Serialize(loginProvider, new JsonSerializerOptions
         {
@@ -95,10 +95,10 @@ public class SerializationTest : DeferredDaoTestBase
         await SeedUser(DataDomain);
 
         using var scope = DataDomain.CreateScope();
-        var userDao = scope.GetDao<User>();
+        var userService = scope.GetEntityService<User>();
 
         // text json serialization of a user
-        var user = userDao.AsQueryable().First();
+        var user = userService.AsQueryable().First();
 
         var serialized = JsonSerializer.Serialize(user, new JsonSerializerOptions
         {
@@ -118,10 +118,10 @@ public class SerializationTest : DeferredDaoTestBase
         await SeedUserLogin(DataDomain);
 
         using var scope = DataDomain.CreateScope();
-        var userLoginDao = scope.GetDao<UserLogin>();
+        var userLoginService = scope.GetEntityService<UserLogin>();
 
         // text json serialization of a user
-        var userLogin = userLoginDao.AsQueryable().First();
+        var userLogin = userLoginService.AsQueryable().First();
 
         var serialized = JsonSerializer.Serialize(userLogin, new JsonSerializerOptions
         {

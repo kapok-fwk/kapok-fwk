@@ -16,7 +16,7 @@ public class ToDoModule : ModuleBase
     {
         base.Initiate();
 
-        DataDomain.RegisterEntity<ToDoItem, IToDoItemDao, ToDoItemDao>();
+        DataDomain.RegisterEntity<ToDoItem, IToDoItemService, ToDoItemService>();
         DataDomain.RegisterEntity<ToDoList>();
     }
 }

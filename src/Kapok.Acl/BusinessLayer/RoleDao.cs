@@ -4,9 +4,9 @@ using Kapok.Data;
 
 namespace Kapok.Acl.BusinessLayer;
 
-public sealed class RoleDao : Dao<Role>, IRoleDao
+public sealed class RoleService : EntityService<Role>, IRoleService
 {
-    public RoleDao(IDataDomainScope dataDomainScope, IRepository<Role> repository, bool isReadOnly = false)
+    public RoleService(IDataDomainScope dataDomainScope, IRepository<Role> repository, bool isReadOnly = false)
         : base(dataDomainScope, repository, isReadOnly)
     {
     }

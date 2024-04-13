@@ -3,6 +3,6 @@ using Kapok.Core.UnitTest.DataModel;
 
 namespace Kapok.Core.UnitTest.Contracts;
 
-public interface IToDoItemDao : IDao<ToDoItem>
+public interface IToDoItemService : IEntityService<ToDoItem>
 {
 }

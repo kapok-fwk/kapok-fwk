@@ -117,8 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DaoAlreadyAdded" xml:space="preserve">
-    <value>Could not add dao to DataDomainScope since a DAO for the entity {0} has already been added</value>
+  <data name="EntityServiceAlreadyAdded" xml:space="preserve">
+    <value>Could not add entity service to DataDomainScope since a entity service for the entity {0} has already been added</value>
     <comment>0 = the full name of the entity type</comment>
   </data>
   <data name="NoTransactionToCommit" xml:space="preserve">
