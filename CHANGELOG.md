@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.0 (2024-04-13)
+
+- :tada: add async. implementation for ReportDataSet via interface IDbReportDataSetAsync
+- :rocket: rename Dao to EntityService
+
 ## 0.1.21 (2023-11-18)
 
 - :tada: upgrade to support .Net 8.0
