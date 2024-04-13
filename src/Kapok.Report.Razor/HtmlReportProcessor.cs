@@ -1,4 +1,5 @@
-﻿using System.Dynamic;
+﻿using System.Data;
+using System.Dynamic;
 using System.Reflection;
 using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.CodeAnalysis;
@@ -104,16 +105,64 @@ public class HtmlReportProcessor : ReportProcessor<Model.HtmlReport>, IHtmlRepor
         // execute all DataSets
         if (_reportEngine != null)
         {
+            var synchronousDataSets = new List<IDbReportDataSet>();
+            var asynchronousDataSets = new List<IDbReportDataSetAsync>();
+
             foreach (var dataSet in ReportModel.DataSets.Values)
             {
                 if (dataSet is IDbReportDataSet dbDataSet && dbDataSet.DataSourceName != null)
                 {
-                    var dataSource = (DbReportDataSource)_reportEngine.GetDataSource(dbDataSet.DataSourceName);
-                    using var connection = dataSource.CreateNewConnection();
+                    if (dbDataSet is IDbReportDataSetAsync asyncDbDataSet)
+                    {
+                        asynchronousDataSets.Add(asyncDbDataSet);
+                    }
+                    else
+                    {
+                        synchronousDataSets.Add(dbDataSet);
+                    }
+                }
+            }
 
-                    dbDataSet.ExecuteQuery(connection,
+            var connections = new List<IDbConnection>();
+            try
+            {
+                var asyncTasks = new List<Task>();
+
+                foreach (var asyncDbDataSet in asynchronousDataSets)
+                {
+#pragma warning disable CS8604 // Possible null reference argument.
+                    var dataSource = (DbReportDataSource)_reportEngine.GetDataSource(asyncDbDataSet.DataSourceName);
+#pragma warning restore CS8604 // Possible null reference argument.
+                    var connection = dataSource.CreateNewConnection();
+                    connections.Add(connection);
+
+                    var task = asyncDbDataSet.ExecuteQueryAsync(connection,
                         parameters: ReportModel.Parameters,
                         resourceProvider: ReportModel.Resources);
+
+                    asyncTasks.Add(task);
+                }
+
+                foreach (var syncDbDataSet in synchronousDataSets)
+                {
+#pragma warning disable CS8604 // Possible null reference argument.
+                    var dataSource = (DbReportDataSource)_reportEngine.GetDataSource(syncDbDataSet.DataSourceName);
+#pragma warning restore CS8604 // Possible null reference argument.
+                    using var connection = dataSource.CreateNewConnection();
+
+                    syncDbDataSet.ExecuteQuery(connection,
+                        parameters: ReportModel.Parameters,
+                        resourceProvider: ReportModel.Resources);
+                }
+
+                if (asyncTasks.Count > 0)
+                    Task.WaitAll(asyncTasks.ToArray());
+            }
+            finally
+            {
+                foreach (var connection in connections)
+                {
+                    connection.Dispose();
                 }
             }
         }
