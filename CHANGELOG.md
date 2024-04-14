@@ -3,6 +3,7 @@
 ## 0.2.0 (2024-04-13)
 
 - :tada: add async. implementation for ReportDataSet via interface IDbReportDataSetAsync
+- :tada: add library Kapok.AspNetCore
 - :rocket: rename Dao to EntityService
 
 ## 0.1.21 (2023-11-18)
