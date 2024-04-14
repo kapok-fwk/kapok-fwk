@@ -38,6 +38,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projektmappenelemente", "Pr
 		CHANGELOG.md = CHANGELOG.md
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kapok.AspNetCore", "src\Kapok.AspNetCore\Kapok.AspNetCore.csproj", "{9184A276-AB83-4C96-8590-8D8E693293F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -104,6 +106,10 @@ Global
 		{4199E3DC-AE49-4777-84C4-4FC592F58E3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4199E3DC-AE49-4777-84C4-4FC592F58E3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4199E3DC-AE49-4777-84C4-4FC592F58E3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9184A276-AB83-4C96-8590-8D8E693293F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9184A276-AB83-4C96-8590-8D8E693293F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9184A276-AB83-4C96-8590-8D8E693293F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9184A276-AB83-4C96-8590-8D8E693293F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
