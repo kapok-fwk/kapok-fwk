@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Kapok.Acl.DataModel;
+﻿using Kapok.Acl.DataModel;
 using Kapok.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -46,7 +42,7 @@ public class RoleStore : IRoleStore<Role>
         if(role == null)
             throw new ArgumentNullException(nameof(role));
 
-        await _dataDomainScope.GetDao<Role>().CreateAsync(role);
+        await _dataDomainScope.GetEntityService<Role>().CreateAsync(role);
         await _dataDomainScope.SaveAsync(cancellationToken);
 
         return IdentityResult.Success;
@@ -66,7 +62,7 @@ public class RoleStore : IRoleStore<Role>
         if(role == null)
             throw new ArgumentNullException(nameof(role));
 
-        _dataDomainScope.GetDao<Role>().Update(role);
+        _dataDomainScope.GetEntityService<Role>().Update(role);
         await _dataDomainScope.SaveAsync(cancellationToken);
 
         return IdentityResult.Success;
@@ -86,7 +82,7 @@ public class RoleStore : IRoleStore<Role>
         if(role == null)
             throw new ArgumentNullException(nameof(role));
 
-        _dataDomainScope.GetDao<Role>().Delete(role);
+        _dataDomainScope.GetEntityService<Role>().Delete(role);
         await _dataDomainScope.SaveAsync(cancellationToken);
 
         return IdentityResult.Success;
@@ -179,7 +175,7 @@ public class RoleStore : IRoleStore<Role>
             throw new ArgumentException($"The {roleId} parameter must be a GUID.", nameof(roleId));
         }
 
-        return await _dataDomainScope.GetDao<Role>().AsQueryable().Where(r => r.Id == roleIdAsGuid).SingleOrDefaultAsync(cancellationToken: cancellationToken);
+        return await _dataDomainScope.GetEntityService<Role>().AsQueryable().Where(r => r.Id == roleIdAsGuid).SingleOrDefaultAsync(cancellationToken: cancellationToken);
     }
 
     /// <summary>
@@ -192,6 +188,6 @@ public class RoleStore : IRoleStore<Role>
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        return await _dataDomainScope.GetDao<Role>().AsQueryable().Where(r => r.Name.ToUpper() == normalizedRoleName).SingleOrDefaultAsync(cancellationToken: cancellationToken);
+        return await _dataDomainScope.GetEntityService<Role>().AsQueryable().Where(r => r.Name.ToUpper() == normalizedRoleName).SingleOrDefaultAsync(cancellationToken: cancellationToken);
     }
 }

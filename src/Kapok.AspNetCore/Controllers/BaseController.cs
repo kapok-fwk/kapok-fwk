@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using Kapok.Data;
 using Kapok.Entity;
 using Microsoft.AspNetCore.Mvc;

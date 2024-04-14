@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1 (2024-04-14)
+
+- :bug: fixing Kapok.AspNetCore reference to use 0.2.0
+
 ## 0.2.0 (2024-04-13)
 
 - :tada: add async. implementation for ReportDataSet via interface IDbReportDataSetAsync

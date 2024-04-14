@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections;
 using Kapok.BusinessLayer;
 using Kapok.Entity;
 using Microsoft.AspNetCore.Mvc;
@@ -44,7 +41,7 @@ public class ReadonlyController<T> : EntityBaseController<T>
         try
 #endif
         {
-            var entries = await DataDomainScope.GetDao<T>().AsQueryable().ToListAsync();
+            var entries = await DataDomainScope.GetEntityService<T>().AsQueryable().ToListAsync();
 
             Logger.LogInformation($"Returned all entries from type {typeof(T).Name} from database.");
 
@@ -84,7 +81,7 @@ public class ReadonlyController<T> : EntityBaseController<T>
         try
         {
             // ReSharper disable once RedundantEnumerableCastCall
-            var entry = await DataDomainScope.GetDao<T>().FindByKeyAsync(values.Cast<object>().ToArray());
+            var entry = await DataDomainScope.GetEntityService<T>().FindByKeyAsync(values.Cast<object>().ToArray());
             if (entry == null)
             {
                 Logger.LogError($"{typeof(T).Name} with {{{string.Join(", ", values)}}} hasn't been found in db.");

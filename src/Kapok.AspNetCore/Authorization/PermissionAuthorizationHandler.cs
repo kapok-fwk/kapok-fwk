@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 #pragma warning disable 1591
 
 namespace Kapok.AspNetCore.Authorization;

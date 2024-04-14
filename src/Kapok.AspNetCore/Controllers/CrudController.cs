@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 using Kapok.BusinessLayer;
 using Kapok.Entity;
 using Microsoft.AspNetCore.Mvc;
@@ -72,13 +69,13 @@ public class CrudController<T> : ReadonlyController<T>
                 primaryKeyValues[i++] = propertyInfo.GetMethod.Invoke(entry, null);
             }
 
-            if (await DataDomainScope.GetDao<T>().FindByKeyAsync(primaryKeyValues) != null)
+            if (await DataDomainScope.GetEntityService<T>().FindByKeyAsync(primaryKeyValues) != null)
             {
                 Logger.LogError($"{typeof(T).Name} with primary key {{{entry.GetPrimaryKeyAsString()}}} is already used.");
                 return BadRequest("Primary key is already used.");
             }
 
-            await DataDomainScope.GetDao<T>().CreateAsync(entry);
+            await DataDomainScope.GetEntityService<T>().CreateAsync(entry);
             await DataDomainScope.SaveAsync();
 
             return Created($"/{GetRouteTemplate()}/GetByKey?values={string.Join("&values=", primaryKeyValues)}", entry);
@@ -129,7 +126,7 @@ public class CrudController<T> : ReadonlyController<T>
             }
 
             // ReSharper disable once RedundantEnumerableCastCall
-            var dbEntry = await DataDomainScope.GetDao<T>().FindByKeyAsync(values.Cast<object>().ToArray());
+            var dbEntry = await DataDomainScope.GetEntityService<T>().FindByKeyAsync(values.Cast<object>().ToArray());
             if (dbEntry == null)
             {
                 Logger.LogError($"{nameof(CLSCompliantAttribute)} with primary key {{{entry.GetPrimaryKeyAsString()}}} hasn't been found in db.");
@@ -137,7 +134,7 @@ public class CrudController<T> : ReadonlyController<T>
             }
  
             dbEntry.Map(entry);
-            await DataDomainScope.GetDao<T>().UpdateAsync(dbEntry);
+            await DataDomainScope.GetEntityService<T>().UpdateAsync(dbEntry);
             await DataDomainScope.SaveAsync();
  
             return NoContent();
@@ -174,14 +171,14 @@ public class CrudController<T> : ReadonlyController<T>
         try
         {
             // ReSharper disable once RedundantEnumerableCastCall
-            var dbEntry = await DataDomainScope.GetDao<T>().FindByKeyAsync(values.Cast<object>().ToArray());
+            var dbEntry = await DataDomainScope.GetEntityService<T>().FindByKeyAsync(values.Cast<object>().ToArray());
             if (dbEntry == null)
             {
                 Logger.LogError($"{typeof(T).Name} with primary key {{{string.Join(", ", values)}}} hasn't been found in db.");
                 return NotFound();
             }
 
-            await DataDomainScope.GetDao<T>().DeleteAsync(dbEntry);
+            await DataDomainScope.GetEntityService<T>().DeleteAsync(dbEntry);
             await DataDomainScope.SaveAsync();
  
             return NoContent();

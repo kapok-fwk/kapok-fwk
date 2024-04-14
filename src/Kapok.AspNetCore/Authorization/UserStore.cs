@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Kapok.Acl.DataModel;
+﻿using Kapok.Acl.DataModel;
 using Kapok.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -39,7 +35,7 @@ public class UserStore : IUserStore<User>
         if (user == null)
             throw new ArgumentNullException(nameof(user));
 
-        await _dataDomainScope.GetDao<User>().CreateAsync(user);
+        await _dataDomainScope.GetEntityService<User>().CreateAsync(user);
         await _dataDomainScope.SaveAsync(cancellationToken);
 
         return IdentityResult.Success;
@@ -66,7 +62,7 @@ public class UserStore : IUserStore<User>
         }
         // TODO: add more validation for the 'User' record
 
-        _dataDomainScope.GetDao<User>().Update(user);
+        _dataDomainScope.GetEntityService<User>().Update(user);
         await _dataDomainScope.SaveAsync(cancellationToken);
 
         return IdentityResult.Success;
@@ -86,7 +82,7 @@ public class UserStore : IUserStore<User>
         if (user == null)
             throw new ArgumentNullException(nameof(user));
 
-        _dataDomainScope.GetDao<User>().Delete(user);
+        _dataDomainScope.GetEntityService<User>().Delete(user);
         await _dataDomainScope.SaveAsync(cancellationToken);
 
         return IdentityResult.Success;
@@ -115,7 +111,7 @@ public class UserStore : IUserStore<User>
             throw new ArgumentException($"The {userId} parameter must be a GUID.", nameof(userId));
         }
             
-        return await _dataDomainScope.GetDao<User>().AsQueryable().Where(u => u.Id == userIdAsGuid)
+        return await _dataDomainScope.GetEntityService<User>().AsQueryable().Where(u => u.Id == userIdAsGuid)
             .SingleOrDefaultAsync(cancellationToken);
     }
 
@@ -129,7 +125,7 @@ public class UserStore : IUserStore<User>
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        return await _dataDomainScope.GetDao<User>().AsQueryable().Where(u => u.UserName.ToUpper() == normalizedUserName)
+        return await _dataDomainScope.GetEntityService<User>().AsQueryable().Where(u => u.UserName.ToUpper() == normalizedUserName)
             .FirstOrDefaultAsync(cancellationToken);
     }
 

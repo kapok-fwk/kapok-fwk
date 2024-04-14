@@ -18,6 +18,6 @@ public class PermissionRequirement : IAuthorizationRequirement
 
     public override string ToString()
     {
-        return $"{ClaimType.ToString()} {ClaimValue}";
+        return $"{ClaimType} {ClaimValue}";
     }
 }
