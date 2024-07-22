@@ -90,7 +90,7 @@ public class UIAction : BindableObjectBase, IAction
                 throw;
 #pragma warning restore CA2200
             }
-            ViewDomain.Default.ShowErrorMessage(e.Message);
+            ViewDomain.Default.ShowErrorMessage(e.Message, exception: e);
         }
     }
 
@@ -184,7 +184,7 @@ public class UIAction<T> : BindableObjectBase, IAction<T>
             {
                 throw;
             }
-            ViewDomain.Default.ShowErrorMessage(e.Message); // TODO: find a better way to report this here!
+            ViewDomain.Default.ShowErrorMessage(e.Message, exception: e); // TODO: find a better way to report this here!
         }
     }
 
