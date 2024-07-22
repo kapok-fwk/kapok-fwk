@@ -189,8 +189,7 @@ public sealed class ReportEngine
             {
                 ReportLayoutId = Guid.NewGuid(),
                 Name = model.Caption,
-                ReportModelId = reportModel.ReportModelId,
-                ReportModel = reportModel
+                ReportModelId = reportModel.ReportModelId
             };
             dataDomainScope.GetEntityService<ReportLayout, IReportLayoutService>()
                 .Create(layout);
@@ -248,6 +247,8 @@ public sealed class ReportEngine
             layout.ActiveDesign = design;
             dataDomainScope.GetEntityService<ReportLayout, IReportLayoutService>()
                 .Update(layout);
+
+            dataDomainScope.Save(); // second save to make sure it gets saved. Otherwise we might run into duplicated key issues in ReportModel.
         }
 
         return design;
