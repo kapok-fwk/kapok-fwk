@@ -196,10 +196,15 @@ public sealed class ReportEngine
 
             dataDomainScope.Save(); // note a bit dirty, but needs to be done to do not create circulating references during insert
 
-            reportModel.DefaultLayoutId = layout.ReportLayoutId;
-            reportModel.DefaultLayout = layout;
-            dataDomainScope.GetEntityService<ReportModel, IReportModelService>()
-                .Update(reportModel);
+            var reportModelService = dataDomainScope.GetEntityService<ReportModel, IReportModelService>();
+
+            var updateableReportModel = reportModelService.FindByKeyForUpdate(reportModel.ReportModelId);
+            if (updateableReportModel != null)
+            {
+                updateableReportModel.DefaultLayoutId = layout.ReportLayoutId;
+                updateableReportModel.DefaultLayout = layout;
+                reportModelService.Update(reportModel);
+            }
         }
 
         return layout;
