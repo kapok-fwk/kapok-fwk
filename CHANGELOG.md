@@ -1,8 +1,10 @@
 # Changelog
 
-## 0.2.1 (2024-04-14)
+## 0.2.1 (2024-04-14, 2024-07-22)
 
 - :bug: fixing Kapok.AspNetCore reference to use 0.2.0
+- :bug: fix try to create ReportModel when creating ReportLayout
+- :bug: add Exception class to error message caught in UIAction.Execute
 
 ## 0.2.0 (2024-04-13)
 
