@@ -12,9 +12,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4.2.2
     - name: Setup .NET
-      uses: actions/setup-dotnet@v2
+      uses: actions/setup-dotnet@v4.3.1
       with:
         dotnet-version: 8.0.x
     - name: Add Kapok package source
@@ -31,9 +31,9 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4.2.2
     - name: Setup .NET
-      uses: actions/setup-dotnet@v2
+      uses: actions/setup-dotnet@v4.3.1
       with:
         dotnet-version: 8.0.x
     - name: Add Kapok package source
@@ -45,7 +45,7 @@ jobs:
         dotnet build --no-restore -c Release
         dotnet pack -c Release -o out
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4.6.2
       with:
         name: Nuget Packages
         path: ./out/*.nupkg
