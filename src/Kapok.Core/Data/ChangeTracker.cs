@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Reflection;
 
@@ -33,9 +34,14 @@ public class ChangeTracking
 
 public static class DtoMapper
 {
+    // Cached per Type so that repeated Map(Type, ...) calls (e.g. one per ChangeTracker.Add()/entity
+    // clone) don't re-run Type.GetProperties() reflection every time.
+    private static readonly ConcurrentDictionary<Type, PropertyInfo[]> PropertiesCache = new();
+
     public static PropertyInfo[] GetProperties(Type dtoType)
     {
-        return dtoType.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.CanRead && p.CanWrite).ToArray();
+        return PropertiesCache.GetOrAdd(dtoType, static t =>
+            t.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.CanRead && p.CanWrite).ToArray());
     }
 
     public static object Map(Type dtoType, object dto)
@@ -58,27 +64,17 @@ public static class DtoMapper
 
     public static void Map(Type dtoType, object fromDto, object toDto)
     {
-        foreach (var p in GetProperties(dtoType))
-        {
-#pragma warning disable CS8602
-            p.SetMethod.Invoke(
-                toDto,
-                new[] { p.GetMethod.Invoke(fromDto, null) }
-            );
-#pragma warning restore CS8602
-        }
+        Map(GetProperties(dtoType), fromDto, toDto);
     }
 
     public static void Map(PropertyInfo[] propertyList, object fromDto, object toDto)
     {
+        // Property access goes through cached compiled getter/setter delegates (CompiledPropertyAccessor)
+        // instead of PropertyInfo.Invoke, which is significantly cheaper when this runs per-property,
+        // per-row (e.g. cloning every entity read into a deferred-commit change tracker).
         foreach (var p in propertyList)
         {
-#pragma warning disable CS8602
-            p.SetMethod.Invoke(
-                toDto,
-                new[] { p.GetMethod.Invoke(fromDto, null) }
-            );
-#pragma warning restore CS8602
+            CompiledPropertyAccessor.SetValue(p, toDto, CompiledPropertyAccessor.GetValue(p, fromDto));
         }
     }
 }
