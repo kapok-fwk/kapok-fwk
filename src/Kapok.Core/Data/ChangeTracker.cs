@@ -103,11 +103,15 @@ public class DtoMapper<TDtoType>
 
 public class ChangeTracker : IEnumerable<ChangeTracking>
 {
-    private readonly List<ChangeTracking> _changeTracker = new();
+    // Keyed by entity reference identity (not value equality, in case the entity type overrides
+    // Equals/GetHashCode) so that Get() is an O(1) lookup instead of a linear scan. This matters
+    // because Get() is invoked on every PropertyChanging/PropertyChanged event of every tracked
+    // entity, which for a grid with many rows/edits was previously O(n) per keystroke.
+    private readonly Dictionary<object, ChangeTracking> _changeTracker = new(ReferenceEqualityComparer.Instance);
 
     public bool AnyChangesOutstanding()
     {
-        return _changeTracker.Any(
+        return _changeTracker.Values.Any(
             ct => ct.State == ChangeTrackingState.Created ||
                   ct.State == ChangeTrackingState.Updated ||
                   ct.State == ChangeTrackingState.Deleted
@@ -207,7 +211,11 @@ public class ChangeTracker : IEnumerable<ChangeTracking>
         var trackingObject = new ChangeTracking(entity, entityType, originalEntity: clonedEntity);
         lock (_changeTracker)
         {
-            _changeTracker.Add(trackingObject);
+            // Use indexer assignment rather than Dictionary.Add: in rare cases a stale, already
+            // Detached entry for the same entity reference can still be present (Detach() from the
+            // collection happens in a separate cleanup pass in some callers), and overwriting it here
+            // is equivalent to (and avoids leaking) what the previous list-based implementation did.
+            _changeTracker[entity] = trackingObject;
             RegisterEvents(trackingObject);
         }
 
@@ -218,7 +226,13 @@ public class ChangeTracker : IEnumerable<ChangeTracking>
     {
         ArgumentNullException.ThrowIfNull(entity, nameof(entity));
 
-        return _changeTracker.FirstOrDefault(ct => ct.Entity == entity && ct.State != ChangeTrackingState.Detached);
+        if (_changeTracker.TryGetValue(entity, out var trackingObject) &&
+            trackingObject.State != ChangeTrackingState.Detached)
+        {
+            return trackingObject;
+        }
+
+        return null;
     }
 
     public void Detach(ChangeTracking trackingObject)
@@ -226,7 +240,7 @@ public class ChangeTracker : IEnumerable<ChangeTracking>
         lock (_changeTracker)
         {
             UnregisterEvents(trackingObject);
-            _changeTracker.Remove(trackingObject);
+            _changeTracker.Remove(trackingObject.Entity);
         }
     }
 
@@ -234,7 +248,7 @@ public class ChangeTracker : IEnumerable<ChangeTracking>
     {
         lock (_changeTracker)
         {
-            foreach (var changeTracking in _changeTracker)
+            foreach (var changeTracking in _changeTracker.Values)
             {
                 UnregisterEvents(changeTracking);
             }
@@ -244,11 +258,11 @@ public class ChangeTracker : IEnumerable<ChangeTracking>
 
     public IEnumerator<ChangeTracking> GetEnumerator()
     {
-        return _changeTracker.GetEnumerator();
+        return _changeTracker.Values.GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator()
     {
-        return _changeTracker.GetEnumerator();
+        return _changeTracker.Values.GetEnumerator();
     }
 }
