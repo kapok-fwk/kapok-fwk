@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- :tada: add support for .Net 10.0
+
 ## 0.2.1 (2024-04-14, 2024-07-22)
 
 - :bug: fixing Kapok.AspNetCore reference to use 0.2.0
