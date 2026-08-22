@@ -54,39 +54,38 @@ public sealed class EFCoreDataDomainScope : DataDomainScope
 
             _dbContext.SaveChanges();
 
-            _dbContext.ChangeTracker.Clear(); // enforce to unbind from all entities
-            _dbContext.Dispose();
-            _dbContext = null;
+            // Unbind from all entities, but keep the DbContext itself alive so that a subsequent
+            // Save() within the same scope can reuse it instead of paying for disposing and lazily
+            // re-constructing a brand new DbContext (and its internal service provider) on every Save().
+            // The DbContext is only actually disposed when the scope itself is disposed (see OnDispose).
+            _dbContext.ChangeTracker.Clear();
 
             PostSaveDeferredCommit();
         }
     }
 
-    public override async Task SaveAsync(CancellationToken cancellationToken = default)
+    public override Task SaveAsync(CancellationToken cancellationToken = default)
     {
         CheckIsDisposed();
-
-        ValueTask task;
 
         lock (_dbContextLockObject)
         {
             SaveDeferredCommit();
 
             if (_dbContext == null) // when nothing was saved to the repositories, the DbContext will not be initialized
-                return;
+                return Task.CompletedTask;
 
             // TODO: ends with a crash when using the SaveChangesAsync async method, so we call int synchronous
             //await _dbContext.SaveChangesAsync(cancellationToken);
             _dbContext.SaveChanges();
 
-            _dbContext.ChangeTracker.Clear(); // enforce to unbind from all entities
-            task = _dbContext.DisposeAsync();
-            _dbContext = null;
+            // see the comment in Save() for why we clear instead of dispose+recreate here
+            _dbContext.ChangeTracker.Clear();
 
             PostSaveDeferredCommit();
         }
 
-        await task;
+        return Task.CompletedTask;
     }
 
     public override void RejectChanges()
@@ -98,10 +97,9 @@ public sealed class EFCoreDataDomainScope : DataDomainScope
             if (_dbContext != null)
             {
                 // this should not be necessary but just in case, we enforce to unbind all tracked entries
-                // before resetting the entries
-                _dbContext.ChangeTracker.Clear(); // enforce to unbind from all entities
-                _dbContext.Dispose();
-                _dbContext = null;
+                // before resetting the entries. The DbContext itself is kept alive for reuse within this
+                // scope, same as in Save() -- see the comment there.
+                _dbContext.ChangeTracker.Clear();
             }
 
             RejectChangesDeferredCommitService();
