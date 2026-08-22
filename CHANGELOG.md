@@ -1,8 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.3.0 (2026-08-22)
 
 - :tada: add support for .Net 10.0
+- :rocket: replace PropertyInfo.Invoke with cached compiled accessors in DtoMapper
+- :rocket: replace ChangeTracker's linear scan with an O(1) dictionary lookup
 
 ## 0.2.1 (2024-04-14, 2024-07-22)
 
